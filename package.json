@@ -1,0 +1,16 @@
+{
+  "name": "chatbot_i_hear_you",
+  "private": true,
+  "scripts": {
+    "prepare": "husky install"
+  },
+  "devDependencies": {
+    "husky": "^9.1.7",
+    "lint-staged": "^16.2.0"
+  },
+  "lint-staged": {
+    "frontend/**/*.{js,jsx,ts,tsx}": "cd frontend && npm run lint:fix",
+    "frontend/**/*.{scss,css}": "cd frontend && npm run lint:style",
+    "frontend/**/*.{ts,tsx,scss,css,md}": "cd frontend && npm run format"
+  }
+}
