@@ -1,0 +1,163 @@
+{
+  "extends": ["stylelint-config-recommended"],
+  "plugins": ["stylelint-order"],
+  "rules": {
+    "block-no-empty": true,
+    "color-no-invalid-hex": true,
+    "selector-class-pattern": null,
+    "custom-property-pattern": null,
+    "no-descending-specificity": null,
+    "declaration-block-no-redundant-longhand-properties": null,
+    "keyframes-name-pattern": null,
+    "string-no-newline": true,
+    "unit-no-unknown": true,
+    "property-no-unknown": [true, { "ignoreProperties": ["composes"] }],
+    "declaration-block-no-duplicate-properties": [
+      true,
+      {
+        "ignore": ["consecutive-duplicates-with-different-values"]
+      }
+    ],
+    "order/properties-order": [
+      {
+        "groupName": "on-top",
+        "properties": ["content", "appearance"]
+      },
+      {
+        "groupName": "position",
+        "properties": ["position", "top", "right", "bottom", "left", "z-index"]
+      },
+      {
+        "groupName": "display",
+        "properties": [
+          "display",
+          "flex",
+          "flex-direction",
+          "flex-wrap",
+          "flex-flow",
+          "justify-content",
+          "align-items",
+          "align-content",
+          "order",
+          "flex-grow",
+          "flex-shrink",
+          "flex-basis",
+          "align-self",
+          "gap",
+          "float",
+          "overflow",
+          "clear",
+          "opacity",
+          "visibility",
+          "grid",
+          "grid-template",
+          "grid-template-areas",
+          "grid-template-columns",
+          "grid-template-rows",
+          "grid-column",
+          "grid-row",
+          "grid-auto-columns",
+          "grid-auto-rows",
+          "grid-area",
+          "grid-gap",
+          "grid-column-gap",
+          "grid-row-gap",
+          "grid-auto-flow",
+          "grid-auto-position"
+        ]
+      },
+      {
+        "groupName": "block-model-and-appearance",
+        "properties": [
+          "width",
+          "min-width",
+          "max-width",
+          "height",
+          "min-height",
+          "max-height",
+          "margin",
+          "margin-top",
+          "margin-right",
+          "margin-bottom",
+          "margin-left",
+          "padding",
+          "padding-top",
+          "padding-right",
+          "padding-bottom",
+          "padding-left",
+          "border",
+          "border-width",
+          "border-style",
+          "border-color",
+          "border-radius",
+          "background",
+          "background-color",
+          "background-image",
+          "background-repeat",
+          "background-position",
+          "background-size",
+          "box-shadow",
+          "opacity",
+          "visibility",
+          "overflow",
+          "overflow-x",
+          "overflow-y"
+        ]
+      },
+      {
+        "groupName": "typography",
+        "properties": [
+          "font",
+          "font-family",
+          "font-size",
+          "font-style",
+          "font-weight",
+          "line-height",
+          "letter-spacing",
+          "word-spacing",
+          "text-align",
+          "text-decoration",
+          "text-transform",
+          "text-indent",
+          "text-shadow",
+          "white-space",
+          "word-break",
+          "word-wrap",
+          "overflow-wrap",
+          "color"
+        ]
+      },
+      {
+        "groupName": "animation",
+        "properties": [
+          "animation",
+          "animation-name",
+          "animation-duration",
+          "animation-timing-function",
+          "animation-delay",
+          "animation-iteration-count",
+          "animation-direction",
+          "animation-play-state",
+          "animation-fill-mode",
+          "transition",
+          "transition-property",
+          "transition-duration",
+          "transition-timing-function",
+          "transition-delay"
+        ]
+      },
+      {
+        "groupName": "miscellaneous",
+        "properties": [
+          "quotes",
+          "cursor",
+          "outline",
+          "resize",
+          "user-select",
+          "pointer-events",
+          "tab-size"
+        ]
+      }
+    ]
+  }
+}
