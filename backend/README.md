@@ -92,7 +92,7 @@ source venv/bin/activate  # Linux/MacOS
 source venv\Scripts\activate  # Windows
 
 # Запустите бота
-python3 main.py
+python3 src/main.py
 ```
 
 ### Собрать контейнеры
