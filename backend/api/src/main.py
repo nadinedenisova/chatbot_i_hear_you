@@ -1,7 +1,17 @@
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI
 from fastapi.responses import ORJSONResponse
 from src.routers.v1 import example
-from .settings import settings
+from src.db.redis import _redis
+from src.settings import settings
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    yield
+    if _redis:
+        await _redis.aclose()
 
 
 app = FastAPI(
@@ -10,6 +20,7 @@ app = FastAPI(
     docs_url='/api/openapi',
     openapi_url='/api/openapi.json',
     default_response_class=ORJSONResponse,
+    lifespan=lifespan,
 )
 
 

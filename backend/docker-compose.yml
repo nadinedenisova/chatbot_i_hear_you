@@ -10,8 +10,21 @@ services:
     depends_on:
       - api
 
+  api-redis-db:
+    image: redis:latest
+    container_name: api-redis-db
+    volumes:
+      - api_redis_db_data:/data
+    expose:
+      - "6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "-p", "6379", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
   api-postgres-db:
-    image: postgres
+    image: postgres:latest
     container_name: api-postgres-db
     restart: always
     volumes:
@@ -29,14 +42,19 @@ services:
   api:
     build: api
     container_name: api
+    env_file:
+      - ./.env
     expose:
       - "8080"
     environment:
       - PYTHONUNBUFFERED=1
       - FASTAPI_RELOAD=1
     depends_on:
+      api-redis-db:
+        condition: service_healthy
       api-postgres-db:
         condition: service_healthy
 
 volumes:
+  api_redis_db_data:
   api_postgres_db_data:
