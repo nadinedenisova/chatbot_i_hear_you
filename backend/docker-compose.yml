@@ -7,3 +7,14 @@ services:
       - ./configs/site.conf:/etc/nginx/conf.d/site.conf:ro
     ports:
       - "80:80"
+    depends_on:
+      - api
+
+  api:
+    build: api
+    container_name: api
+    expose:
+      - "8080"
+    environment:
+      - PYTHONUNBUFFERED=1
+      - FASTAPI_RELOAD=1
