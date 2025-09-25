@@ -94,3 +94,17 @@ source venv\Scripts\activate  # Windows
 # Запустите бота
 python3 main.py
 ```
+
+### Собрать контейнеры
+
+```bash
+docker-compose up -d
+docker-compose up -d --build # если контейнер нужно пересобрать
+```
+
+### Остановить контейнеры
+
+```bash
+docker-compose down
+docker-compose down -v # если нужно удалить вольюмы
+```
