@@ -6,5 +6,12 @@ class Settings(BaseSettings):
 
     project_name: str = 'API системы администрирования бота'
 
+    # postgres
+    postgres_host: str
+    postgres_port: int
+    postgres_db: str
+    postgres_user: str
+    postgres_password: str
 
-settings = Settings()
+
+settings = Settings()  # type: ignore
