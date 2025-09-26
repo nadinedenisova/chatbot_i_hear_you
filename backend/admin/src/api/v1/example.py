@@ -12,7 +12,7 @@ router = APIRouter()
 
 @router.get(
     '/',
-    summary='Базовый пример роутера'
+    summary='Базовый пример роутера',include_in_schema=False
 )
 async def base(
     #redis: Annotated[Redis, Depends(get_redis)],

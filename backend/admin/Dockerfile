@@ -1,12 +1,19 @@
-FROM python:latest
+FROM python:3.13-bookworm
 
-WORKDIR /opt/api
+# Устанавливаем рабочую директорию
+WORKDIR /app/src
 
-COPY . .
+# Копируем зависимости
+COPY requirements.txt /app
 
-RUN  pip install --upgrade pip \
-     && pip install --no-cache-dir -r requirements.txt
+# Устанавливаем зависимости
+RUN pip install --upgrade pip \
+    && pip install --no-cache-dir -r /app/requirements.txt
 
-EXPOSE 8080
+# Копируем исходный код приложения
+COPY . /app
 
-ENTRYPOINT ["fastapi", "run", "src/main.py", "--port", "8080", "--reload"]
+RUN chmod +x /app/entrypoint.sh
+
+# Команда для запуска приложения
+ENTRYPOINT ["/app/entrypoint.sh"]
