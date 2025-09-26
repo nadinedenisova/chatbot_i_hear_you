@@ -4,7 +4,7 @@ from fastapi import FastAPI
 from fastapi.responses import ORJSONResponse
 from src.routers.v1 import example
 from src.db.redis import _redis
-from src.settings import settings
+from src.core.settings import settings
 
 
 @asynccontextmanager
