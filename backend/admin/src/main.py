@@ -2,7 +2,7 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 from fastapi.responses import ORJSONResponse
-from src.routers.v1 import example
+from src.api.v1 import example
 from src.db.redis import _redis
 from src.core.settings import settings
 
