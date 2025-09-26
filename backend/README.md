@@ -92,5 +92,19 @@ source venv/bin/activate  # Linux/MacOS
 source venv\Scripts\activate  # Windows
 
 # Запустите бота
-python3 main.py
+python3 src/main.py
+```
+
+### Собрать контейнеры
+
+```bash
+docker-compose up -d
+docker-compose up -d --build # если контейнер нужно пересобрать
+```
+
+### Остановить контейнеры
+
+```bash
+docker-compose down
+docker-compose down -v # если нужно удалить вольюмы
 ```
