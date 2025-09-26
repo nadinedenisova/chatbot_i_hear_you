@@ -8,13 +8,13 @@ services:
     ports:
       - "80:80"
     depends_on:
-      - api
+      - admin
 
-  api-redis-db:
+  admin-redis-db:
     image: redis:latest
-    container_name: api-redis-db
+    container_name: admin-redis-db
     volumes:
-      - api_redis_db_data:/data
+      - admin_redis_db_data:/data
     expose:
       - "6379"
     healthcheck:
@@ -23,12 +23,12 @@ services:
       timeout: 5s
       retries: 5
 
-  api-postgres-db:
+  admin-postgres-db:
     image: postgres:latest
-    container_name: api-postgres-db
+    container_name: admin-postgres-db
     restart: always
     volumes:
-      - api_postgres_db_data:/var/lib/postgresql/data
+      - admin_postgres_db_data:/var/lib/postgresql/data
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
@@ -39,20 +39,20 @@ services:
       timeout: 5s
       retries: 5
 
-  api:
-    build: api
-    container_name: api
+  admin:
+    build: admin
+    container_name: admin
     env_file:
       - ./.env
     expose:
       - "8080"
     environment:
       - PYTHONUNBUFFERED=1
-      - FASTAPI_RELOAD=1
+      - FASTadmin_RELOAD=1
     depends_on:
-      api-redis-db:
+      admin-redis-db:
         condition: service_healthy
-      api-postgres-db:
+      admin-postgres-db:
         condition: service_healthy
 
   bot:
@@ -64,5 +64,5 @@ services:
       - PYTHONUNBUFFERED=1
 
 volumes:
-  api_redis_db_data:
-  api_postgres_db_data:
+  admin_redis_db_data:
+  admin_postgres_db_data:
