@@ -7,8 +7,8 @@ from src.db.postgres import Base
 from src.models.users import User
 
 
-class Rating(Base):
-    __tablename__ = 'rating'
+class UserMenuNode(Base):
+    __tablename__ = 'user_menu_node'
 
     id: Mapped[uuid.UUID] = mapped_column(
         primary_key=True,
