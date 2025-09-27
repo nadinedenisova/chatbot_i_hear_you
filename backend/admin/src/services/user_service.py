@@ -51,14 +51,14 @@ class UserService:
 
     async def get_user_questions(self, user_id: str) -> UserOut:
         """Получение всех вопросов пользователя"""
-        user = await self.db_engine.get_user_by_id(UUID(user_id))
+        user = await self.db_engine.get_user_by_id(user_id)
         if not user:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail="User not found"
             )
 
-        questions = await self.db_engine.get_user_questions(UUID(user_id))
+        questions = await self.db_engine.get_user_questions(user_id)
 
         return UserOut(
             id=str(user.id),
@@ -100,7 +100,7 @@ class UserService:
 
     async def get_user_history(self, user_id: str, pagination: PaginatedParams) -> HistoryOut:
         """Получение истории пользователя"""
-        history_records = await self.db_engine.get_user_history(UUID(user_id), pagination)
+        history_records = await self.db_engine.get_user_history(user_id, pagination)
 
         return HistoryOut(
             user_id=user_id,

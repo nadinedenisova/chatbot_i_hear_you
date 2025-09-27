@@ -1,6 +1,6 @@
 # db_engine.py
 from uuid import UUID
-from typing import Sequence, AsyncGenerator
+from typing import Sequence
 from sqlalchemy import select, update, delete, and_, func
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
@@ -10,25 +10,22 @@ from db.postgres import get_async_session
 from models.users import User
 from models.questions import Question
 from models.history import History
-from models.ratings import Rating
+from models.ratings import UserMenuNode
 from models.nodes import MenuNode
 from models.contents import Content
 from schemas.entity import (
-    UserCreate, QuestionCreate, HistoryCreate,
-    RatingCreate, MenuNodeCreate, MenuNodeUpdate, ContentCreate
+    UserCreate, QuestionCreate, HistoryCreate, RatingCreate,
+    MenuNodeCreate, MenuNodeUpdate, ContentCreate
 )
 from utils.pagination import PaginatedParams
 
 
 class DBEngine:
-    """Движок для работы с базой данных"""
-
     def __init__(self, session: AsyncSession):
         self.session = session
 
     # User methods
     async def get_users(self, pagination: PaginatedParams) -> Sequence[User]:
-        """Получение списка пользователей с пагинацией"""
         stmt = (
             select(User)
             .offset(pagination.offset)
@@ -38,16 +35,22 @@ class DBEngine:
         result = await self.session.execute(stmt)
         return result.scalars().all()
 
-    async def get_user_by_id(self, user_id: UUID) -> User | None:
-        """Получение пользователя по ID"""
+    async def get_user_by_id(self, user_id: str) -> User | None:
         stmt = select(User).where(User.id == user_id)
         result = await self.session.execute(stmt)
         return result.scalar_one_or_none()
 
     async def create_user(self, user_data: UserCreate) -> User:
-        """Создание нового пользователя"""
+        # Проверяем, существует ли пользователь
+        existing_user = await self.get_user_by_id(user_data.id)
+        if existing_user:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="User already exists"
+            )
+
         user = User(
-            id=UUID(user_data.id),
+            id=user_data.id,
             phone_number=user_data.phone_number
         )
         self.session.add(user)
@@ -56,19 +59,17 @@ class DBEngine:
         return user
 
     async def get_long_time_lost_users(self, days_count: int, pagination: PaginatedParams) -> Sequence[User]:
-        """Получение пользователей, которые долго не появлялись"""
         cutoff_date = func.now() - func.make_interval(days=days_count)
+
+        subquery = (
+            select(History.user_id)
+            .group_by(History.user_id)
+            .having(func.max(History.action_date) < cutoff_date)
+        ).alias("lost_users")
 
         stmt = (
             select(User)
-            .outerjoin(History, User.id == History.user_id)
-            .group_by(User.id)
-            .having(
-                and_(
-                    func.max(History.action_date) < cutoff_date,
-                    func.count(History.id) > 0
-                )
-            )
+            .join(subquery, User.id == subquery.c.user_id)
             .offset(pagination.offset)
             .limit(pagination.limit)
             .order_by(User.phone_number)
@@ -78,8 +79,7 @@ class DBEngine:
         return result.scalars().all()
 
     # Question methods
-    async def get_user_questions(self, user_id: UUID) -> Sequence[Question]:
-        """Получение всех вопросов пользователя"""
+    async def get_user_questions(self, user_id: str) -> Sequence[Question]:
         stmt = (
             select(Question)
             .where(Question.user_id == user_id)
@@ -89,7 +89,6 @@ class DBEngine:
         return result.scalars().all()
 
     async def get_all_questions(self, pagination: PaginatedParams) -> Sequence[Question]:
-        """Получение всех вопросов с пагинацией"""
         stmt = (
             select(Question)
             .offset(pagination.offset)
@@ -100,9 +99,8 @@ class DBEngine:
         return result.scalars().all()
 
     async def create_question(self, question_data: QuestionCreate) -> Question:
-        """Создание нового вопроса"""
         question = Question(
-            user_id=UUID(question_data.user_id),
+            user_id=question_data.user_id,
             text=question_data.text
         )
         self.session.add(question)
@@ -111,7 +109,6 @@ class DBEngine:
         return question
 
     async def answer_question(self, question_id: UUID, answer: str) -> Question:
-        """Ответ на вопрос"""
         stmt = (
             update(Question)
             .where(Question.id == question_id)
@@ -132,18 +129,17 @@ class DBEngine:
 
     # History methods
     async def create_history_record(self, history_data: HistoryCreate) -> History:
-        """Создание записи истории пользователя"""
         history = History(
-            user_id=UUID(history_data.user_id),
-            menu_id=history_data.menu_id
+            user_id=history_data.user_id,
+            menu_id=history_data.menu_id,
+            action_date=history_data.action_date
         )
         self.session.add(history)
         await self.session.commit()
         await self.session.refresh(history)
         return history
 
-    async def get_user_history(self, user_id: UUID, pagination: PaginatedParams) -> Sequence[History]:
-        """Получение истории пользователя"""
+    async def get_user_history(self, user_id: str, pagination: PaginatedParams) -> Sequence[History]:
         stmt = (
             select(History)
             .where(History.user_id == user_id)
@@ -156,7 +152,6 @@ class DBEngine:
 
     # Menu methods
     async def get_full_menu(self) -> Sequence[MenuNode]:
-        """Получение полного дерева меню"""
         stmt = (
             select(MenuNode)
             .options(selectinload(MenuNode.content))
@@ -166,7 +161,6 @@ class DBEngine:
         return result.scalars().all()
 
     async def get_menu_node_by_id(self, menu_id: UUID) -> MenuNode | None:
-        """Получение узла меню по ID"""
         stmt = (
             select(MenuNode)
             .where(MenuNode.id == menu_id)
@@ -176,7 +170,6 @@ class DBEngine:
         return result.scalar_one_or_none()
 
     async def get_menu_node_by_name(self, name: str) -> MenuNode | None:
-        """Получение узла меню по имени"""
         stmt = (
             select(MenuNode)
             .where(MenuNode.name == name)
@@ -186,7 +179,6 @@ class DBEngine:
         return result.scalar_one_or_none()
 
     async def get_menu_root(self) -> MenuNode | None:
-        """Получение корневого узла меню"""
         stmt = (
             select(MenuNode)
             .where(MenuNode.parent_id.is_(None))
@@ -196,7 +188,6 @@ class DBEngine:
         return result.scalar_one_or_none()
 
     async def create_menu_node(self, node_data: MenuNodeCreate) -> MenuNode:
-        """Создание нового узла меню"""
         menu_node = MenuNode(
             parent_id=node_data.parent_id,
             name=node_data.name,
@@ -209,7 +200,6 @@ class DBEngine:
         return menu_node
 
     async def update_menu_node(self, menu_id: UUID, node_data: MenuNodeUpdate) -> MenuNode:
-        """Обновление узла меню"""
         stmt = (
             update(MenuNode)
             .where(MenuNode.id == menu_id)
@@ -229,7 +219,6 @@ class DBEngine:
         return node
 
     async def delete_menu_node(self, menu_id: UUID) -> bool:
-        """Удаление узла меню"""
         stmt = delete(MenuNode).where(MenuNode.id == menu_id)
         result = await self.session.execute(stmt)
         await self.session.commit()
@@ -237,7 +226,6 @@ class DBEngine:
 
     # Content methods
     async def add_content_to_menu(self, menu_id: UUID, content_data: ContentCreate) -> Content:
-        """Добавление контента к узлу меню"""
         content = Content(
             menu_id=menu_id,
             type=content_data.type,
@@ -249,7 +237,6 @@ class DBEngine:
         return content
 
     async def update_content(self, content_id: UUID, content_data: ContentCreate) -> Content:
-        """Обновление контента"""
         stmt = (
             update(Content)
             .where(Content.id == content_id)
@@ -269,7 +256,6 @@ class DBEngine:
         return content
 
     async def delete_content(self, content_id: UUID) -> bool:
-        """Удаление контента"""
         stmt = delete(Content).where(Content.id == content_id)
         result = await self.session.execute(stmt)
         await self.session.commit()
@@ -277,38 +263,31 @@ class DBEngine:
 
     # Rating methods
     async def get_menu_rating(self, menu_id: UUID) -> float | None:
-        """Получение среднего рейтинга узла меню"""
-        stmt = (
-            select(func.avg(Rating.node_rating))
-            .where(Rating.menu_id == menu_id)
-        )
+        stmt = select(func.avg(UserMenuNode.post_rating)).where(UserMenuNode.menu_id == menu_id)
         result = await self.session.execute(stmt)
         return result.scalar()
 
-    async def rate_menu_node(self, rating_data: RatingCreate, menu_id: UUID) -> Rating:
-        """Оценка узла меню"""
-        # Проверяем, есть ли уже оценка от этого пользователя
-        existing_stmt = select(Rating).where(
+    async def rate_menu_node(self, rating_data: RatingCreate, menu_id: UUID) -> UserMenuNode:
+        # Проверяем существующую оценку
+        existing_stmt = select(UserMenuNode).where(
             and_(
-                Rating.user_id == UUID(rating_data.user_id),
-                Rating.menu_id == menu_id
+                UserMenuNode.user_id == rating_data.user_id,
+                UserMenuNode.menu_id == menu_id
             )
         )
         existing_result = await self.session.execute(existing_stmt)
         existing_rating = existing_result.scalar_one_or_none()
 
         if existing_rating:
-            # Обновляем существующую оценку
-            existing_rating.node_rating = rating_data.node_rating
+            existing_rating.post_rating = rating_data.node_rating
             await self.session.commit()
             await self.session.refresh(existing_rating)
             return existing_rating
         else:
-            # Создаем новую оценку
-            rating = Rating(
-                user_id=UUID(rating_data.user_id),
+            rating = UserMenuNode(
+                user_id=rating_data.user_id,
                 menu_id=menu_id,
-                node_rating=rating_data.node_rating
+                post_rating=rating_data.node_rating
             )
             self.session.add(rating)
             await self.session.commit()
@@ -316,6 +295,5 @@ class DBEngine:
             return rating
 
 
-def get_db_engine(session: AsyncSession = Depends(get_async_session)) -> AsyncGenerator[DBEngine, None]:
-    """Зависимость для получения экземпляра DBEngine"""
-    yield DBEngine(session)
+def get_db_engine(session: AsyncSession = Depends(get_async_session)):
+    return DBEngine(session)
