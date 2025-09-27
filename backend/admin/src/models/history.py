@@ -10,7 +10,7 @@ from src.models.users import User
 class History(Base):
     __tablename__ = 'history'
 
-    id: Mapped[uuid.UUID] = mapped_column(
+    action_id: Mapped[uuid.UUID] = mapped_column(
         primary_key=True,
         default=uuid.uuid4,
         server_default=text('gen_random_uuid()'),
