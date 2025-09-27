@@ -18,7 +18,8 @@ class User(Base):
     )
 
     phone_number: Mapped[str] = mapped_column(
-        String(255)
+        String(255),
+        nullable=False
     )
 
     questions: Mapped[list[Question]] = relationship(
