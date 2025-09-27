@@ -7,6 +7,7 @@ pydantic==2.11.9
 pydantic-settings==2.11.0
 pydantic_core==2.33.2
 python-dotenv==1.1.1
+orjson==3.11.3
 SQLAlchemy==2.0.43
 typing-inspection==0.4.1
 typing_extensions==4.15.0
