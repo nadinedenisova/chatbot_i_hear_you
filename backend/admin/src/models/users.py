@@ -1,8 +1,9 @@
 import uuid
 
 from sqlalchemy import text, String
-from sqlalchemy.orm import mapped_column, Mapped
+from sqlalchemy.orm import mapped_column, relationship, Mapped
 from src.db.postgres import Base
+from src.models.questions import Question
 
 
 class User(Base):
@@ -17,4 +18,8 @@ class User(Base):
 
     phone_number: Mapped[str] = mapped_column(
         String(30)
+    )
+
+    questions: Mapped[list[Question]] = relationship(
+        back_populates='user'
     )
