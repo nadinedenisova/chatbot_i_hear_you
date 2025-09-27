@@ -1,7 +1,7 @@
 import uuid
 from datetime import datetime, timezone
 
-from sqlalchemy import text, func, DateTime, ForeignKey
+from sqlalchemy import text, func, String, DateTime, ForeignKey
 from sqlalchemy.orm import mapped_column, relationship, Mapped
 from src.db.postgres import Base
 from src.models.nodes import MenuNode
@@ -28,7 +28,9 @@ class Content(Base):
 
     type: Mapped[int]
 
-    server_path: Mapped[str]
+    server_path: Mapped[str] = mapped_column(
+        String(500)
+    )
 
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
