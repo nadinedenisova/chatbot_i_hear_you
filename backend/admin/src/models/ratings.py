@@ -27,7 +27,7 @@ class Rating(Base):
 
     menu_id: Mapped[uuid.UUID]
 
-    node_rating: Mapped[int]
+    post_rating: Mapped[int]
 
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
