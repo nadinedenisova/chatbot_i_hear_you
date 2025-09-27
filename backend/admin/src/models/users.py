@@ -5,7 +5,7 @@ from sqlalchemy.orm import mapped_column, relationship, Mapped
 from src.db.postgres import Base
 from src.models.questions import Question
 from src.models.history import History
-from src.models.ratings import Rating
+from src.models.ratings import UserMenuNode
 
 
 class User(Base):
@@ -30,7 +30,7 @@ class User(Base):
         back_populates='user'
     )
 
-    ratings: Mapped[list[Rating]] = relationship(
+    ratings: Mapped[list[UserMenuNode]] = relationship(
         back_populates='user'
     )
 
