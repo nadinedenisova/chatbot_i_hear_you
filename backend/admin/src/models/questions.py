@@ -17,7 +17,7 @@ class Question(Base):
         index=True,
     )
 
-    user_id: Mapped[uuid.UUID] = mapped_column(
+    user_id: Mapped[str] = mapped_column(
         ForeignKey('users.id')
     )
 

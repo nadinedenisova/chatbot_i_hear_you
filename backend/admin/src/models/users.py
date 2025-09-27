@@ -1,7 +1,6 @@
-import uuid
 from datetime import datetime, timezone
 
-from sqlalchemy import text, func, DateTime, String
+from sqlalchemy import func, DateTime, String
 from sqlalchemy.orm import mapped_column, relationship, Mapped
 from src.db.postgres import Base
 from src.models.questions import Question
@@ -12,10 +11,9 @@ from src.models.ratings import UserMenuNode
 class User(Base):
     __tablename__ = 'user'
 
-    id: Mapped[uuid.UUID] = mapped_column(
+    id: Mapped[str] = mapped_column(
+        String(255),
         primary_key=True,
-        default=uuid.uuid4,
-        server_default=text('gen_random_uuid()'),
         index=True,
     )
 
