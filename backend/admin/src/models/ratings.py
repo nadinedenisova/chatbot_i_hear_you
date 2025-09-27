@@ -1,7 +1,7 @@
 import uuid
 from datetime import datetime, timezone
 
-from sqlalchemy import func, DateTime, ForeignKey
+from sqlalchemy import func, String, DateTime, ForeignKey
 from sqlalchemy.orm import mapped_column, relationship, Mapped
 from src.db.postgres import Base
 from src.models.users import User
@@ -11,6 +11,7 @@ class UserMenuNode(Base):
     __tablename__ = 'user_menu_node'
 
     user_id: Mapped[str] = mapped_column(
+        String(255),
         ForeignKey('users.id')
     )
 

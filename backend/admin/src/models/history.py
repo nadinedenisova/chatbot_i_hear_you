@@ -1,7 +1,7 @@
 import uuid
 from datetime import datetime, timezone
 
-from sqlalchemy import text, func, DateTime, ForeignKey
+from sqlalchemy import text, func, String, DateTime, ForeignKey
 from sqlalchemy.orm import mapped_column, relationship, Mapped
 from src.db.postgres import Base
 from src.models.users import User
@@ -18,6 +18,7 @@ class History(Base):
     )
 
     user_id: Mapped[str] = mapped_column(
+        String(255),
         ForeignKey('users.id')
     )
 
