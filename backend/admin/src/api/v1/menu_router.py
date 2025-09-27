@@ -1,4 +1,4 @@
-from uuid import UUID
+from uuid import uuid4, UUID
 
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -42,10 +42,30 @@ async def get_menu_node_by_name(
 
 
 @router.get(
-    "/root", summary="Получить корень узла меню навигации", response_model=MenuNodeOut
+    "/root", summary="Получить корень узла меню навигации",
+    response_model=list[MenuNodeOut]
 )
 async def get_menu_root(session: AsyncSession = Depends(get_async_session)):
-    return {"Hello": "World"}
+    return [
+        MenuNodeOut(
+            id=uuid4(),
+            parent_id=None,
+            name='name 1',
+            text='Я волнуюсь о слухе ребенка',
+            subscription_type=None,
+            content=[],
+            children_names=[]
+        ),
+        MenuNodeOut(
+            id=uuid4(),
+            parent_id=None,
+            name='name 2',
+            text='Я волнуюсь о своем слухе',
+            subscription_type=None,
+            content=[],
+            children_names=[]
+        )
+    ]
 
 
 @router.post("/add", summary="Добавить узел меню навигации", response_model=Message)
