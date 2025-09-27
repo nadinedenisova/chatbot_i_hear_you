@@ -20,7 +20,7 @@ class User(Base):
     )
 
     phone_number: Mapped[str] = mapped_column(
-        String(30)
+        String(255)
     )
 
     questions: Mapped[list[Question]] = relationship(
