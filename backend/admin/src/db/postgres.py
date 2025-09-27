@@ -9,7 +9,7 @@ from sqlalchemy.ext.asyncio import (
 )
 from sqlalchemy.orm import DeclarativeBase
 
-from src.core.settings import settings
+from core.settings import settings
 
 
 class Base(AsyncAttrs, DeclarativeBase):

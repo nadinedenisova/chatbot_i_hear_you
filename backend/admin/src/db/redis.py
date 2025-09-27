@@ -1,6 +1,6 @@
 from redis.asyncio import Redis
 
-from src.core.settings import settings
+from core.settings import settings
 
 
 _redis: Redis | None = None
