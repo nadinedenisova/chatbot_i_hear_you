@@ -1,18 +1,15 @@
 import { Routes, Route } from 'react-router-dom';
 
-import Main from '@components/Main/Main';
-
-import './App.css';
+import MainPage from '../../pages/MainPage/MainPage';
+import Login from '../../pages/Login/Login';
 
 function App() {
   return (
-    <div>
-      <Routes>
-        <Route path="/" element={<Main />} />
-        <Route path="/login" element={<></>} />
-        <Route path="*" element={<></>} />
-      </Routes>
-    </div>
+    <Routes>
+      <Route path="/" element={<MainPage />} />
+      <Route path="/login" element={<Login />} />
+      {/* <Route path="/statistics" element={<Statistics />} /> */}
+    </Routes>
   );
 }
 

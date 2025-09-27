@@ -18,7 +18,7 @@ async function enableMocking() {
 
 await enableMocking();
 
-const rootElement = createRoot(document.getElementById('app')!);
+const rootElement = createRoot(document.getElementById('root')!);
 
 rootElement.render(
   <StrictMode>
