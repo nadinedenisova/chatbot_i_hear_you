@@ -4,6 +4,7 @@ from sqlalchemy import text, String
 from sqlalchemy.orm import mapped_column, relationship, Mapped
 from src.db.postgres import Base
 from src.models.questions import Question
+from src.models.history import History
 
 
 class User(Base):
@@ -21,5 +22,9 @@ class User(Base):
     )
 
     questions: Mapped[list[Question]] = relationship(
+        back_populates='user'
+    )
+
+    history: Mapped[list[History]] = relationship(
         back_populates='user'
     )
