@@ -16,6 +16,8 @@ class MenuNode(Base):
         index=True,
     )
 
+    parent_id: Mapped[uuid.UUID | None]
+
     name: Mapped[str]
 
     text: Mapped[str | None]
