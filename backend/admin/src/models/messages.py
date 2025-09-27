@@ -18,3 +18,6 @@ class Message(Base):
     detail: Mapped[str] = mapped_column(
         String(255)
     )
+
+    def __repr__(self):
+        return f'<Message(id={self.id}'

@@ -27,3 +27,6 @@ class MenuNode(Base):
     content: Mapped[list[Content]] = relationship(
         back_populates='menu_node'
     )
+
+    def __repr__(self):
+        return f'<MenuNode(id={self.id}'

@@ -33,3 +33,6 @@ class History(Base):
         server_default=func.now(),
         nullable=False
     )
+
+    def __repr__(self):
+        return f'<History(id={self.id}'

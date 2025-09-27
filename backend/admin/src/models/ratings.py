@@ -42,3 +42,6 @@ class Rating(Base):
         server_default=func.now(),
         nullable=False
     )
+
+    def __repr__(self):
+        return f'<Rating(id={self.id}'

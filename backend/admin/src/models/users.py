@@ -33,3 +33,6 @@ class User(Base):
     ratings: Mapped[list[Rating]] = relationship(
         back_populates='user'
     )
+
+    def __repr__(self):
+        return f'<User(id={self.id}'
