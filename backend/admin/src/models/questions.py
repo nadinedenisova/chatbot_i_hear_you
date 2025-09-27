@@ -8,23 +8,18 @@ from models.users import User
 
 
 class Question(Base):
-    __tablename__ = 'question'
+    __tablename__ = "question"
 
     id: Mapped[uuid.UUID] = mapped_column(
         primary_key=True,
         default=uuid.uuid4,
-        server_default=text('gen_random_uuid()'),
+        server_default=text("gen_random_uuid()"),
         index=True,
     )
 
-    user_id: Mapped[str] = mapped_column(
-        String(255),
-        ForeignKey('user.id')
-    )
+    user_id: Mapped[str] = mapped_column(String(255), ForeignKey("user.id"))
 
-    user: Mapped[User] = relationship(
-        back_populates='questions'
-    )
+    user: Mapped[User] = relationship(back_populates="questions")
 
     text: Mapped[str]
 
@@ -34,15 +29,15 @@ class Question(Base):
         DateTime(timezone=True),
         default=datetime.now(timezone.utc),
         server_default=func.now(),
-        nullable=False
+        nullable=False,
     )
 
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         default=datetime.now(timezone.utc),
         server_default=func.now(),
-        nullable=False
+        nullable=False,
     )
 
     def __repr__(self):
-        return f'<Question(id={self.id}'
+        return f"<Question(id={self.id}"

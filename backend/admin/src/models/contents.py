@@ -8,44 +8,38 @@ from models.nodes import MenuNode
 
 
 class Content(Base):
-    __tablename__ = 'content'
+    __tablename__ = "content"
 
     id: Mapped[uuid.UUID] = mapped_column(
         primary_key=True,
         default=uuid.uuid4,
-        server_default=text('gen_random_uuid()'),
+        server_default=text("gen_random_uuid()"),
         index=True,
     )
 
     menu_id: Mapped[uuid.UUID] = mapped_column(
-        ForeignKey('menu_node.id'),
-        nullable=False
+        ForeignKey("menu_node.id"), nullable=False
     )
 
-    menu_node: Mapped[MenuNode] = relationship(
-        back_populates='content'
-    )
+    menu_node: Mapped[MenuNode] = relationship(back_populates="content")
 
     type: Mapped[int]
 
-    server_path: Mapped[str] = mapped_column(
-        String(500),
-        nullable=False
-    )
+    server_path: Mapped[str] = mapped_column(String(500), nullable=False)
 
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         default=datetime.now(timezone.utc),
         server_default=func.now(),
-        nullable=False
+        nullable=False,
     )
 
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         default=datetime.now(timezone.utc),
         server_default=func.now(),
-        nullable=False
+        nullable=False,
     )
 
     def __repr__(self):
-        return f'<Content(id={self.id}'
+        return f"<Content(id={self.id}"

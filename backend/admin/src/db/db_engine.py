@@ -14,8 +14,13 @@ from models.ratings import UserMenuNode
 from models.nodes import MenuNode
 from models.contents import Content
 from schemas.entity import (
-    UserCreate, QuestionCreate, HistoryCreate, RatingCreate,
-    MenuNodeCreate, MenuNodeUpdate, ContentCreate
+    UserCreate,
+    QuestionCreate,
+    HistoryCreate,
+    RatingCreate,
+    MenuNodeCreate,
+    MenuNodeUpdate,
+    ContentCreate,
 )
 from utils.pagination import PaginatedParams
 
@@ -45,20 +50,18 @@ class DBEngine:
         existing_user = await self.get_user_by_id(user_data.id)
         if existing_user:
             raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="User already exists"
+                status_code=status.HTTP_400_BAD_REQUEST, detail="User already exists"
             )
 
-        user = User(
-            id=user_data.id,
-            phone_number=user_data.phone_number
-        )
+        user = User(id=user_data.id, phone_number=user_data.phone_number)
         self.session.add(user)
         await self.session.commit()
         await self.session.refresh(user)
         return user
 
-    async def get_long_time_lost_users(self, days_count: int, pagination: PaginatedParams) -> Sequence[User]:
+    async def get_long_time_lost_users(
+        self, days_count: int, pagination: PaginatedParams
+    ) -> Sequence[User]:
         cutoff_date = func.now() - func.make_interval(days=days_count)
 
         subquery = (
@@ -88,7 +91,9 @@ class DBEngine:
         result = await self.session.execute(stmt)
         return result.scalars().all()
 
-    async def get_all_questions(self, pagination: PaginatedParams) -> Sequence[Question]:
+    async def get_all_questions(
+        self, pagination: PaginatedParams
+    ) -> Sequence[Question]:
         stmt = (
             select(Question)
             .offset(pagination.offset)
@@ -99,10 +104,7 @@ class DBEngine:
         return result.scalars().all()
 
     async def create_question(self, question_data: QuestionCreate) -> Question:
-        question = Question(
-            user_id=question_data.user_id,
-            text=question_data.text
-        )
+        question = Question(user_id=question_data.user_id, text=question_data.text)
         self.session.add(question)
         await self.session.commit()
         await self.session.refresh(question)
@@ -122,8 +124,7 @@ class DBEngine:
         question = result.scalar_one_or_none()
         if not question:
             raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="Question not found"
+                status_code=status.HTTP_404_NOT_FOUND, detail="Question not found"
             )
         return question
 
@@ -132,14 +133,16 @@ class DBEngine:
         history = History(
             user_id=history_data.user_id,
             menu_id=history_data.menu_id,
-            action_date=history_data.action_date
+            action_date=history_data.action_date,
         )
         self.session.add(history)
         await self.session.commit()
         await self.session.refresh(history)
         return history
 
-    async def get_user_history(self, user_id: str, pagination: PaginatedParams) -> Sequence[History]:
+    async def get_user_history(
+        self, user_id: str, pagination: PaginatedParams
+    ) -> Sequence[History]:
         stmt = (
             select(History)
             .where(History.user_id == user_id)
@@ -192,14 +195,16 @@ class DBEngine:
             parent_id=node_data.parent_id,
             name=node_data.name,
             text=node_data.text,
-            subscription_type=node_data.subscription_type
+            subscription_type=node_data.subscription_type,
         )
         self.session.add(menu_node)
         await self.session.commit()
         await self.session.refresh(menu_node)
         return menu_node
 
-    async def update_menu_node(self, menu_id: UUID, node_data: MenuNodeUpdate) -> MenuNode:
+    async def update_menu_node(
+        self, menu_id: UUID, node_data: MenuNodeUpdate
+    ) -> MenuNode:
         stmt = (
             update(MenuNode)
             .where(MenuNode.id == menu_id)
@@ -213,8 +218,7 @@ class DBEngine:
         node = result.scalar_one_or_none()
         if not node:
             raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="Menu node not found"
+                status_code=status.HTTP_404_NOT_FOUND, detail="Menu node not found"
             )
         return node
 
@@ -225,18 +229,22 @@ class DBEngine:
         return result.rowcount > 0
 
     # Content methods
-    async def add_content_to_menu(self, menu_id: UUID, content_data: ContentCreate) -> Content:
+    async def add_content_to_menu(
+        self, menu_id: UUID, content_data: ContentCreate
+    ) -> Content:
         content = Content(
             menu_id=menu_id,
             type=content_data.type,
-            server_path=content_data.server_path
+            server_path=content_data.server_path,
         )
         self.session.add(content)
         await self.session.commit()
         await self.session.refresh(content)
         return content
 
-    async def update_content(self, content_id: UUID, content_data: ContentCreate) -> Content:
+    async def update_content(
+        self, content_id: UUID, content_data: ContentCreate
+    ) -> Content:
         stmt = (
             update(Content)
             .where(Content.id == content_id)
@@ -250,8 +258,7 @@ class DBEngine:
         content = result.scalar_one_or_none()
         if not content:
             raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="Content not found"
+                status_code=status.HTTP_404_NOT_FOUND, detail="Content not found"
             )
         return content
 
@@ -263,16 +270,20 @@ class DBEngine:
 
     # Rating methods
     async def get_menu_rating(self, menu_id: UUID) -> float | None:
-        stmt = select(func.avg(UserMenuNode.post_rating)).where(UserMenuNode.menu_id == menu_id)
+        stmt = select(func.avg(UserMenuNode.post_rating)).where(
+            UserMenuNode.menu_id == menu_id
+        )
         result = await self.session.execute(stmt)
         return result.scalar()
 
-    async def rate_menu_node(self, rating_data: RatingCreate, menu_id: UUID) -> UserMenuNode:
+    async def rate_menu_node(
+        self, rating_data: RatingCreate, menu_id: UUID
+    ) -> UserMenuNode:
         # Проверяем существующую оценку
         existing_stmt = select(UserMenuNode).where(
             and_(
                 UserMenuNode.user_id == rating_data.user_id,
-                UserMenuNode.menu_id == menu_id
+                UserMenuNode.menu_id == menu_id,
             )
         )
         existing_result = await self.session.execute(existing_stmt)
@@ -287,7 +298,7 @@ class DBEngine:
             rating = UserMenuNode(
                 user_id=rating_data.user_id,
                 menu_id=menu_id,
-                post_rating=rating_data.node_rating
+                post_rating=rating_data.node_rating,
             )
             self.session.add(rating)
             await self.session.commit()

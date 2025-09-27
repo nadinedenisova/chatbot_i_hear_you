@@ -9,7 +9,7 @@ from models.ratings import UserMenuNode
 
 
 class User(Base):
-    __tablename__ = 'user'
+    __tablename__ = "user"
 
     id: Mapped[str] = mapped_column(
         String(255),
@@ -17,36 +17,27 @@ class User(Base):
         index=True,
     )
 
-    phone_number: Mapped[str] = mapped_column(
-        String(255),
-        nullable=False
-    )
+    phone_number: Mapped[str] = mapped_column(String(255), nullable=False)
 
-    questions: Mapped[list[Question]] = relationship(
-        back_populates='user'
-    )
+    questions: Mapped[list[Question]] = relationship(back_populates="user")
 
-    history: Mapped[list[History]] = relationship(
-        back_populates='user'
-    )
+    history: Mapped[list[History]] = relationship(back_populates="user")
 
-    ratings: Mapped[list[UserMenuNode]] = relationship(
-        back_populates='user'
-    )
+    ratings: Mapped[list[UserMenuNode]] = relationship(back_populates="user")
 
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         default=datetime.now(timezone.utc),
         server_default=func.now(),
-        nullable=False
+        nullable=False,
     )
 
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         default=datetime.now(timezone.utc),
         server_default=func.now(),
-        nullable=False
+        nullable=False,
     )
 
     def __repr__(self):
-        return f'<User(id={self.id}'
+        return f"<User(id={self.id}"

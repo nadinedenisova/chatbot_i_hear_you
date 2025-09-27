@@ -8,16 +8,11 @@ from models.users import User
 
 
 class UserMenuNode(Base):
-    __tablename__ = 'user_menu_node'
+    __tablename__ = "user_menu_node"
 
-    user_id: Mapped[str] = mapped_column(
-        String(255),
-        ForeignKey('user.id')
-    )
+    user_id: Mapped[str] = mapped_column(String(255), ForeignKey("user.id"))
 
-    user: Mapped[User] = relationship(
-        back_populates='ratings'
-    )
+    user: Mapped[User] = relationship(back_populates="ratings")
 
     menu_id: Mapped[uuid.UUID]
 
@@ -27,15 +22,15 @@ class UserMenuNode(Base):
         DateTime(timezone=True),
         default=datetime.now(timezone.utc),
         server_default=func.now(),
-        nullable=False
+        nullable=False,
     )
 
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         default=datetime.now(timezone.utc),
         server_default=func.now(),
-        nullable=False
+        nullable=False,
     )
 
     def __repr__(self):
-        return f'<UserMenuNode(user_id={self.user_id}'
+        return f"<UserMenuNode(user_id={self.user_id}"

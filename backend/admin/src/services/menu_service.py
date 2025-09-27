@@ -8,8 +8,15 @@ from sqlalchemy import select
 from db.db_engine import DBEngine, get_db_engine
 from models.nodes import MenuNode
 from schemas.entity import (
-    MenuNodeCreate, MenuNodeUpdate, MenuNodeOut, AllMenuNodeOut,
-    ContentCreate, RatingCreate, RatingOut, Message, ContentOut
+    MenuNodeCreate,
+    MenuNodeUpdate,
+    MenuNodeOut,
+    AllMenuNodeOut,
+    ContentCreate,
+    RatingCreate,
+    RatingOut,
+    Message,
+    ContentOut,
 )
 
 
@@ -24,9 +31,13 @@ class MenuService:
         result = await self.db_engine.session.execute(stmt)
         return result.scalars().all()
 
-    async def _build_menu_tree(self, nodes: Sequence[MenuNodeOut]) -> list[AllMenuNodeOut]:
+    async def _build_menu_tree(
+        self, nodes: Sequence[MenuNodeOut]
+    ) -> list[AllMenuNodeOut]:
         """Построение дерева меню из плоского списка."""
-        node_map = {node.id: AllMenuNodeOut(**node.model_dump(), children=[]) for node in nodes}
+        node_map = {
+            node.id: AllMenuNodeOut(**node.model_dump(), children=[]) for node in nodes
+        }
         root_nodes = []
 
         for node in nodes:
@@ -43,8 +54,7 @@ class MenuService:
 
         if not menu_nodes:
             raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="No menu nodes found"
+                status_code=status.HTTP_404_NOT_FOUND, detail="No menu nodes found"
             )
 
         node_out_list = [
@@ -67,19 +77,23 @@ class MenuService:
                 ],
                 children_names=[
                     child.name for child in menu_nodes if child.parent_id == node.id
-                ]
+                ],
             )
             for node in menu_nodes
         ]
 
         tree = await self._build_menu_tree(node_out_list)
-        return tree[0] if tree else AllMenuNodeOut(
-            id=UUID(int=0),
-            name="Empty Menu",
-            text="No menu items available",
-            content=[],
-            children_names=[],
-            children=[]
+        return (
+            tree[0]
+            if tree
+            else AllMenuNodeOut(
+                id=UUID(int=0),
+                name="Empty Menu",
+                text="No menu items available",
+                content=[],
+                children_names=[],
+                children=[],
+            )
         )
 
     async def get_menu_node_by_name(self, name: str) -> MenuNodeOut:
@@ -87,8 +101,7 @@ class MenuService:
         node = await self.db_engine.get_menu_node_by_name(name)
         if not node:
             raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="Menu node not found"
+                status_code=status.HTTP_404_NOT_FOUND, detail="Menu node not found"
             )
 
         children_names = await self._get_children_names(node.id)
@@ -110,7 +123,7 @@ class MenuService:
                 )
                 for c in node.content
             ],
-            children_names=children_names
+            children_names=children_names,
         )
 
     async def get_menu_root(self) -> MenuNodeOut:
@@ -118,8 +131,7 @@ class MenuService:
         node = await self.db_engine.get_menu_root()
         if not node:
             raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="Root menu node not found"
+                status_code=status.HTTP_404_NOT_FOUND, detail="Root menu node not found"
             )
 
         children_names = await self._get_children_names(node.id)
@@ -141,7 +153,7 @@ class MenuService:
                 )
                 for c in node.content
             ],
-            children_names=children_names
+            children_names=children_names,
         )
 
     async def get_menu_node_by_id(self, menu_id: UUID) -> MenuNodeOut:
@@ -149,8 +161,7 @@ class MenuService:
         node = await self.db_engine.get_menu_node_by_id(menu_id)
         if not node:
             raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="Menu node not found"
+                status_code=status.HTTP_404_NOT_FOUND, detail="Menu node not found"
             )
 
         children_names = await self._get_children_names(node.id)
@@ -172,7 +183,7 @@ class MenuService:
                 )
                 for c in node.content
             ],
-            children_names=children_names
+            children_names=children_names,
         )
 
     async def add_menu_node(self, node_data: MenuNodeCreate) -> Message:
@@ -182,13 +193,15 @@ class MenuService:
             if not parent:
                 raise HTTPException(
                     status_code=status.HTTP_400_BAD_REQUEST,
-                    detail="Parent menu node not found"
+                    detail="Parent menu node not found",
                 )
 
         await self.db_engine.create_menu_node(node_data)
         return Message(detail="The menu node was added")
 
-    async def update_menu_node(self, menu_id: UUID, node_data: MenuNodeUpdate) -> Message:
+    async def update_menu_node(
+        self, menu_id: UUID, node_data: MenuNodeUpdate
+    ) -> Message:
         """Обновление узла меню."""
         await self.db_engine.update_menu_node(menu_id, node_data)
         return Message(detail="The menu node was updated")
@@ -198,17 +211,20 @@ class MenuService:
         success = await self.db_engine.delete_menu_node(menu_id)
         if not success:
             raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="Menu node not found"
+                status_code=status.HTTP_404_NOT_FOUND, detail="Menu node not found"
             )
         return Message(detail="The menu node was deleted.")
 
-    async def add_menu_content(self, menu_id: UUID, content_data: ContentCreate) -> Message:
+    async def add_menu_content(
+        self, menu_id: UUID, content_data: ContentCreate
+    ) -> Message:
         """Добавление контента к узлу меню."""
         await self.db_engine.add_content_to_menu(menu_id, content_data)
         return Message(detail="The content was added")
 
-    async def update_menu_content(self, content_id: UUID, content_data: ContentCreate) -> Message:
+    async def update_menu_content(
+        self, content_id: UUID, content_data: ContentCreate
+    ) -> Message:
         """Обновление контента."""
         await self.db_engine.update_content(content_id, content_data)
         return Message(detail="The content was changed")
@@ -218,12 +234,11 @@ class MenuService:
         success = await self.db_engine.delete_content(content_id)
         if not success:
             raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="Content not found"
+                status_code=status.HTTP_404_NOT_FOUND, detail="Content not found"
             )
         return Message(detail="The node content was deleted")
 
-    #TODO рейтинг это количество оценок "Полезно" и "Не очень" а не цифра
+    # TODO рейтинг это количество оценок "Полезно" и "Не очень" а не цифра
     async def get_menu_node_rate(self, menu_id: UUID) -> RatingOut:
         """Получение рейтинга узла меню."""
         avg_rating = await self.db_engine.get_menu_rating(menu_id)
@@ -233,7 +248,7 @@ class MenuService:
             menu_id=menu_id,
             node_rating=int(avg_rating) if avg_rating else 0,
             created_at=None,
-            updated_at=None
+            updated_at=None,
         )
 
     async def rate_menu_node(self, menu_id: UUID, rating_data: RatingCreate) -> Message:

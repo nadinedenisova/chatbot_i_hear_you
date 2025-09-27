@@ -43,9 +43,7 @@ class MenuNodeOut(BaseModel):
     )
     name: str = Field(..., description="Имя узла меню")
     text: str | None = Field(None, description="Текстовое наполнение узла")
-    subscription_type: str | None = Field(
-        None, description="Тип подписки (если есть)"
-    )
+    subscription_type: str | None = Field(None, description="Тип подписки (если есть)")
     content: list[ContentOut] = Field(
         ..., description="Список контента, привязанного к узлу"
     )
@@ -78,8 +76,10 @@ class ContentCreate(BaseModel):
         ..., description="Серверный путь для загружаемого контента"
     )
 
+
 class AllMenuNodeOut(MenuNodeOut):
     children: list["AllMenuNodeOut"] = Field(..., description="Дочерние узлы меню")
+
 
 class QuestionCreate(BaseModel):
     user_id: str = Field(
@@ -128,5 +128,6 @@ class RatingOut(RatingCreate):
     )
     created_at: date = Field(..., description="Дата создания оценки")
     updated_at: date = Field(..., description="Дата обновления оценки")
+
 
 AllMenuNodeOut.model_rebuild()
