@@ -8,7 +8,7 @@ from src.models.users import User
 
 
 class Rating(Base):
-    __tablename__ = 'ratings'
+    __tablename__ = 'rating'
 
     id: Mapped[uuid.UUID] = mapped_column(
         primary_key=True,

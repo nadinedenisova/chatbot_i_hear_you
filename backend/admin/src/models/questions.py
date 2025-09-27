@@ -8,7 +8,7 @@ from src.models.users import User
 
 
 class Question(Base):
-    __tablename__ = 'questions'
+    __tablename__ = 'question'
 
     id: Mapped[uuid.UUID] = mapped_column(
         primary_key=True,

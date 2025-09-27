@@ -7,7 +7,7 @@ from src.models.contents import Content
 
 
 class MenuNode(Base):
-    __tablename__ = 'menu_nodes'
+    __tablename__ = 'menu_node'
 
     id: Mapped[uuid.UUID] = mapped_column(
         primary_key=True,
