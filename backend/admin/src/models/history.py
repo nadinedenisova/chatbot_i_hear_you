@@ -36,4 +36,4 @@ class History(Base):
     )
 
     def __repr__(self):
-        return f'<History(id={self.id}'
+        return f'<History(id={self.action_id}'
