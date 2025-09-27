@@ -40,7 +40,7 @@ async def get_menu_node_by_name(
 ):
     return MenuNodeOut(
         id=uuid4(),
-        parent_id=None,
+        parent_id=uuid4(),
         name=name,
         text=f'Клавиши раздела: "{name}"',
         subscription_type=None,
