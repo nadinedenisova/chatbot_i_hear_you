@@ -1,6 +1,6 @@
 import uuid
 
-from sqlalchemy import text
+from sqlalchemy import text, String
 from sqlalchemy.orm import mapped_column, relationship, Mapped
 from src.db.postgres import Base
 from src.models.contents import Content
@@ -18,11 +18,15 @@ class MenuNode(Base):
 
     parent_id: Mapped[uuid.UUID | None]
 
-    name: Mapped[str]
+    name: Mapped[str] = mapped_column(
+        String(255)
+    )
 
     text: Mapped[str | None]
 
-    subscription_type: Mapped[str | None]
+    subscription_type: Mapped[str | None] = mapped_column(
+        String(255)
+    )
 
     content: Mapped[list[Content]] = relationship(
         back_populates='menu_node'
