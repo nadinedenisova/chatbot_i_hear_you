@@ -5,6 +5,7 @@ from sqlalchemy.orm import mapped_column, relationship, Mapped
 from src.db.postgres import Base
 from src.models.questions import Question
 from src.models.history import History
+from src.models.ratings import Rating
 
 
 class User(Base):
@@ -26,5 +27,9 @@ class User(Base):
     )
 
     history: Mapped[list[History]] = relationship(
+        back_populates='user'
+    )
+
+    ratings: Mapped[list[Rating]] = relationship(
         back_populates='user'
     )
