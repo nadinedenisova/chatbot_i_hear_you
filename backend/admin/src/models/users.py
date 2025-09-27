@@ -1,6 +1,7 @@
 import uuid
+from datetime import datetime, timezone
 
-from sqlalchemy import text, String
+from sqlalchemy import text, func, DateTime, String
 from sqlalchemy.orm import mapped_column, relationship, Mapped
 from src.db.postgres import Base
 from src.models.questions import Question
@@ -32,6 +33,20 @@ class User(Base):
 
     ratings: Mapped[list[UserMenuNode]] = relationship(
         back_populates='user'
+    )
+
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        default=datetime.now(timezone.utc),
+        server_default=func.now(),
+        nullable=False
+    )
+
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        default=datetime.now(timezone.utc),
+        server_default=func.now(),
+        nullable=False
     )
 
     def __repr__(self):
