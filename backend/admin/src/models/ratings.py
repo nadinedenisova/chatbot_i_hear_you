@@ -12,7 +12,7 @@ class UserMenuNode(Base):
 
     user_id: Mapped[str] = mapped_column(
         String(255),
-        ForeignKey('users.id')
+        ForeignKey('user.id')
     )
 
     user: Mapped[User] = relationship(
