@@ -1,9 +1,10 @@
 import uuid
 from datetime import datetime, timezone
 
-from sqlalchemy import text, func, DateTime
-from sqlalchemy.orm import mapped_column, Mapped
+from sqlalchemy import text, func, DateTime, ForeignKey
+from sqlalchemy.orm import mapped_column, relationship, Mapped
 from src.db.postgres import Base
+from src.models.nodes import MenuNode
 
 
 class Content(Base):
@@ -16,8 +17,13 @@ class Content(Base):
         index=True,
     )
 
-    # TODO
-    # menu_id: Mapped[uuid.UUID]
+    menu_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey('menu_nodes.id')
+    )
+
+    menu_node: Mapped[MenuNode] = relationship(
+        back_populates='content'
+    )
 
     type: Mapped[int]
 
