@@ -35,5 +35,12 @@ class History(Base):
         nullable=False
     )
 
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        default=datetime.now(timezone.utc),
+        server_default=func.now(),
+        nullable=False
+    )
+
     def __repr__(self):
         return f'<History(id={self.action_id}'
