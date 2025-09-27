@@ -38,7 +38,20 @@ async def get_menu_node_by_name(
     name: str = Query(default=None, title="Название узла", max_length=100),
     session: AsyncSession = Depends(get_async_session),
 ):
-    return {"Hello": "World"}
+    return MenuNodeOut(
+        id=uuid4(),
+        parent_id=uuid4(),
+        name=name,
+        text=f'Клавиши раздела: "{name}"',
+        subscription_type=None,
+        content=[],
+        children_names=[
+            'Key 1',
+            'Key 2',
+            'Key 3',
+            'Key 4'
+        ]
+    )
 
 
 @router.get(
