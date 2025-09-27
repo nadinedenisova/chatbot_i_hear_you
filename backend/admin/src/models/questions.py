@@ -26,9 +26,7 @@ class Question(Base):
         back_populates='questions'
     )
 
-    text: Mapped[str] = mapped_column(
-        String(255)
-    )
+    text: Mapped[str]
 
     admin_answer: Mapped[str | None]
 
