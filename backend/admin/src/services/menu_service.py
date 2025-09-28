@@ -49,28 +49,19 @@ class MenuService:
 
         return root_nodes
 
-    def _get_content_list(self,node:MenuNode)->list[ContentOut]:
-        content = []
-        if node.content:
-            # Проверяем, является ли content списком или одиночным объектом
-            content_items: list[ContentOut] = []
-            if isinstance(node.content, list):
-                content_items = node.content
-            else:
-                # Если это одиночный объект, помещаем его в список
-                content_items = [node.content]
-            content = [
-                ContentOut(
-                    id=c.id,
-                    menu_id=c.menu_id,
-                    type=c.type,
-                    server_path=c.server_path,
-                    created_at=c.created_at,
-                    updated_at=c.updated_at,
-                )
-                for c in content_items
-            ]
-        return content
+    def _get_content_list(self, node: MenuNode) -> list[ContentOut]:
+        """Получение списка контента для узла меню."""
+        return [
+            ContentOut(
+                id=c.id,
+                menu_id=c.menu_id,
+                type=c.type,
+                server_path=c.server_path,
+                created_at=c.created_at,
+                updated_at=c.updated_at,
+            )
+            for c in node.content
+        ] if node.content else []
 
     async def get_full_menu(self) -> AllMenuNodeOut:
         """Получение полного дерева меню."""
