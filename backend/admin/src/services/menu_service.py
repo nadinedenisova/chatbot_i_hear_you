@@ -48,6 +48,22 @@ class MenuService:
 
         return root_nodes
 
+    def _get_content_list(self,node:MenuNode)->list[ContentOut]:
+        content = []
+        if node.content:
+            content = [
+                ContentOut(
+                    id=c.id,
+                    menu_id=c.menu_id,
+                    type=c.type,
+                    server_path=c.server_path,
+                    created_at=c.created_at,
+                    updated_at=c.updated_at,
+                )
+                for c in node.content
+            ]
+        return content
+
     async def get_full_menu(self) -> AllMenuNodeOut:
         """Получение полного дерева меню."""
         menu_nodes = await self.db_engine.get_full_menu()
@@ -112,17 +128,7 @@ class MenuService:
             name=node.name,
             text=node.text,
             subscription_type=node.subscription_type,
-            content=[
-                ContentOut(
-                    id=c.id,
-                    menu_id=c.menu_id,
-                    type=c.type,
-                    server_path=c.server_path,
-                    created_at=c.created_at,
-                    updated_at=c.updated_at,
-                )
-                for c in node.content
-            ],
+            content=self._get_content_list(node),
             children_names=children_names,
         )
 
@@ -142,17 +148,7 @@ class MenuService:
             name=node.name,
             text=node.text,
             subscription_type=node.subscription_type,
-            content=[
-                # ContentOut(
-                #     id=c.id,
-                #     menu_id=c.menu_id,
-                #     type=c.type,
-                #     server_path=c.server_path,
-                #     created_at=c.created_at,
-                #     updated_at=c.updated_at,
-                # )
-                # for c in node.content
-            ],
+            content=self._get_content_list(node),
             children_names=children_names,
         )
 
@@ -172,17 +168,7 @@ class MenuService:
             name=node.name,
             text=node.text,
             subscription_type=node.subscription_type,
-            content=[
-                ContentOut(
-                    id=c.id,
-                    menu_id=c.menu_id,
-                    type=c.type,
-                    server_path=c.server_path,
-                    created_at=c.created_at,
-                    updated_at=c.updated_at,
-                )
-                for c in node.content
-            ],
+            content=self._get_content_list(node),
             children_names=children_names,
         )
 
