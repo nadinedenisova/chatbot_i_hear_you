@@ -1,7 +1,7 @@
 # db_engine.py
 from uuid import UUID
 from typing import Sequence
-from sqlalchemy import select, update, delete, and_, func
+from sqlalchemy import select, update, delete, and_, func, text
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 from fastapi import Depends, HTTPException, status
@@ -60,9 +60,10 @@ class DBEngine:
         return user
 
     async def get_long_time_lost_users(
-        self, days_count: int, pagination: PaginatedParams
+            self, days_count: int, pagination: PaginatedParams
     ) -> Sequence[User]:
-        cutoff_date = func.now() - func.make_interval(days=days_count)
+        # Для PostgreSQL (рекомендуемый)
+        cutoff_date = func.now() - text(f"INTERVAL '{days_count} days'")
 
         subquery = (
             select(History.user_id)
@@ -129,9 +130,9 @@ class DBEngine:
         return question
 
     # History methods
-    async def create_history_record(self, history_data: HistoryCreate) -> History:
+    async def create_history_record(self, user_id:str,history_data: HistoryCreate) -> History:
         history = History(
-            user_id=history_data.user_id,
+            user_id=user_id,
             menu_id=history_data.menu_id,
             action_date=history_data.action_date,
         )

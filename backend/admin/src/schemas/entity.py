@@ -87,6 +87,9 @@ class QuestionCreate(BaseModel):
     )
     text: str = Field(..., description="Текст вопроса")
 
+class QuestionAnswer(BaseModel):
+    admin_answer: str = Field(..., description="Текст вопроса")
+
 
 class UserCreate(BaseModel):
     id: str = Field(..., description="Уникальный идентификатор пользователя")
@@ -103,7 +106,6 @@ class UsersListOut(BaseModel):
 
 
 class HistoryCreate(BaseModel):
-    user_id: str = Field(..., description="Идентификатор пользователя")
     menu_id: UUID | None = Field(
         None, description="Идентификатор меню (необязательный)"
     )
@@ -111,6 +113,7 @@ class HistoryCreate(BaseModel):
 
 
 class HistoryOut(HistoryCreate):
+    user_id: str = Field(..., description="Идентификатор пользователя")
     action_id: UUID = Field(..., description="Идентификатор действия")
     created_at: datetime = Field(..., description="Дата и время создания записи истории")  # Изменено
 
