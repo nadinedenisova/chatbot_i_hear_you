@@ -31,6 +31,6 @@ app.include_router(menu_router.router, prefix='/api/v1/menu', tags=['Меню'])
 app.include_router(users_router.router,
                    prefix='/api/v1/users', tags=['Пользователи'])
 
-app.include_router(file_router.router, prefix="/api/files", tags=["file-upload"])
+app.include_router(file_router.router, prefix="/api/files", tags=["Загрузка файлов"])
 
 app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")

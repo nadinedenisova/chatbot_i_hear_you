@@ -41,7 +41,7 @@ async def add_menu_content_with_upload(
             detail="Недопустимый тип документа. Разрешены: PDF, DOC, DOCX"
         )
 
-    content_data = ContentCreate(type=file_type, server_path="")  # server_path будет заполнен автоматически
+    content_data = ContentCreate(menu_id=menu_id,type=file_type, server_path="")  # server_path будет заполнен автоматически
     return await menu_service.add_menu_content_with_file(menu_id, content_data, file)
 
 @router.put(
@@ -57,7 +57,7 @@ async def update_menu_content_with_upload(
         menu_service: MenuService = Depends(get_menu_service),
 ):
     """Обновляет контент с загрузкой нового файла на сервер"""
-    content_data = ContentCreate(type=file_type, server_path="")
+    content_data = ContentCreate(menu_id=menu_id,type=file_type, server_path="")
     return await menu_service.update_menu_content_with_file(content_id, content_data, file)
 
 @router.post("/upload-test", summary="Тест загрузки файла")
