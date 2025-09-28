@@ -1,5 +1,4 @@
-from uuid import uuid4, UUID
-
+from uuid import UUID
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 from db.postgres import get_async_session
@@ -13,96 +12,67 @@ from schemas.entity import (
     RatingOut,
     AllMenuNodeOut,
 )
-
+from services.menu_service import MenuService, get_menu_service
 
 router = APIRouter()
 
 
 @router.get(
-    "/",
-    summary="Получить всё дерево меню навигации",
-    response_model=AllMenuNodeOut,
-    description="""Получить полное дерево меню. 
-    Здесь указан список _content_ как список строк, но это не так, это список ```MenuNodeOut``` структур""",
+    "/", summary="Получить всё дерево меню навигации", response_model=AllMenuNodeOut
 )
-async def get_full_menu(session: AsyncSession = Depends(get_async_session)):
-    return {"Hello": "World"}
+async def get_full_menu(menu_service: MenuService = Depends(get_menu_service)):
+    return await menu_service.get_full_menu()
 
 
 @router.get(
     "/search-by-name",
-    summary="Получить узел меню навигации по названию",
+    summary="Получить узел меню по названию",
     response_model=MenuNodeOut,
 )
 async def get_menu_node_by_name(
-    name: str = Query(default=None, title="Название узла", max_length=100),
-    session: AsyncSession = Depends(get_async_session),
+    name: str = Query(..., title="Название узла", max_length=100),
+    menu_service: MenuService = Depends(get_menu_service),
 ):
-    return MenuNodeOut(
-        id=uuid4(),
-        parent_id=uuid4(),
-        name=name,
-        text=f'Клавиши раздела: "{name}"',
-        subscription_type=None,
-        content=[],
-        children_names=[
-            'Key 1',
-            'Key 2',
-            'Key 3',
-            'Key 4'
-        ]
-    )
+    return await menu_service.get_menu_node_by_name(name)
 
 
 @router.get(
-    "/root", summary="Получить корень узла меню навигации",
-    response_model=MenuNodeOut
+    "/root", summary="Получить корень узла меню навигации", response_model=MenuNodeOut
 )
-async def get_menu_root(session: AsyncSession = Depends(get_async_session)):
-    return MenuNodeOut(
-        id=uuid4(),
-        parent_id=None,
-        name='Начальный экран',
-        text='Здравствуйте',
-        subscription_type=None,
-        content=[],
-        children_names=[
-            'Я волнуюсь о слухе ребенка',
-            'Я волнуюсь о своем слухе'
-        ]
-    )
+async def get_menu_root(menu_service: MenuService = Depends(get_menu_service)):
+    return await menu_service.get_menu_root()
 
 
 @router.post("/add", summary="Добавить узел меню навигации", response_model=Message)
 async def add_menu_node(
-    node_data: MenuNodeCreate, session: AsyncSession = Depends(get_async_session)
+    node_data: MenuNodeCreate, menu_service: MenuService = Depends(get_menu_service)
 ):
-    return Message(detail="The menu node was added")
+    return await menu_service.add_menu_node(node_data)
 
 
 @router.get(
     "/{menu_id}", summary="Получить узел меню по id", response_model=MenuNodeOut
 )
 async def get_menu_node(
-    menu_id: UUID, session: AsyncSession = Depends(get_async_session)
+    menu_id: UUID, menu_service: MenuService = Depends(get_menu_service)
 ):
-    return {"Hello": "World"}
+    return await menu_service.get_menu_node_by_id(menu_id)
 
 
 @router.put("/{menu_id}", summary="Обновить узел меню по id", response_model=Message)
 async def update_menu_node(
     menu_id: UUID,
-    node_data: MenuNodeCreate,
-    session: AsyncSession = Depends(get_async_session),
+    node_data: MenuNodeUpdate,
+    menu_service: MenuService = Depends(get_menu_service),
 ):
-    return Message(detail="The menu node was updated")
+    return await menu_service.update_menu_node(menu_id, node_data)
 
 
 @router.delete("/{menu_id}", summary="Удалить узел меню по id", response_model=Message)
 async def delete_menu_node(
-    menu_id: UUID, session: AsyncSession = Depends(get_async_session)
+    menu_id: UUID, menu_service: MenuService = Depends(get_menu_service)
 ):
-    return Message(detail="The menu node was deleted.")
+    return await menu_service.delete_menu_node(menu_id)
 
 
 @router.post(
@@ -113,9 +83,9 @@ async def delete_menu_node(
 async def add_menu_content(
     menu_id: UUID,
     content_data: ContentCreate,
-    session: AsyncSession = Depends(get_async_session),
+    menu_service: MenuService = Depends(get_menu_service),
 ):
-    return Message(detail="The content was added")
+    return await menu_service.add_menu_content(menu_id, content_data)
 
 
 @router.put(
@@ -127,35 +97,37 @@ async def update_menu_content(
     menu_id: UUID,
     content_id: UUID,
     content_data: ContentCreate,
-    session: AsyncSession = Depends(get_async_session),
+    menu_service: MenuService = Depends(get_menu_service),
 ):
-    return Message(detail="The content was changed")
+    return await menu_service.update_menu_content(content_id, content_data)
 
 
 @router.delete(
     "/{menu_id}/content/delete/{content_id}",
-    summary="Удалить контент поста",
+    summary="Удалить контент",
     response_model=Message,
 )
 async def delete_menu_content(
-    menu_id: UUID, content_id: UUID, session: AsyncSession = Depends(get_async_session)
+    menu_id: UUID,
+    content_id: UUID,
+    menu_service: MenuService = Depends(get_menu_service),
 ):
-    return Message(detail="The node content was deleted")
+    return await menu_service.delete_menu_content(content_id)
 
 
 @router.get(
     "/{menu_id}/rate", summary="Получить рейтинг узла меню", response_model=RatingOut
 )
 async def get_menu_node_rate(
-    menu_id: UUID, session: AsyncSession = Depends(get_async_session)
+    menu_id: UUID, menu_service: MenuService = Depends(get_menu_service)
 ):
-    return {"Hello": "World"}
+    return await menu_service.get_menu_node_rate(menu_id)
 
 
 @router.post("/{menu_id}/rate", summary="Оценить узел меню", response_model=Message)
 async def rate_menu_node(
     menu_id: UUID,
     rating_data: RatingCreate,
-    session: AsyncSession = Depends(get_async_session),
+    menu_service: MenuService = Depends(get_menu_service),
 ):
-    return Message(detail="The node was successfully rated!")
+    return await menu_service.rate_menu_node(menu_id, rating_data)

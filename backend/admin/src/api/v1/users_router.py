@@ -1,5 +1,4 @@
 from uuid import UUID
-
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 from db.postgres import get_async_session
@@ -14,8 +13,8 @@ from schemas.entity import (
     QuestionCreate,
     QuestionsListOut,
 )
+from services.user_service import UserService, get_user_service
 from utils.pagination import PaginatedParams
-
 
 router = APIRouter()
 
@@ -25,61 +24,53 @@ router = APIRouter()
 )
 async def get_users(
     pagination: PaginatedParams = Depends(),
-    session: AsyncSession = Depends(get_async_session),
+    user_service: UserService = Depends(get_user_service),
 ):
-    return {"Hello": "World"}
+    return await user_service.get_users(pagination)
 
 
 @router.post("/create", summary="Добавить пользователя", response_model=Message)
 async def create_user(
-    user_data: UserCreate, session: AsyncSession = Depends(get_async_session)
+    user_data: UserCreate, user_service: UserService = Depends(get_user_service)
 ):
-    return {"Hello": "World"}
+    return await user_service.create_user(user_data)
 
 
 @router.get(
     "/long-time-lost",
-    summary="Получить список пользователей, которые долго не появлялись",
+    summary="Пользователи, которые давно не заходили",
     response_model=UsersListOut,
 )
 async def get_long_time_lost_users(
-    days_count: int = Query(
-        default=10, ge=1, title="Количество дней, которое человек бездействовал"
-    ),
+    days_count: int = Query(10, ge=1),
     pagination: PaginatedParams = Depends(),
-    session: AsyncSession = Depends(get_async_session),
+    user_service: UserService = Depends(get_user_service),
 ):
-    return {"Hello": "World"}
+    return await user_service.get_long_time_lost_users(days_count, pagination)
 
 
 @router.get(
-    "/questions/{user_id}",
-    summary="Получить все вопросы пользователя",
-    response_model=UserOut,
+    "/questions/{user_id}", summary="Вопросы пользователя", response_model=UserOut
 )
 async def get_user_questions(
-    user_id: str, session: AsyncSession = Depends(get_async_session)
+    user_id: str, user_service: UserService = Depends(get_user_service)
 ):
-    return {"Hello": "World"}
+    return await user_service.get_user_questions(user_id)
 
 
-@router.get(
-    "/questions", summary="Получить все вопросы", response_model=QuestionsListOut
-)
+@router.get("/questions", summary="Все вопросы", response_model=QuestionsListOut)
 async def get_all_questions(
     pagination: PaginatedParams = Depends(),
-    session: AsyncSession = Depends(get_async_session),
+    user_service: UserService = Depends(get_user_service),
 ):
-    return {"Hello": "World"}
+    return await user_service.get_all_questions(pagination)
 
 
-@router.post(
-    "/questions/create", summary="Добавить новый вопрос", response_model=Message
-)
+@router.post("/questions/create", summary="Добавить вопрос", response_model=Message)
 async def create_question(
-    question_data: QuestionCreate, session: AsyncSession = Depends(get_async_session)
+    question_data: QuestionCreate, user_service: UserService = Depends(get_user_service)
 ):
-    return {"Hello": "World"}
+    return await user_service.create_question(question_data)
 
 
 @router.put(
@@ -90,9 +81,9 @@ async def create_question(
 async def answer_question(
     question_id: UUID,
     question_data: QuestionCreate,
-    session: AsyncSession = Depends(get_async_session),
+    user_service: UserService = Depends(get_user_service),
 ):
-    return {"Hello": "World"}
+    return await user_service.answer_question(question_id, question_data.admin_answer)
 
 
 @router.post(
@@ -103,9 +94,9 @@ async def answer_question(
 async def create_user_action_record(
     user_id: str,
     history_data: HistoryCreate,
-    session: AsyncSession = Depends(get_async_session),
+    user_service: UserService = Depends(get_user_service),
 ):
-    return {"Hello": "World"}
+    return await user_service.create_user_action_record(user_id, history_data)
 
 
 @router.get(
@@ -116,6 +107,6 @@ async def create_user_action_record(
 async def get_user_history(
     user_id: str,
     pagination: PaginatedParams = Depends(),
-    session: AsyncSession = Depends(get_async_session),
+    user_service: UserService = Depends(get_user_service),
 ):
-    return {"Hello": "World"}
+    return await user_service.get_user_history(user_id, pagination)

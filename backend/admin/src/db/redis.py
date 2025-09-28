@@ -23,7 +23,7 @@ def get_redis(refresh: bool = False) -> Redis:
             host=settings.redis_host,
             port=settings.redis_port,
             db=settings.redis_db,
-            decode_responses=True
+            decode_responses=True,
         )
 
     return _redis
