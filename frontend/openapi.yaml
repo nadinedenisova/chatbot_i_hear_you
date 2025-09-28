@@ -1,0 +1,1304 @@
+openapi: 3.1.0
+info:
+  title: API системы администрирования бота
+  description: Предоставляет эндпоинты для управления ботом.
+  version: 0.1.0
+paths:
+  /api/v1/menu/:
+    get:
+      tags:
+        - Меню
+      summary: Получить всё дерево меню навигации
+      operationId: get_full_menu_api_v1_menu__get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AllMenuNodeOut'
+  /api/v1/menu/search-by-name:
+    get:
+      tags:
+        - Меню
+      summary: Получить узел меню по названию
+      operationId: get_menu_node_by_name_api_v1_menu_search_by_name_get
+      parameters:
+        - name: name
+          in: query
+          required: true
+          schema:
+            type: string
+            maxLength: 100
+            title: Название узла
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MenuNodeOut'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/menu/root:
+    get:
+      tags:
+        - Меню
+      summary: Получить корень узла меню навигации
+      operationId: get_menu_root_api_v1_menu_root_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MenuNodeOut'
+  /api/v1/menu/add:
+    post:
+      tags:
+        - Меню
+      summary: Добавить узел меню навигации
+      operationId: add_menu_node_api_v1_menu_add_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MenuNodeCreate'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/menu/{menu_id}:
+    get:
+      tags:
+        - Меню
+      summary: Получить узел меню по id
+      operationId: get_menu_node_api_v1_menu__menu_id__get
+      parameters:
+        - name: menu_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+            title: Menu Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MenuNodeOut'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    put:
+      tags:
+        - Меню
+      summary: Обновить узел меню по id
+      operationId: update_menu_node_api_v1_menu__menu_id__put
+      parameters:
+        - name: menu_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+            title: Menu Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MenuNodeUpdate'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    delete:
+      tags:
+        - Меню
+      summary: Удалить узел меню по id
+      operationId: delete_menu_node_api_v1_menu__menu_id__delete
+      parameters:
+        - name: menu_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+            title: Menu Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/menu/{menu_id}/content/add:
+    post:
+      tags:
+        - Меню
+      summary: Добавить контент к узлу меню
+      operationId: add_menu_content_api_v1_menu__menu_id__content_add_post
+      parameters:
+        - name: menu_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+            title: Menu Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ContentCreate'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/menu/{menu_id}/content/change/{content_id}:
+    put:
+      tags:
+        - Меню
+      summary: Обновить контент
+      operationId: >-
+        update_menu_content_api_v1_menu__menu_id__content_change__content_id__put
+      parameters:
+        - name: menu_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+            title: Menu Id
+        - name: content_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+            title: Content Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ContentCreate'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/menu/{menu_id}/content/delete/{content_id}:
+    delete:
+      tags:
+        - Меню
+      summary: Удалить контент
+      operationId: >-
+        delete_menu_content_api_v1_menu__menu_id__content_delete__content_id__delete
+      parameters:
+        - name: menu_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+            title: Menu Id
+        - name: content_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+            title: Content Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/menu/{menu_id}/rate:
+    get:
+      tags:
+        - Меню
+      summary: Получить рейтинг узла меню
+      operationId: get_menu_node_rate_api_v1_menu__menu_id__rate_get
+      parameters:
+        - name: menu_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+            title: Menu Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RatingOut'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    post:
+      tags:
+        - Меню
+      summary: Оценить узел меню
+      operationId: rate_menu_node_api_v1_menu__menu_id__rate_post
+      parameters:
+        - name: menu_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+            title: Menu Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RatingCreate'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/users/users:
+    get:
+      tags:
+        - Пользователи
+      summary: Получить список пользователей
+      operationId: get_users_api_v1_users_users_get
+      parameters:
+        - name: page_size
+          in: query
+          required: false
+          schema:
+            type: integer
+            maximum: 100
+            minimum: 1
+            description: Количество записей на странице
+            default: 50
+            title: Page Size
+          description: Количество записей на странице
+        - name: page_number
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            description: Номер страницы
+            default: 1
+            title: Page Number
+          description: Номер страницы
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UsersListOut'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/users/create:
+    post:
+      tags:
+        - Пользователи
+      summary: Добавить пользователя
+      operationId: create_user_api_v1_users_create_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserCreate'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/users/long-time-lost:
+    get:
+      tags:
+        - Пользователи
+      summary: Пользователи, которые давно не заходили
+      operationId: get_long_time_lost_users_api_v1_users_long_time_lost_get
+      parameters:
+        - name: days_count
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            default: 10
+            title: Days Count
+        - name: page_size
+          in: query
+          required: false
+          schema:
+            type: integer
+            maximum: 100
+            minimum: 1
+            description: Количество записей на странице
+            default: 50
+            title: Page Size
+          description: Количество записей на странице
+        - name: page_number
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            description: Номер страницы
+            default: 1
+            title: Page Number
+          description: Номер страницы
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UsersListOut'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/users/questions/{user_id}:
+    get:
+      tags:
+        - Пользователи
+      summary: Вопросы пользователя
+      operationId: get_user_questions_api_v1_users_questions__user_id__get
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: string
+            title: User Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserOut'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/users/questions:
+    get:
+      tags:
+        - Пользователи
+      summary: Все вопросы
+      operationId: get_all_questions_api_v1_users_questions_get
+      parameters:
+        - name: page_size
+          in: query
+          required: false
+          schema:
+            type: integer
+            maximum: 100
+            minimum: 1
+            description: Количество записей на странице
+            default: 50
+            title: Page Size
+          description: Количество записей на странице
+        - name: page_number
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            description: Номер страницы
+            default: 1
+            title: Page Number
+          description: Номер страницы
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QuestionsListOut'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/users/questions/create:
+    post:
+      tags:
+        - Пользователи
+      summary: Добавить вопрос
+      operationId: create_question_api_v1_users_questions_create_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/QuestionCreate'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/users/questions/{question_id}/answer:
+    put:
+      tags:
+        - Пользователи
+      summary: Ответить на вопрос
+      operationId: answer_question_api_v1_users_questions__question_id__answer_put
+      parameters:
+        - name: question_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+            title: Question Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/QuestionAnswer'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/users/{user_id}/history/add:
+    post:
+      tags:
+        - Пользователи
+      summary: Добавить действие пользователя
+      operationId: create_user_action_record_api_v1_users__user_id__history_add_post
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: string
+            title: User Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/HistoryCreate'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/users/{user_id}/history:
+    get:
+      tags:
+        - Пользователи
+      summary: Получить историю пользователя
+      operationId: get_user_history_api_v1_users__user_id__history_get
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: string
+            title: User Id
+        - name: page_size
+          in: query
+          required: false
+          schema:
+            type: integer
+            maximum: 100
+            minimum: 1
+            description: Количество записей на странице
+            default: 50
+            title: Page Size
+          description: Количество записей на странице
+        - name: page_number
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            description: Номер страницы
+            default: 1
+            title: Page Number
+          description: Номер страницы
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HistoryOut'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/files/{menu_id}/content/upload:
+    post:
+      tags:
+        - Загрузка файлов
+      summary: Добавить контент с загрузкой файла
+      description: Добавляет контент с загрузкой файла на сервер
+      operationId: add_menu_content_with_upload_api_files__menu_id__content_upload_post
+      parameters:
+        - name: menu_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+            title: Menu Id
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: >-
+                #/components/schemas/Body_add_menu_content_with_upload_api_files__menu_id__content_upload_post
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/files/{menu_id}/content/upload/{content_id}:
+    put:
+      tags:
+        - Загрузка файлов
+      summary: Обновить контент с загрузкой нового файла
+      description: Обновляет контент с загрузкой нового файла на сервер
+      operationId: >-
+        update_menu_content_with_upload_api_files__menu_id__content_upload__content_id__put
+      parameters:
+        - name: menu_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+            title: Menu Id
+        - name: content_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+            title: Content Id
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: >-
+                #/components/schemas/Body_update_menu_content_with_upload_api_files__menu_id__content_upload__content_id__put
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/files/upload-test:
+    post:
+      tags:
+        - Загрузка файлов
+      summary: Тест загрузки файла
+      description: Тестовый эндпоинт для загрузки файлов
+      operationId: upload_test_file_api_files_upload_test_post
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: >-
+                #/components/schemas/Body_upload_test_file_api_files_upload_test_post
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+components:
+  schemas:
+    AllMenuNodeOut:
+      properties:
+        id:
+          type: string
+          format: uuid
+          title: Id
+          description: Уникальный идентификатор узла меню
+        parent_id:
+          anyOf:
+            - type: string
+              format: uuid
+            - type: 'null'
+          title: Parent Id
+          description: Идентификатор родительского узла (если есть)
+        name:
+          type: string
+          title: Name
+          description: Имя узла меню
+        text:
+          anyOf:
+            - type: string
+            - type: 'null'
+          title: Text
+          description: Текстовое наполнение узла
+        subscription_type:
+          anyOf:
+            - type: string
+            - type: 'null'
+          title: Subscription Type
+          description: Тип подписки (если есть)
+        content:
+          items:
+            $ref: '#/components/schemas/ContentOut'
+          type: array
+          title: Content
+          description: Список контента, привязанного к узлу
+        children_names:
+          items:
+            type: string
+          type: array
+          title: Children Names
+          description: Имена дочерних узлов меню
+        children:
+          items:
+            $ref: '#/components/schemas/AllMenuNodeOut'
+          type: array
+          title: Children
+          description: Дочерние узлы меню
+      type: object
+      required:
+        - id
+        - name
+        - content
+        - children_names
+        - children
+      title: AllMenuNodeOut
+    Body_add_menu_content_with_upload_api_files__menu_id__content_upload_post:
+      properties:
+        file_type:
+          type: integer
+          title: File Type
+          description: Тип контента (1-изображение, 2-видео, 3-документ)
+        file:
+          type: string
+          format: binary
+          title: File
+          description: Файл для загрузки
+      type: object
+      required:
+        - file_type
+        - file
+      title: >-
+        Body_add_menu_content_with_upload_api_files__menu_id__content_upload_post
+    Body_update_menu_content_with_upload_api_files__menu_id__content_upload__content_id__put:
+      properties:
+        file_type:
+          type: integer
+          title: File Type
+          description: Тип контента (1-изображение, 2-видео, 3-документ)
+        file:
+          type: string
+          format: binary
+          title: File
+          description: Новый файл для загрузки
+      type: object
+      required:
+        - file_type
+        - file
+      title: >-
+        Body_update_menu_content_with_upload_api_files__menu_id__content_upload__content_id__put
+    Body_upload_test_file_api_files_upload_test_post:
+      properties:
+        file:
+          type: string
+          format: binary
+          title: File
+      type: object
+      required:
+        - file
+      title: Body_upload_test_file_api_files_upload_test_post
+    ContentCreate:
+      properties:
+        menu_id:
+          type: string
+          format: uuid
+          title: Menu Id
+          description: Идентификатор меню, к которому привязывается контент
+        type:
+          type: integer
+          title: Type
+          description: Тип контента (числовой код)
+        server_path:
+          type: string
+          title: Server Path
+          description: Серверный путь для загружаемого контента
+      type: object
+      required:
+        - menu_id
+        - type
+        - server_path
+      title: ContentCreate
+    ContentOut:
+      properties:
+        id:
+          type: string
+          format: uuid
+          title: Id
+          description: Уникальный идентификатор контента
+        menu_id:
+          type: string
+          format: uuid
+          title: Menu Id
+          description: Идентификатор меню, к которому относится контент
+        type:
+          type: integer
+          title: Type
+          description: Тип контента (числовой код)
+        server_path:
+          type: string
+          title: Server Path
+          description: Серверный путь до контента
+        created_at:
+          type: string
+          format: date-time
+          title: Created At
+          description: Дата и время создания
+        updated_at:
+          type: string
+          format: date-time
+          title: Updated At
+          description: Дата и время последнего обновления
+      type: object
+      required:
+        - id
+        - menu_id
+        - type
+        - server_path
+        - created_at
+        - updated_at
+      title: ContentOut
+    HTTPValidationError:
+      properties:
+        detail:
+          items:
+            $ref: '#/components/schemas/ValidationError'
+          type: array
+          title: Detail
+      type: object
+      title: HTTPValidationError
+    HistoryCreate:
+      properties:
+        menu_id:
+          anyOf:
+            - type: string
+              format: uuid
+            - type: 'null'
+          title: Menu Id
+          description: Идентификатор меню (необязательный)
+        action_date:
+          type: string
+          format: date-time
+          title: Action Date
+          description: Дата и время действия
+      type: object
+      required:
+        - action_date
+      title: HistoryCreate
+    HistoryOut:
+      properties:
+        menu_id:
+          anyOf:
+            - type: string
+              format: uuid
+            - type: 'null'
+          title: Menu Id
+          description: Идентификатор меню (необязательный)
+        action_date:
+          type: string
+          format: date-time
+          title: Action Date
+          description: Дата и время действия
+        user_id:
+          type: string
+          title: User Id
+          description: Идентификатор пользователя
+        action_id:
+          type: string
+          format: uuid
+          title: Action Id
+          description: Идентификатор действия
+        created_at:
+          type: string
+          format: date-time
+          title: Created At
+          description: Дата и время создания записи истории
+      type: object
+      required:
+        - action_date
+        - user_id
+        - action_id
+        - created_at
+      title: HistoryOut
+    MenuNodeCreate:
+      properties:
+        parent_id:
+          anyOf:
+            - type: string
+              format: uuid
+            - type: 'null'
+          title: Parent Id
+          description: Идентификатор родительского узла (необязательный)
+        name:
+          type: string
+          title: Name
+          description: Имя нового узла
+        text:
+          anyOf:
+            - type: string
+            - type: 'null'
+          title: Text
+          description: Текст узла (необязательный)
+        subscription_type:
+          anyOf:
+            - type: string
+            - type: 'null'
+          title: Subscription Type
+          description: Тип подписки (необязательный)
+      type: object
+      required:
+        - name
+      title: MenuNodeCreate
+    MenuNodeOut:
+      properties:
+        id:
+          type: string
+          format: uuid
+          title: Id
+          description: Уникальный идентификатор узла меню
+        parent_id:
+          anyOf:
+            - type: string
+              format: uuid
+            - type: 'null'
+          title: Parent Id
+          description: Идентификатор родительского узла (если есть)
+        name:
+          type: string
+          title: Name
+          description: Имя узла меню
+        text:
+          anyOf:
+            - type: string
+            - type: 'null'
+          title: Text
+          description: Текстовое наполнение узла
+        subscription_type:
+          anyOf:
+            - type: string
+            - type: 'null'
+          title: Subscription Type
+          description: Тип подписки (если есть)
+        content:
+          items:
+            $ref: '#/components/schemas/ContentOut'
+          type: array
+          title: Content
+          description: Список контента, привязанного к узлу
+        children_names:
+          items:
+            type: string
+          type: array
+          title: Children Names
+          description: Имена дочерних узлов меню
+      type: object
+      required:
+        - id
+        - name
+        - content
+        - children_names
+      title: MenuNodeOut
+    MenuNodeUpdate:
+      properties:
+        parent_id:
+          anyOf:
+            - type: string
+              format: uuid
+            - type: 'null'
+          title: Parent Id
+          description: Идентификатор родительского узла (необязательный)
+        name:
+          type: string
+          title: Name
+          description: Имя нового узла
+        text:
+          anyOf:
+            - type: string
+            - type: 'null'
+          title: Text
+          description: Текст узла (необязательный)
+        subscription_type:
+          anyOf:
+            - type: string
+            - type: 'null'
+          title: Subscription Type
+          description: Тип подписки (необязательный)
+      type: object
+      required:
+        - name
+      title: MenuNodeUpdate
+      description: То же, что MenuNodeCreate, используется для обновления.
+    Message:
+      properties:
+        detail:
+          type: string
+          title: Detail
+          description: Сообщение об ошибке или информация
+          default: ''
+      type: object
+      title: Message
+    QuestionAnswer:
+      properties:
+        admin_answer:
+          type: string
+          title: Admin Answer
+          description: Текст вопроса
+      type: object
+      required:
+        - admin_answer
+      title: QuestionAnswer
+    QuestionCreate:
+      properties:
+        user_id:
+          type: string
+          title: User Id
+          description: Идентификатор пользователя, задающего вопрос
+        text:
+          type: string
+          title: Text
+          description: Текст вопроса
+      type: object
+      required:
+        - user_id
+        - text
+      title: QuestionCreate
+    QuestionOut:
+      properties:
+        id:
+          type: string
+          format: uuid
+          title: Id
+          description: Уникальный идентификатор вопроса
+        user_id:
+          type: string
+          title: User Id
+          description: Идентификатор пользователя, задавшего вопрос
+        text:
+          type: string
+          title: Text
+          description: Текст вопроса
+        admin_answer:
+          anyOf:
+            - type: string
+            - type: 'null'
+          title: Admin Answer
+          description: Ответ администратора (может отсутствовать)
+        created_at:
+          type: string
+          format: date-time
+          title: Created At
+          description: Дата и время создания
+        updated_at:
+          type: string
+          format: date-time
+          title: Updated At
+          description: Дата и время последнего обновления
+      type: object
+      required:
+        - id
+        - user_id
+        - text
+        - created_at
+        - updated_at
+      title: QuestionOut
+    QuestionsListOut:
+      properties:
+        items:
+          items:
+            $ref: '#/components/schemas/QuestionOut'
+          type: array
+          title: Items
+          description: Список вопросов
+      type: object
+      required:
+        - items
+      title: QuestionsListOut
+    RatingCreate:
+      properties:
+        user_id:
+          type: string
+          title: User Id
+          description: Идентификатор пользователя
+        node_rating:
+          type: integer
+          maximum: 5
+          minimum: 1
+          title: Node Rating
+          description: Оценка (например, от 1 до 5)
+      type: object
+      required:
+        - user_id
+        - node_rating
+      title: RatingCreate
+    RatingOut:
+      properties:
+        user_id:
+          type: string
+          title: User Id
+          description: Идентификатор пользователя
+        node_rating:
+          type: integer
+          maximum: 5
+          minimum: 1
+          title: Node Rating
+          description: Оценка (например, от 1 до 5)
+        menu_id:
+          type: string
+          format: uuid
+          title: Menu Id
+          description: Идентификатор меню/узла, к которому привязана оценка
+        created_at:
+          type: string
+          format: date-time
+          title: Created At
+          description: Дата и время создания оценки
+        updated_at:
+          type: string
+          format: date-time
+          title: Updated At
+          description: Дата и время обновления оценки
+      type: object
+      required:
+        - user_id
+        - node_rating
+        - menu_id
+        - created_at
+        - updated_at
+      title: RatingOut
+    UserCreate:
+      properties:
+        id:
+          type: string
+          title: Id
+          description: Уникальный идентификатор пользователя
+        phone_number:
+          type: string
+          title: Phone Number
+          description: Номер телефона пользователя
+      type: object
+      required:
+        - id
+        - phone_number
+      title: UserCreate
+    UserOut:
+      properties:
+        id:
+          type: string
+          title: Id
+          description: Уникальный идентификатор пользователя
+        phone_number:
+          type: string
+          title: Phone Number
+          description: Номер телефона пользователя
+        created_at:
+          type: string
+          format: date-time
+          title: Created At
+          description: Дата и время создания пользователя
+        updated_at:
+          type: string
+          format: date-time
+          title: Updated At
+          description: Дата и время последнего обновления пользователя
+      type: object
+      required:
+        - id
+        - phone_number
+        - created_at
+        - updated_at
+      title: UserOut
+    UsersListOut:
+      properties:
+        items:
+          items:
+            $ref: '#/components/schemas/UserOut'
+          type: array
+          title: Items
+          description: Список пользователей
+      type: object
+      required:
+        - items
+      title: UsersListOut
+    ValidationError:
+      properties:
+        loc:
+          items:
+            anyOf:
+              - type: string
+              - type: integer
+          type: array
+          title: Location
+        msg:
+          type: string
+          title: Message
+        type:
+          type: string
+          title: Error Type
+      type: object
+      required:
+        - loc
+        - msg
+        - type
+      title: ValidationError
