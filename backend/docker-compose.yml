@@ -47,6 +47,8 @@ services:
       - ./.env
     expose:
       - "8000"
+    volumes:
+      - ./uploaded_content:/app/src/uploads
     environment:
       - PYTHONUNBUFFERED=1
       - FASTadmin_RELOAD=1

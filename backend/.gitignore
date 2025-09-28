@@ -1,4 +1,7 @@
 # Byte-compiled / optimized / DLL files
+uploaded_content/*
+!uploaded_content/.gitkeep
+
 __pycache__/
 *.py[cod]
 *$py.class
