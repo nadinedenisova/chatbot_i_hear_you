@@ -143,15 +143,15 @@ class MenuService:
             text=node.text,
             subscription_type=node.subscription_type,
             content=[
-                ContentOut(
-                    id=c.id,
-                    menu_id=c.menu_id,
-                    type=c.type,
-                    server_path=c.server_path,
-                    created_at=c.created_at,
-                    updated_at=c.updated_at,
-                )
-                for c in node.content
+                # ContentOut(
+                #     id=c.id,
+                #     menu_id=c.menu_id,
+                #     type=c.type,
+                #     server_path=c.server_path,
+                #     created_at=c.created_at,
+                #     updated_at=c.updated_at,
+                # )
+                # for c in node.content
             ],
             children_names=children_names,
         )

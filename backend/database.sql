@@ -1,13 +1,18 @@
+-- database.sql
 CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 
-CREATE TABLE "user" (
+-- Создать схему content
+CREATE SCHEMA IF NOT EXISTS content;
+
+-- Создать таблицы в схеме content
+CREATE TABLE content."user" (
 	"id" VARCHAR(255) PRIMARY KEY,
 	"phone_number" VARCHAR(255) NOT NULL,
 	"created_at" TIMESTAMP NOT NULL DEFAULT now(),
     "updated_at" TIMESTAMP NOT NULL DEFAULT now()
 );
 
-CREATE TABLE "menu_node" (
+CREATE TABLE content.menu_node (
 	"id" UUID PRIMARY KEY DEFAULT gen_random_uuid(),
 	"parent_id" UUID,
 	"name" VARCHAR(255) NOT NULL,
@@ -15,7 +20,7 @@ CREATE TABLE "menu_node" (
 	"subscription_type" VARCHAR(255)
 );
 
-CREATE TABLE "content" (
+CREATE TABLE content.content (
 	"id" UUID PRIMARY KEY DEFAULT gen_random_uuid(),
 	"menu_id" UUID NOT NULL,
 	"type" SMALLINT NOT NULL,
@@ -24,7 +29,7 @@ CREATE TABLE "content" (
     "updated_at" TIMESTAMP NOT NULL DEFAULT now()
 );
 
-CREATE TABLE "question" (
+CREATE TABLE content.question (
 	"id" UUID PRIMARY KEY DEFAULT gen_random_uuid(),
 	"user_id" VARCHAR(255) NOT NULL,
 	"text" TEXT NOT NULL,
@@ -33,7 +38,7 @@ CREATE TABLE "question" (
     "updated_at" TIMESTAMP NOT NULL DEFAULT now()
 );
 
-CREATE TABLE "history" (
+CREATE TABLE content.history (
 	"id" UUID PRIMARY KEY DEFAULT gen_random_uuid(),
 	"user_id" VARCHAR(255) NOT NULL,
 	"action_date" TIMESTAMP NOT NULL,
@@ -41,7 +46,7 @@ CREATE TABLE "history" (
 	"created_at" TIMESTAMP NOT NULL DEFAULT now()
 );
 
-CREATE TABLE "user_menu_node" (
+CREATE TABLE content.user_menu_node (
 	"id" UUID PRIMARY KEY DEFAULT gen_random_uuid(),
 	"user_id" VARCHAR(255) NOT NULL,
 	"menu_id" UUID NOT NULL,
@@ -52,21 +57,23 @@ CREATE TABLE "user_menu_node" (
 );
 
 
-ALTER TABLE "menu_node" ADD FOREIGN KEY ("parent_id") REFERENCES "menu_node" ("id");
-ALTER TABLE "content" ADD FOREIGN KEY ("menu_id") REFERENCES "menu_node" ("id");
-ALTER TABLE "question" ADD FOREIGN KEY ("user_id") REFERENCES "user" ("id");
-ALTER TABLE "history" ADD FOREIGN KEY ("user_id") REFERENCES "user" ("id");
-ALTER TABLE "history" ADD FOREIGN KEY ("menu_id") REFERENCES "menu_node" ("id");
-ALTER TABLE "user_menu_node" ADD FOREIGN KEY ("menu_id") REFERENCES "menu_node" ("id");
-ALTER TABLE "user_menu_node" ADD FOREIGN KEY ("user_id") REFERENCES "user" ("id");
+-- Добавление внешних ключей
+ALTER TABLE content.menu_node ADD FOREIGN KEY ("parent_id") REFERENCES content.menu_node ("id");
+ALTER TABLE content.content ADD FOREIGN KEY ("menu_id") REFERENCES content.menu_node ("id");
+ALTER TABLE content.question ADD FOREIGN KEY ("user_id") REFERENCES content."user" ("id");
+ALTER TABLE content.history ADD FOREIGN KEY ("user_id") REFERENCES content."user" ("id");
+ALTER TABLE content.history ADD FOREIGN KEY ("menu_id") REFERENCES content.menu_node ("id");
+ALTER TABLE content.user_menu_node ADD FOREIGN KEY ("menu_id") REFERENCES content.menu_node ("id");
+ALTER TABLE content.user_menu_node ADD FOREIGN KEY ("user_id") REFERENCES content."user" ("id");
 
 
-INSERT INTO "user" ("id", "phone_number") VALUES 
+-- Вставка тестовых данных
+INSERT INTO content."user" ("id", "phone_number") VALUES 
 ('user_001', '+79161234567'),
 ('user_002', '+79169876543'),
 ('user_003', '+79155556677');
 
-INSERT INTO "menu_node" ("id", "parent_id", "name", "text", "subscription_type") VALUES 
+INSERT INTO content.menu_node ("id", "parent_id", "name", "text", "subscription_type") VALUES 
 ('00000000-0000-0000-0000-000000000001', NULL, 'Главное меню', 'Здравствуйте! Я бот-помощник "ано я тебя слышу". Мы помогаем семьям с детьми с нарушением слуха. Здесь вы найдете проверенную информацию и поддержку на каждом этапе. Чтобы я мог показать вам самые нужные материалы, выберите, пожалуйста, ваш путь.', 'free'),
 ('00000000-0000-0000-0000-000000000002', '00000000-0000-0000-0000-000000000001', 'Я волнуюсь о слухе ребенка', 'Вы выбрали раздел для родителей. Это большой путь, и вы не одни. Мы собрали информацию по самым важным темам — от первых шагов после диагноза до вопросов школы и социализации. Выберите, что вас беспокоит в первую очередь.', 'free'),
 ('00000000-0000-0000-0000-000000000003', '00000000-0000-0000-0000-000000000001', 'Я волнуюсь о своем слухе', 'Раздел для взрослых с нарушением слуха находится в разработке.', 'free'),
@@ -80,34 +87,35 @@ INSERT INTO "menu_node" ("id", "parent_id", "name", "text", "subscription_type")
 ('00000000-0000-0000-0000-000000000022', '00000000-0000-0000-0000-000000000011', 'Как справиться с шоком?', 'Как принять новость? Что является нормальной реакцией? Поддержка семьи: как разговаривать с партнёром, родственниками. Где найти помощь: группы взаимопомощи, горячие линии, психологи.', 'free'),
 ('00000000-0000-0000-0000-000000000023', '00000000-0000-0000-0000-000000000011', 'Понимание диагноза', 'Типы нарушений слуха: лёгкая, средняя, тяжёлая, глухота. Почему это важно: как тип и степень влияют на методы коррекции. Может ли слух измениться: динамика состояния, контрольные проверки.', 'free');
 
-INSERT INTO "content" ("menu_id", "type", "server_path") VALUES 
+INSERT INTO content.content ("menu_id", "type", "server_path") VALUES 
 ('00000000-0000-0000-0000-000000000011', 1, 'https://example.com/images/diagnosis_help.jpg'),
 ('00000000-0000-0000-0000-000000000011', 2, 'https://example.com/videos/first_steps.mp4'),
 ('00000000-0000-0000-0000-000000000012', 1, 'https://example.com/images/hearing_aids.jpg'),
 ('00000000-0000-0000-0000-000000000012', 3, 'https://example.com/documents/guide.pdf');
 
-INSERT INTO "question" ("user_id", "text", "admin_answer") VALUES 
+INSERT INTO content.question ("user_id", "text", "admin_answer") VALUES 
 ('user_001', 'Какой график работы вашей службы поддержки?', 'Наша служба поддержки работает с 9:00 до 18:00 по московскому времени в рабочие дни.'),
 ('user_002', 'Можно ли получить консультацию сурдолога онлайн?', 'Да, мы организуем онлайн-консультации со специалистами. Заполните форму на нашем сайте.'),
 ('user_003', 'Какие документы нужны для получения слухового аппарата?', NULL);
 
-INSERT INTO "history" ("user_id", "menu_id", "action_date") VALUES 
+INSERT INTO content.history ("user_id", "menu_id", "action_date") VALUES 
 ('user_001', '00000000-0000-0000-0000-000000000001', '2024-01-15 10:00:00'),
 ('user_001', '00000000-0000-0000-0000-000000000002', '2024-01-15 10:05:00'),
 ('user_001', '00000000-0000-0000-0000-000000000011', '2024-01-15 10:10:00'),
 ('user_002', '00000000-0000-0000-0000-000000000001', '2024-01-16 11:00:00'),
 ('user_002', '00000000-0000-0000-0000-000000000012', '2024-01-16 11:15:00');
 
-INSERT INTO "user_menu_node" ("user_id", "menu_id", "post_rating") VALUES 
+INSERT INTO content.user_menu_node ("user_id", "menu_id", "post_rating") VALUES 
 ('user_001', '00000000-0000-0000-0000-000000000011', 5),
 ('user_001', '00000000-0000-0000-0000-000000000012', 4),
 ('user_002', '00000000-0000-0000-0000-000000000011', 2),
 ('user_003', '00000000-0000-0000-0000-000000000013', 5);
 
 
-CREATE INDEX CONCURRENTLY idx_menu_node_parent_id ON menu_node(parent_id) WHERE parent_id IS NOT NULL;
-CREATE INDEX CONCURRENTLY idx_content_menu_id ON content(menu_id);
-CREATE INDEX CONCURRENTLY idx_history_user_id ON history(user_id);
-CREATE INDEX CONCURRENTLY idx_history_menu_id ON history(menu_id) WHERE menu_id IS NOT NULL;
-CREATE INDEX CONCURRENTLY idx_question_user_id ON question(user_id);
-CREATE INDEX CONCURRENTLY idx_history_user_action_date ON history(user_id, action_date);
+-- Создание индексов
+CREATE INDEX CONCURRENTLY idx_menu_node_parent_id ON content.menu_node(parent_id) WHERE parent_id IS NOT NULL;
+CREATE INDEX CONCURRENTLY idx_content_menu_id ON content.content(menu_id);
+CREATE INDEX CONCURRENTLY idx_history_user_id ON content.history(user_id);
+CREATE INDEX CONCURRENTLY idx_history_menu_id ON content.history(menu_id) WHERE menu_id IS NOT NULL;
+CREATE INDEX CONCURRENTLY idx_question_user_id ON content.question(user_id);
+CREATE INDEX CONCURRENTLY idx_history_user_action_date ON content.history(user_id, action_date);
