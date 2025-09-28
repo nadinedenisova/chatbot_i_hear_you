@@ -12,6 +12,7 @@ from schemas.entity import (
     QuestionOut,
     QuestionCreate,
     QuestionsListOut,
+    QuestionAnswer
 )
 from services.user_service import UserService, get_user_service
 from utils.pagination import PaginatedParams
@@ -80,7 +81,7 @@ async def create_question(
 )
 async def answer_question(
     question_id: UUID,
-    question_data: QuestionCreate,
+    question_data: QuestionAnswer,
     user_service: UserService = Depends(get_user_service),
 ):
     return await user_service.answer_question(question_id, question_data.admin_answer)

@@ -48,6 +48,29 @@ class MenuService:
 
         return root_nodes
 
+    def _get_content_list(self,node:MenuNode)->list[ContentOut]:
+        content = []
+        if node.content:
+            # Проверяем, является ли content списком или одиночным объектом
+            content_items: list[ContentOut] = []
+            if isinstance(node.content, list):
+                content_items = node.content
+            else:
+                # Если это одиночный объект, помещаем его в список
+                content_items = [node.content]
+            content = [
+                ContentOut(
+                    id=c.id,
+                    menu_id=c.menu_id,
+                    type=c.type,
+                    server_path=c.server_path,
+                    created_at=c.created_at,
+                    updated_at=c.updated_at,
+                )
+                for c in content_items
+            ]
+        return content
+
     async def get_full_menu(self) -> AllMenuNodeOut:
         """Получение полного дерева меню."""
         menu_nodes = await self.db_engine.get_full_menu()
@@ -64,17 +87,7 @@ class MenuService:
                 name=node.name,
                 text=node.text,
                 subscription_type=node.subscription_type,
-                content=[
-                    ContentOut(
-                        id=c.id,
-                        menu_id=c.menu_id,
-                        type=c.type,
-                        server_path=c.server_path,
-                        created_at=c.created_at,
-                        updated_at=c.updated_at,
-                    )
-                    for c in node.content
-                ],
+                content=self._get_content_list(node),
                 children_names=[
                     child.name for child in menu_nodes if child.parent_id == node.id
                 ],
@@ -112,17 +125,7 @@ class MenuService:
             name=node.name,
             text=node.text,
             subscription_type=node.subscription_type,
-            content=[
-                ContentOut(
-                    id=c.id,
-                    menu_id=c.menu_id,
-                    type=c.type,
-                    server_path=c.server_path,
-                    created_at=c.created_at,
-                    updated_at=c.updated_at,
-                )
-                for c in node.content
-            ],
+            content=self._get_content_list(node),
             children_names=children_names,
         )
 
@@ -142,17 +145,7 @@ class MenuService:
             name=node.name,
             text=node.text,
             subscription_type=node.subscription_type,
-            content=[
-                ContentOut(
-                    id=c.id,
-                    menu_id=c.menu_id,
-                    type=c.type,
-                    server_path=c.server_path,
-                    created_at=c.created_at,
-                    updated_at=c.updated_at,
-                )
-                for c in node.content
-            ],
+            content=self._get_content_list(node),
             children_names=children_names,
         )
 
@@ -172,17 +165,7 @@ class MenuService:
             name=node.name,
             text=node.text,
             subscription_type=node.subscription_type,
-            content=[
-                ContentOut(
-                    id=c.id,
-                    menu_id=c.menu_id,
-                    type=c.type,
-                    server_path=c.server_path,
-                    created_at=c.created_at,
-                    updated_at=c.updated_at,
-                )
-                for c in node.content
-            ],
+            content=self._get_content_list(node),
             children_names=children_names,
         )
 

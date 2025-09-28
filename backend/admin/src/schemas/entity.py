@@ -1,5 +1,5 @@
 from uuid import UUID
-from datetime import date
+from datetime import datetime  # Изменено с date на datetime
 
 from pydantic import BaseModel, Field
 
@@ -17,8 +17,8 @@ class QuestionOut(BaseModel):
     admin_answer: str | None = Field(
         None, description="Ответ администратора (может отсутствовать)"
     )
-    created_at: date = Field(..., description="Дата создания")
-    updated_at: date = Field(..., description="Дата последнего обновления")
+    created_at: datetime = Field(..., description="Дата и время создания")  # Изменено
+    updated_at: datetime = Field(..., description="Дата и время последнего обновления")  # Изменено
 
 
 class QuestionsListOut(BaseModel):
@@ -32,8 +32,8 @@ class ContentOut(BaseModel):
     )
     type: int = Field(..., description="Тип контента (числовой код)")
     server_path: str = Field(..., description="Серверный путь до контента")
-    created_at: date = Field(..., description="Дата создания")
-    updated_at: date = Field(..., description="Дата последнего обновления")
+    created_at: datetime = Field(..., description="Дата и время создания")  # Изменено
+    updated_at: datetime = Field(..., description="Дата и время последнего обновления")  # Изменено
 
 
 class MenuNodeOut(BaseModel):
@@ -87,6 +87,9 @@ class QuestionCreate(BaseModel):
     )
     text: str = Field(..., description="Текст вопроса")
 
+class QuestionAnswer(BaseModel):
+    admin_answer: str = Field(..., description="Текст вопроса")
+
 
 class UserCreate(BaseModel):
     id: str = Field(..., description="Уникальный идентификатор пользователя")
@@ -94,8 +97,8 @@ class UserCreate(BaseModel):
 
 
 class UserOut(UserCreate):
-    created_at: date = Field(..., description="Дата создания пользователя")
-    updated_at: date = Field(..., description="Дата последнего обновления пользователя")
+    created_at: datetime = Field(..., description="Дата и время создания пользователя")  # Изменено
+    updated_at: datetime = Field(..., description="Дата и время последнего обновления пользователя")  # Изменено
 
 
 class UsersListOut(BaseModel):
@@ -103,16 +106,16 @@ class UsersListOut(BaseModel):
 
 
 class HistoryCreate(BaseModel):
-    user_id: str = Field(..., description="Идентификатор пользователя")
     menu_id: UUID | None = Field(
         None, description="Идентификатор меню (необязательный)"
     )
-    action_date: date = Field(..., description="Дата действия")
+    action_date: datetime = Field(..., description="Дата и время действия")  # Изменено
 
 
 class HistoryOut(HistoryCreate):
+    user_id: str = Field(..., description="Идентификатор пользователя")
     action_id: UUID = Field(..., description="Идентификатор действия")
-    created_at: date = Field(..., description="Дата создания записи истории")
+    created_at: datetime = Field(..., description="Дата и время создания записи истории")  # Изменено
 
 
 class RatingCreate(BaseModel):
@@ -126,8 +129,8 @@ class RatingOut(RatingCreate):
     menu_id: UUID = Field(
         ..., description="Идентификатор меню/узла, к которому привязана оценка"
     )
-    created_at: date = Field(..., description="Дата создания оценки")
-    updated_at: date = Field(..., description="Дата обновления оценки")
+    created_at: datetime = Field(..., description="Дата и время создания оценки")  # Изменено
+    updated_at: datetime = Field(..., description="Дата и время обновления оценки")  # Изменено
 
 
 AllMenuNodeOut.model_rebuild()
