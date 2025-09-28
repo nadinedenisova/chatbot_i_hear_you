@@ -51,6 +51,13 @@ class MenuService:
     def _get_content_list(self,node:MenuNode)->list[ContentOut]:
         content = []
         if node.content:
+            # Проверяем, является ли content списком или одиночным объектом
+            content_items: list[ContentOut] = []
+            if isinstance(node.content, list):
+                content_items = node.content
+            else:
+                # Если это одиночный объект, помещаем его в список
+                content_items = [node.content]
             content = [
                 ContentOut(
                     id=c.id,
@@ -60,7 +67,7 @@ class MenuService:
                     created_at=c.created_at,
                     updated_at=c.updated_at,
                 )
-                for c in node.content
+                for c in content_items
             ]
         return content
 
@@ -80,17 +87,7 @@ class MenuService:
                 name=node.name,
                 text=node.text,
                 subscription_type=node.subscription_type,
-                content=[
-                    ContentOut(
-                        id=c.id,
-                        menu_id=c.menu_id,
-                        type=c.type,
-                        server_path=c.server_path,
-                        created_at=c.created_at,
-                        updated_at=c.updated_at,
-                    )
-                    for c in node.content
-                ],
+                content=self._get_content_list(node),
                 children_names=[
                     child.name for child in menu_nodes if child.parent_id == node.id
                 ],
