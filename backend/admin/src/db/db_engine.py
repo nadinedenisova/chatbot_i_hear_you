@@ -29,6 +29,59 @@ class DBEngine:
     def __init__(self, session: AsyncSession):
         self.session = session
 
+    async def add_content_with_file(
+            self, menu_id: UUID, content_data: ContentCreate, file_info: dict
+    ) -> Content:
+        """Добавляет контент с информацией о файле"""
+        content = Content(
+            menu_id=menu_id,
+            type=content_data.type,
+            server_path=file_info["server_path"],  # Используем реальный путь к файлу
+        )
+        self.session.add(content)
+        await self.session.commit()
+        await self.session.refresh(content)
+        return content
+
+    async def update_content_with_file(
+            self, content_id: UUID, content_data: ContentCreate, file_info: dict
+    ) -> Content:
+        """Обновляет контент с новым файлом"""
+        # Сначала получаем старый контент чтобы удалить старый файл
+        old_content = await self.get_content_by_id(content_id)
+
+        stmt = (
+            update(Content)
+            .where(Content.id == content_id)
+            .values(
+                type=content_data.type,
+                server_path=file_info["server_path"],
+                updated_at=func.now()
+            )
+            .returning(Content)
+        )
+
+        result = await self.session.execute(stmt)
+        await self.session.commit()
+
+        content = result.scalar_one_or_none()
+        if not content:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="Content not found"
+            )
+
+        # Удаляем старый файл если он существует
+        if old_content and old_content.server_path != file_info["server_path"]:
+            # Здесь можно добавить удаление старого файла
+            pass
+
+        return content
+
+    async def get_content_by_id(self, content_id: UUID) -> Content | None:
+        """Получает контент по ID"""
+        stmt = select(Content).where(Content.id == content_id)
+        result = await self.session.execute(stmt)
+        return result.scalar_one_or_none()
     # User methods
     async def get_users(self, pagination: PaginatedParams) -> Sequence[User]:
         stmt = (
