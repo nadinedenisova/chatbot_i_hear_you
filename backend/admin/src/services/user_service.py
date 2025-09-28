@@ -29,12 +29,8 @@ class UserService:
             UserOut(
                 id=str(user.id),
                 phone_number=user.phone_number,
-                created_at=user.created_at.date(),
-                updated_at=(
-                    user.updated_at.date()
-                    if user.updated_at
-                    else user.created_at.date()
-                ),
+                created_at=user.created_at,
+                updated_at=user.updated_at if user.updated_at else user.created_at,
             )
             for user in users
         ]
@@ -54,18 +50,14 @@ class UserService:
             UserOut(
                 id=str(user.id),
                 phone_number=user.phone_number,
-                created_at=user.created_at.date(),
-                updated_at=(
-                    user.updated_at.date()
-                    if user.updated_at
-                    else user.created_at.date()
-                ),
+                created_at=user.created_at,
+                updated_at=user.updated_at if user.updated_at else user.created_at,
             )
             for user in users
         ]
         return UsersListOut(items=user_out_list)
 
-    async def get_user_questions(self, user_id: str) -> UserOut:
+    async def get_user_questions(self, user_id: str) -> QuestionsListOut:
         """Получение всех вопросов пользователя"""
         user = await self.db_engine.get_user_by_id(user_id)
         if not user:
@@ -75,14 +67,20 @@ class UserService:
 
         questions = await self.db_engine.get_user_questions(user_id)
 
-        return UserOut(
-            id=str(user.id),
-            phone_number=user.phone_number,
-            created_at=user.created_at.date(),
-            updated_at=(
-                user.updated_at.date() if user.updated_at else user.created_at.date()
-            ),
-        )
+        if not questions:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Questions of that user not found")
+
+        if isinstance(questions, QuestionOut):
+            questions = [questions]
+
+        return QuestionsListOut(items=[
+            QuestionOut(id=q.id,
+                        user_id=q.user_id,
+                        text=q.text,
+                        admin_answer=q.admin_answer,
+                        created_at=q.created_at,
+                        updated_at=q.updated_at) for q in questions
+        ])
 
     async def get_all_questions(self, pagination: PaginatedParams) -> QuestionsListOut:
         """Получение всех вопросов"""
@@ -93,8 +91,8 @@ class UserService:
                 user_id=str(question.user_id),
                 text=question.text,
                 admin_answer=question.admin_answer,
-                created_at=question.created_at.date(),
-                updated_at=question.updated_at.date(),
+                created_at=question.created_at,
+                updated_at=question.updated_at,
             )
             for question in questions
         ]
@@ -114,7 +112,15 @@ class UserService:
         self, user_id: str, history_data: HistoryCreate
     ) -> dict:
         """Создание записи истории пользователя"""
-        history = await self.db_engine.create_history_record(history_data)
+        user=await self.db_engine.get_user_by_id(user_id)
+        if not user:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail="User not found")
+
+        menu=await self.db_engine.get_menu_node_by_id(history_data.menu_id)
+        if not menu:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail="Menu not found")
+
+        history = await self.db_engine.create_history_record(user_id, history_data)
         return {"detail": "User action recorded successfully"}
 
     async def get_user_history(
@@ -127,12 +133,8 @@ class UserService:
             user_id=user_id,
             action_id=history_records[0].id if history_records else UUID(int=0),
             menu_id=history_records[0].menu_id if history_records else None,
-            action_date=(
-                history_records[0].action_date.date() if history_records else None
-            ),
-            created_at=(
-                history_records[0].action_date.date() if history_records else None
-            ),
+            action_date=history_records[0].action_date if history_records else None,
+            created_at=history_records[0].action_date if history_records else None,
         )
 
 
