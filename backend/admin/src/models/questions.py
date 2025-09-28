@@ -4,7 +4,6 @@ from datetime import datetime, timezone
 from sqlalchemy import text, func, String, DateTime, ForeignKey
 from sqlalchemy.orm import mapped_column, relationship, Mapped
 from db.postgres import Base
-from models.users import User
 
 
 class Question(Base):
@@ -19,7 +18,7 @@ class Question(Base):
 
     user_id: Mapped[str] = mapped_column(String(255), ForeignKey("user.id"))
 
-    user: Mapped[User] = relationship(back_populates="questions")
+    user: Mapped["User"] = relationship("User", back_populates="questions")
 
     text: Mapped[str]
 

@@ -4,7 +4,6 @@ from datetime import datetime, timezone
 from sqlalchemy import text, func, String, DateTime, ForeignKey
 from sqlalchemy.orm import mapped_column, relationship, Mapped
 from db.postgres import Base
-from models.nodes import MenuNode
 
 
 class Content(Base):
@@ -21,7 +20,8 @@ class Content(Base):
         ForeignKey("menu_node.id"), nullable=False
     )
 
-    menu_node: Mapped[MenuNode] = relationship(back_populates="content")
+    menu_node: Mapped["MenuNode"] = relationship(
+        "MenuNode", back_populates="content")
 
     type: Mapped[int]
 

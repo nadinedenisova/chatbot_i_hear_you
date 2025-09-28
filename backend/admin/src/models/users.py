@@ -3,9 +3,6 @@ from datetime import datetime, timezone
 from sqlalchemy import func, DateTime, String
 from sqlalchemy.orm import mapped_column, relationship, Mapped
 from db.postgres import Base
-from models.questions import Question
-from models.history import History
-from models.ratings import UserMenuNode
 
 
 class User(Base):
@@ -19,11 +16,11 @@ class User(Base):
 
     phone_number: Mapped[str] = mapped_column(String(255), nullable=False)
 
-    questions: Mapped[list[Question]] = relationship(back_populates="user")
+    questions: Mapped[list] = relationship("Question", back_populates="user")
 
-    history: Mapped[list[History]] = relationship(back_populates="user")
+    history: Mapped[list] = relationship("History", back_populates="user")
 
-    ratings: Mapped[list[UserMenuNode]] = relationship(back_populates="user")
+    ratings: Mapped[list] = relationship("UserMenuNode", back_populates="user")
 
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),

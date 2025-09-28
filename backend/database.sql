@@ -42,6 +42,7 @@ CREATE TABLE "history" (
 );
 
 CREATE TABLE "user_menu_node" (
+	"id" UUID PRIMARY KEY DEFAULT gen_random_uuid(),
 	"user_id" VARCHAR(255) NOT NULL,
 	"menu_id" UUID NOT NULL,
 	"post_rating" SMALLINT,

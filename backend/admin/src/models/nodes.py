@@ -3,7 +3,6 @@ import uuid
 from sqlalchemy import text, String
 from sqlalchemy.orm import mapped_column, relationship, Mapped
 from db.postgres import Base
-from models.contents import Content
 
 
 class MenuNode(Base):
@@ -24,7 +23,7 @@ class MenuNode(Base):
 
     subscription_type: Mapped[str | None] = mapped_column(String(255))
 
-    content: Mapped[list[Content]] = relationship(back_populates="menu_node")
+    content: Mapped[list] = relationship("Content", back_populates="menu_node")
 
     def __repr__(self):
         return f"<MenuNode(id={self.id}"

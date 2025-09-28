@@ -2,7 +2,7 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 from fastapi.responses import ORJSONResponse
-from api.v1 import example,menu_router,users_router
+from api.v1 import example, menu_router, users_router
 from db.redis import _redis
 from core.settings import settings
 
@@ -26,4 +26,5 @@ app = FastAPI(
 
 app.include_router(example.router, prefix='/api/v1/example', tags=['Пример'])
 app.include_router(menu_router.router, prefix='/api/v1/menu', tags=['Меню'])
-app.include_router(users_router.router, prefix='/api/v1/users', tags=['Пользователи'])
+app.include_router(users_router.router,
+                   prefix='/api/v1/users', tags=['Пользователи'])

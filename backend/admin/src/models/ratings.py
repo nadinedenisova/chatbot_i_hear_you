@@ -1,18 +1,24 @@
 import uuid
 from datetime import datetime, timezone
 
-from sqlalchemy import func, String, DateTime, ForeignKey
+from sqlalchemy import text, func, String, DateTime, ForeignKey
 from sqlalchemy.orm import mapped_column, relationship, Mapped
 from db.postgres import Base
-from models.users import User
 
 
 class UserMenuNode(Base):
     __tablename__ = "user_menu_node"
 
+    id: Mapped[uuid.UUID] = mapped_column(
+        primary_key=True,
+        default=uuid.uuid4,
+        server_default=text("gen_random_uuid()"),
+        index=True,
+    )
+
     user_id: Mapped[str] = mapped_column(String(255), ForeignKey("user.id"))
 
-    user: Mapped[User] = relationship(back_populates="ratings")
+    user: Mapped["User"] = relationship("User", back_populates="ratings")
 
     menu_id: Mapped[uuid.UUID]
 
