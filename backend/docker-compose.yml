@@ -45,28 +45,56 @@ services:
     container_name: admin
     env_file:
       - ./.env
-    # expose:
-    #   - "8000"
-    ports:
-      - "8000:8000"
+    expose:
+      - "8000"
     volumes:
       - ./uploaded_content:/app/src/uploads
     environment:
       - PYTHONUNBUFFERED=1
-      - FASTadmin_RELOAD=1
+      - FASTAPI_RELOAD=1
     depends_on:
       admin-redis-db:
         condition: service_healthy
       admin-postgres-db:
         condition: service_healthy
+    develop:
+      watch:
+        - action: sync
+          path: ./admin/src
+          target: /opt/admin/src
 
-  # bot:
-  #   build: bot
-  #   container_name: bot
-  #   env_file:
-  #     - ./.env
-  #   environment:
-  #     - PYTHONUNBUFFERED=1
+  admin-tests:
+    build:
+      context: ./admin
+      dockerfile: Dockerfile tests
+    container_name: admin-tests
+    env_file:
+      - ./.env
+    environment:
+      - PYTHONUNBUFFERED=1
+    depends_on:
+      admin-redis-db:
+        condition: service_healthy
+      admin-postgres-db:
+        condition: service_healthy
+    develop:
+      watch:
+        - action: sync+restart
+          path: ./admin/src
+          target: /opt/admin/src
+
+  bot:
+    build: bot
+    container_name: bot
+    env_file:
+      - ./.env
+    environment:
+      - PYTHONUNBUFFERED=1
+    develop:
+      watch:
+        - action: sync+restart
+          path: ./bot/src
+          target: /opt/bot/src
 
 volumes:
   admin_redis_db_data:

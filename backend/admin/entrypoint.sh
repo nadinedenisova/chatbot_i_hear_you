@@ -1,5 +1,9 @@
-#!/bin/sh
+#!/bin/bash
 
-uvicorn main:app --host $ADMIN_SERVICE_HOST --port $ADMIN_SERVICE_PORT --reload
+set -e
 
-exec "$@"
+if [ "$DEV" = "True" ]; then
+    fastapi dev src/main.py --host 0.0.0.0 --port $ADMIN_SERVICE_PORT --reload
+else
+    fastapi run src/main.py --port $ADMIN_SERVICE_PORT
+fi

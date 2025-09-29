@@ -1,11 +1,12 @@
 # routers/file_router.py
 from fastapi import APIRouter, UploadFile, File, Depends, Form, HTTPException
 from uuid import UUID
-from services.menu_service import MenuService, get_menu_service
-from services.file_service import file_service
-from schemas.entity import Message, ContentCreate
+from src.services.menu_service import MenuService, get_menu_service
+from src.services.file_service import file_service
+from src.schemas.entity import Message, ContentCreate
 
 router = APIRouter()
+
 
 @router.post(
     "/{menu_id}/content/upload",
@@ -14,7 +15,8 @@ router = APIRouter()
 )
 async def add_menu_content_with_upload(
         menu_id: UUID,
-        file_type: int = Form(..., description="Тип контента (1-изображение, 2-видео, 3-документ)"),
+        file_type: int = Form(...,
+                              description="Тип контента (1-изображение, 2-видео, 3-документ)"),
         file: UploadFile = File(..., description="Файл для загрузки"),
         menu_service: MenuService = Depends(get_menu_service),
 ):
@@ -23,7 +25,8 @@ async def add_menu_content_with_upload(
     # Проверяем допустимые типы файлов
     allowed_image_types = ["image/jpeg", "image/png", "image/gif"]
     allowed_video_types = ["video/mp4", "video/avi", "video/mkv"]
-    allowed_document_types = ["application/pdf", "application/msword", "application/vnd.openxmlformats-officedocument.wordprocessingml.document"]
+    allowed_document_types = ["application/pdf", "application/msword",
+                              "application/vnd.openxmlformats-officedocument.wordprocessingml.document"]
 
     if file_type == 1 and file.content_type not in allowed_image_types:
         raise HTTPException(
@@ -41,8 +44,11 @@ async def add_menu_content_with_upload(
             detail="Недопустимый тип документа. Разрешены: PDF, DOC, DOCX"
         )
 
-    content_data = ContentCreate(menu_id=menu_id,type=file_type, server_path="")  # server_path будет заполнен автоматически
+    # server_path будет заполнен автоматически
+    content_data = ContentCreate(
+        menu_id=menu_id, type=file_type, server_path="")
     return await menu_service.add_menu_content_with_file(menu_id, content_data, file)
+
 
 @router.put(
     "/{menu_id}/content/upload/{content_id}",
@@ -52,13 +58,16 @@ async def add_menu_content_with_upload(
 async def update_menu_content_with_upload(
         menu_id: UUID,
         content_id: UUID,
-        file_type: int = Form(..., description="Тип контента (1-изображение, 2-видео, 3-документ)"),
+        file_type: int = Form(...,
+                              description="Тип контента (1-изображение, 2-видео, 3-документ)"),
         file: UploadFile = File(..., description="Новый файл для загрузки"),
         menu_service: MenuService = Depends(get_menu_service),
 ):
     """Обновляет контент с загрузкой нового файла на сервер"""
-    content_data = ContentCreate(menu_id=menu_id,type=file_type, server_path="")
+    content_data = ContentCreate(
+        menu_id=menu_id, type=file_type, server_path="")
     return await menu_service.update_menu_content_with_file(content_id, content_data, file)
+
 
 @router.post("/upload-test", summary="Тест загрузки файла")
 async def upload_test_file(file: UploadFile = File(...)):

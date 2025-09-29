@@ -1,19 +1,15 @@
 FROM python:3.13-bookworm
 
-# Устанавливаем рабочую директорию
-WORKDIR /app/src
+WORKDIR /opt/admin
 
-# Копируем зависимости
-COPY requirements.txt /app
+COPY . .
 
-# Устанавливаем зависимости
-RUN pip install --upgrade pip \
-    && pip install --no-cache-dir -r /app/requirements.txt
+RUN  pip install --upgrade pip \
+     && pip install --no-cache-dir -r requirements.txt
 
-# Копируем исходный код приложения
-COPY . /app
+EXPOSE 8000
 
-RUN chmod +x /app/entrypoint.sh
+RUN chmod +x /opt/admin/entrypoint.sh
 
 # Команда для запуска приложения
-ENTRYPOINT ["/app/entrypoint.sh"]
+ENTRYPOINT ["/opt/admin/entrypoint.sh"]

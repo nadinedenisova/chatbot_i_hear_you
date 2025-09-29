@@ -2,8 +2,8 @@
 from uuid import UUID
 from fastapi import Depends, HTTPException, status
 
-from db.db_engine import DBEngine, get_db_engine
-from schemas.entity import (
+from src.db.db_engine import DBEngine, get_db_engine
+from src.schemas.entity import (
     UserCreate,
     UserOut,
     UsersListOut,
@@ -13,7 +13,7 @@ from schemas.entity import (
     QuestionOut,
     QuestionsListOut,
 )
-from utils.pagination import PaginatedParams
+from src.utils.pagination import PaginatedParams
 
 
 class UserService:
@@ -68,7 +68,8 @@ class UserService:
         questions = await self.db_engine.get_user_questions(user_id)
 
         if not questions:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Questions of that user not found")
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                                detail="Questions of that user not found")
 
         if isinstance(questions, QuestionOut):
             questions = [questions]
@@ -112,13 +113,15 @@ class UserService:
         self, user_id: str, history_data: HistoryCreate
     ) -> dict:
         """Создание записи истории пользователя"""
-        user=await self.db_engine.get_user_by_id(user_id)
+        user = await self.db_engine.get_user_by_id(user_id)
         if not user:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail="User not found")
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
 
-        menu=await self.db_engine.get_menu_node_by_id(history_data.menu_id)
+        menu = await self.db_engine.get_menu_node_by_id(history_data.menu_id)
         if not menu:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail="Menu not found")
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="Menu not found")
 
         history = await self.db_engine.create_history_record(user_id, history_data)
         return {"detail": "User action recorded successfully"}
@@ -131,7 +134,8 @@ class UserService:
 
         return HistoryOut(
             user_id=user_id,
-            action_id=history_records[0].id if history_records else UUID(int=0),
+            action_id=history_records[0].id if history_records else UUID(
+                int=0),
             menu_id=history_records[0].menu_id if history_records else None,
             action_date=history_records[0].action_date if history_records else None,
             created_at=history_records[0].action_date if history_records else None,

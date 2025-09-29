@@ -6,14 +6,14 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 from fastapi import Depends, HTTPException, status
 
-from db.postgres import get_async_session
-from models.users import User
-from models.questions import Question
-from models.history import History
-from models.ratings import UserMenuNode
-from models.nodes import MenuNode
-from models.contents import Content
-from schemas.entity import (
+from src.db.postgres import get_async_session
+from src.models.users import User
+from src.models.questions import Question
+from src.models.history import History
+from src.models.ratings import UserMenuNode
+from src.models.nodes import MenuNode
+from src.models.contents import Content
+from src.schemas.entity import (
     UserCreate,
     QuestionCreate,
     HistoryCreate,
@@ -22,7 +22,7 @@ from schemas.entity import (
     MenuNodeUpdate,
     ContentCreate,
 )
-from utils.pagination import PaginatedParams
+from src.utils.pagination import PaginatedParams
 
 
 class DBEngine:
@@ -36,7 +36,8 @@ class DBEngine:
         content = Content(
             menu_id=menu_id,
             type=content_data.type,
-            server_path=file_info["server_path"],  # Используем реальный путь к файлу
+            # Используем реальный путь к файлу
+            server_path=file_info["server_path"],
         )
         self.session.add(content)
         await self.session.commit()
@@ -83,6 +84,7 @@ class DBEngine:
         result = await self.session.execute(stmt)
         return result.scalar_one_or_none()
     # User methods
+
     async def get_users(self, pagination: PaginatedParams) -> Sequence[User]:
         stmt = (
             select(User)
@@ -158,7 +160,8 @@ class DBEngine:
         return result.scalars().all()
 
     async def create_question(self, question_data: QuestionCreate) -> Question:
-        question = Question(user_id=question_data.user_id, text=question_data.text)
+        question = Question(user_id=question_data.user_id,
+                            text=question_data.text)
         self.session.add(question)
         await self.session.commit()
         await self.session.refresh(question)
@@ -183,7 +186,7 @@ class DBEngine:
         return question
 
     # History methods
-    async def create_history_record(self, user_id:str,history_data: HistoryCreate) -> History:
+    async def create_history_record(self, user_id: str, history_data: HistoryCreate) -> History:
         history = History(
             user_id=user_id,
             menu_id=history_data.menu_id,

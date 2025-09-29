@@ -4,9 +4,9 @@ from fastapi import FastAPI
 from fastapi.responses import ORJSONResponse
 from fastapi.staticfiles import StaticFiles
 
-from api.v1 import example, menu_router, users_router,file_router
-from db.redis import _redis
-from core.settings import settings
+from src.api.v1 import example, menu_router, users_router, file_router
+from src.db.redis import _redis
+from src.core.settings import settings
 
 
 @asynccontextmanager
@@ -31,6 +31,7 @@ app.include_router(menu_router.router, prefix='/api/v1/menu', tags=['Меню'])
 app.include_router(users_router.router,
                    prefix='/api/v1/users', tags=['Пользователи'])
 
-app.include_router(file_router.router, prefix="/api/files", tags=["Загрузка файлов"])
+app.include_router(file_router.router, prefix="/api/files",
+                   tags=["Загрузка файлов"])
 
 app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")

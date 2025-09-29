@@ -3,8 +3,8 @@ from typing import Annotated
 # from redis.asyncio import Redis
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
-from db.postgres import get_async_session
-from db.redis import get_redis
+from src.db.postgres import get_async_session
+from src.db.redis import get_redis
 
 
 router = APIRouter()
