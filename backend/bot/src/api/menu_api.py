@@ -22,7 +22,7 @@ class MenuAPI:
         Если menu_id не указан, получаем все меню, иначе получаем конкретное.
         """
 
-        url = f'{self.api_url}/menu/root'  # ЗАМЕНИТЬ!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        url = f'{self.api_url}/menu'
         if menu_id:
             url = f'{url}/{menu_id}'
 
@@ -31,7 +31,6 @@ class MenuAPI:
                 async with session.get(url) as response:
                     response.raise_for_status()  # проверка статуса
                     data = await response.json()
-                    print(data)
                     return Menu(data)
         except Exception as e:
             logger.error(f'Ошибка загрузки меню: {e}')
