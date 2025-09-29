@@ -21,7 +21,6 @@ from schemas.entity import (
 from services.file_service import file_service
 from fastapi import UploadFile
 
-
 class MenuService:
     """Сервис для работы с меню."""
 
@@ -52,21 +51,24 @@ class MenuService:
 
     def _get_content_list(self, node: MenuNode) -> list[ContentOut]:
         """Получение списка контента для узла меню."""
-        return (
-            [
-                ContentOut(
-                    id=c.id,
-                    menu_id=c.menu_id,
-                    type=c.type,
-                    server_path=c.server_path,
-                    created_at=c.created_at,
-                    updated_at=c.updated_at,
-                )
-                for c in node.content
-            ]
-            if node.content
-            else []
-        )
+        return [
+            ContentOut(
+                id=c.id,
+                menu_id=c.menu_id,
+                type=c.type,
+                server_path=c.server_path,
+                created_at=c.created_at,
+                updated_at=c.updated_at,
+            )
+            for c in node.content
+        ] if node.content else []
+    async def _get_node_by_id(self, node_id: UUID) -> MenuNode:
+        node = await self.db_engine.get_menu_node_by_id(node_id)
+        if not node:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="Menu node not found"
+            )
+        return node
 
     async def get_full_menu(self) -> AllMenuNodeOut:
         """Получение полного дерева меню."""
@@ -148,11 +150,7 @@ class MenuService:
 
     async def get_menu_node_by_id(self, menu_id: UUID) -> MenuNodeOut:
         """Получение узла меню по ID."""
-        node = await self.db_engine.get_menu_node_by_id(menu_id)
-        if not node:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND, detail="Menu node not found"
-            )
+        node = await self._get_node_by_id(menu_id)
 
         children_names = await self._get_children_names(node.id)
 
@@ -168,6 +166,7 @@ class MenuService:
 
     async def add_menu_node(self, node_data: MenuNodeCreate) -> Message:
         """Добавление узла меню."""
+
         if node_data.parent_id:
             parent = await self.db_engine.get_menu_node_by_id(node_data.parent_id)
             if not parent:
@@ -176,6 +175,11 @@ class MenuService:
                     detail="Parent menu node not found",
                 )
 
+        if await self.db_engine.get_menu_node_by_name(node_data.name):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Node with the same name already exists",
+            )
         await self.db_engine.create_menu_node(node_data)
         return Message(detail="The menu node was added")
 
@@ -183,6 +187,22 @@ class MenuService:
         self, menu_id: UUID, node_data: MenuNodeUpdate
     ) -> Message:
         """Обновление узла меню."""
+        await self._get_node_by_id(menu_id)  # проверка есть ли menu_node с таким id
+
+        if node_data.parent_id:
+            parent = await self.db_engine.get_menu_node_by_id(node_data.parent_id)
+            if not parent:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="Parent menu node not found",
+                )
+
+        if await self.db_engine.get_menu_node_by_name(node_data.name):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Node with the same name already exists",
+            )
+
         await self.db_engine.update_menu_node(menu_id, node_data)
         return Message(detail="The menu node was updated")
 
@@ -199,6 +219,7 @@ class MenuService:
         self, menu_id: UUID, content_data: ContentCreate
     ) -> Message:
         """Добавление контента к узлу меню."""
+        await self._get_node_by_id(menu_id)  # проверка есть ли menu_node с таким id
         await self.db_engine.add_content_to_menu(menu_id, content_data)
         return Message(detail="The content was added")
 
@@ -206,6 +227,7 @@ class MenuService:
         self, content_id: UUID, content_data: ContentCreate
     ) -> Message:
         """Обновление контента."""
+        await self._get_node_by_id(content_data.menu_id)  # проверка есть ли menu_node с таким id
         await self.db_engine.update_content(content_id, content_data)
         return Message(detail="The content was changed")
 
@@ -219,9 +241,10 @@ class MenuService:
         return Message(detail="The node content was deleted")
 
     async def add_menu_content_with_file(
-        self, menu_id: UUID, content_data: ContentCreate, file: UploadFile
+            self, menu_id: UUID, content_data: ContentCreate, file: UploadFile
     ) -> Message:
         """Добавляет контент с загрузкой файла"""
+        await self._get_node_by_id(menu_id)  # проверка есть ли menu_node с таким id
         # Сохраняем файл
         file_info = await file_service.save_upload_file(file)
 
@@ -230,16 +253,16 @@ class MenuService:
         return Message(detail="The content was added with file")
 
     async def update_menu_content_with_file(
-        self, content_id: UUID, content_data: ContentCreate, file: UploadFile
+            self, content_id: UUID, content_data: ContentCreate, file: UploadFile
     ) -> Message:
         """Обновляет контент с новым файлом"""
+        await self._get_node_by_id(content_data.menu_id)  # проверка есть ли menu_node с таким id
+
         # Сохраняем новый файл
         file_info = await file_service.save_upload_file(file)
 
         # Обновляем контент в БД
-        await self.db_engine.update_content_with_file(
-            content_id, content_data, file_info
-        )
+        await self.db_engine.update_content_with_file(content_id, content_data, file_info)
         return Message(detail="The content was changed with new file")
 
     # TODO рейтинг это количество оценок "Полезно" и "Не очень" а не цифра
@@ -257,6 +280,11 @@ class MenuService:
 
     async def rate_menu_node(self, menu_id: UUID, rating_data: RatingCreate) -> Message:
         """Оценка узла меню."""
+        await self._get_node_by_id(menu_id) #проверка есть ли menu_node с таким id
+
+        user= await self.db_engine.get_user_by_id(rating_data.user_id)
+        if not user:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
         await self.db_engine.rate_menu_node(rating_data, menu_id)
         return Message(detail="The node was successfully rated!")
 
