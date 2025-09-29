@@ -49,6 +49,8 @@ services:
     #   - "8000"
     ports:
       - "8000:8000"
+    volumes:
+      - ./uploaded_content:/app/src/uploads
     environment:
       - PYTHONUNBUFFERED=1
       - FASTadmin_RELOAD=1

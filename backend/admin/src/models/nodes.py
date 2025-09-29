@@ -23,7 +23,9 @@ class MenuNode(Base):
 
     subscription_type: Mapped[str | None] = mapped_column(String(255))
 
-    content: Mapped[list] = relationship("Content", back_populates="menu_node")
+    content: Mapped[list["Content"]] = relationship(
+        "Content", back_populates="menu_node"
+    )
 
     def __repr__(self):
         return f"<MenuNode(id={self.id}"
