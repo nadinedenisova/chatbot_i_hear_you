@@ -45,8 +45,10 @@ services:
     container_name: admin
     env_file:
       - ./.env
-    expose:
-      - "8000"
+    # expose:
+    #   - "8000"
+    ports:
+      - "8000:8000"
     volumes:
       - ./uploaded_content:/app/src/uploads
     environment:
@@ -58,13 +60,13 @@ services:
       admin-postgres-db:
         condition: service_healthy
 
-  bot:
-    build: bot
-    container_name: bot
-    env_file:
-      - ./.env
-    environment:
-      - PYTHONUNBUFFERED=1
+  # bot:
+  #   build: bot
+  #   container_name: bot
+  #   env_file:
+  #     - ./.env
+  #   environment:
+  #     - PYTHONUNBUFFERED=1
 
 volumes:
   admin_redis_db_data:

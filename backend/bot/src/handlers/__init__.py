@@ -1,6 +1,3 @@
-"""
-Модуль обработчиков сообщений.
-"""
-from . import start, common
+from . import commands, common, content, navigation
 
-__all__ = ["start", "common"]
+__all__ = ["commands", 'common', 'content', 'navigation']
