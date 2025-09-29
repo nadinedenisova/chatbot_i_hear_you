@@ -12,7 +12,7 @@ from schemas.entity import (
     QuestionOut,
     QuestionCreate,
     QuestionsListOut,
-    QuestionAnswer
+    QuestionAnswer, HistoryListOut
 )
 from services.user_service import UserService, get_user_service
 from utils.pagination import PaginatedParams
@@ -51,7 +51,7 @@ async def get_long_time_lost_users(
 
 
 @router.get(
-    "/questions/{user_id}", summary="Вопросы пользователя", response_model=UserOut
+    "/questions/{user_id}", summary="Вопросы пользователя", response_model=QuestionsListOut
 )
 async def get_user_questions(
     user_id: str, user_service: UserService = Depends(get_user_service)
@@ -103,7 +103,7 @@ async def create_user_action_record(
 @router.get(
     "/{user_id}/history",
     summary="Получить историю пользователя",
-    response_model=HistoryOut,
+    response_model=HistoryListOut,
 )
 async def get_user_history(
     user_id: str,

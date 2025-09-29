@@ -11,7 +11,7 @@ from schemas.entity import (
     HistoryCreate,
     HistoryOut,
     QuestionOut,
-    QuestionsListOut,
+    QuestionsListOut, HistoryListOut,
 )
 from utils.pagination import PaginatedParams
 
@@ -125,17 +125,20 @@ class UserService:
 
     async def get_user_history(
         self, user_id: str, pagination: PaginatedParams
-    ) -> HistoryOut:
+    ) -> HistoryListOut:
         """Получение истории пользователя"""
         history_records = await self.db_engine.get_user_history(user_id, pagination)
-
-        return HistoryOut(
-            user_id=user_id,
-            action_id=history_records[0].id if history_records else UUID(int=0),
-            menu_id=history_records[0].menu_id if history_records else None,
-            action_date=history_records[0].action_date if history_records else None,
-            created_at=history_records[0].action_date if history_records else None,
-        )
+        history_out_list = [
+            HistoryOut(
+                user_id=user_id,
+                action_id=history_record.id,
+                menu_id=history_record.menu_id,
+                action_date=history_record.action_date,
+                created_at=history_record.action_date,
+            )
+            for history_record in history_records
+        ]
+        return HistoryListOut(items=history_out_list)
 
 
 def get_user_service(db_engine: DBEngine = Depends(get_db_engine)) -> UserService:

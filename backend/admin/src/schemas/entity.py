@@ -117,6 +117,8 @@ class HistoryOut(HistoryCreate):
     action_id: UUID = Field(..., description="Идентификатор действия")
     created_at: datetime = Field(..., description="Дата и время создания записи истории")  # Изменено
 
+class HistoryListOut(BaseModel):
+    items: list[HistoryOut] = Field(..., description="Список действий")
 
 class RatingCreate(BaseModel):
     user_id: str = Field(..., description="Идентификатор пользователя")
