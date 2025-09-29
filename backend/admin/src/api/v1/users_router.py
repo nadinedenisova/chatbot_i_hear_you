@@ -12,7 +12,7 @@ from schemas.entity import (
     QuestionOut,
     QuestionCreate,
     QuestionsListOut,
-    QuestionAnswer
+    QuestionAnswer,
 )
 from services.user_service import UserService, get_user_service
 from utils.pagination import PaginatedParams

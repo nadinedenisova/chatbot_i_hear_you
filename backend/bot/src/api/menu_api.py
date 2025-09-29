@@ -22,9 +22,9 @@ class MenuAPI:
         Если menu_id не указан, получаем все меню, иначе получаем конкретное.
         """
 
-        url = f'{self.api_url}/menu'
+        url = f"{self.api_url}/menu"
         if menu_id:
-            url = f'{url}/{menu_id}'
+            url = f"{url}/{menu_id}"
 
         try:
             async with aiohttp.ClientSession(timeout=self.timeout) as session:
@@ -33,7 +33,7 @@ class MenuAPI:
                     data = await response.json()
                     return Menu(data)
         except Exception as e:
-            logger.error(f'Ошибка загрузки меню: {e}')
+            logger.error(f"Ошибка загрузки меню: {e}")
             raise
 
     async def get_content_url(self, content_id: str) -> str:
@@ -41,11 +41,11 @@ class MenuAPI:
         try:
             async with aiohttp.ClientSession(timeout=self.timeout) as session:
                 async with session.get(
-                    f'{self.api_url}/content/{content_id}/url'
+                    f"{self.api_url}/content/{content_id}/url"
                 ) as resp:
                     resp.raise_for_status()
                     result = await resp.json()
-                    return result.get('url')
+                    return result.get("url")
         except Exception as e:
-            logger.error(f'Ошибка загрузки контента: {e}')
+            logger.error(f"Ошибка загрузки контента: {e}")
             raise

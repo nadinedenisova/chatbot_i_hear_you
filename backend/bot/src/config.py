@@ -13,10 +13,10 @@ env.read_env()
 class Config:
     """Класс для хранения конфигурационных переменных."""
 
-    BOT_TOKEN = env.str('BOT_TOKEN')
-    API_URL = env.str('API_URL')
+    BOT_TOKEN = env.str("BOT_TOKEN")
+    API_URL = env.str("API_URL")
     API_TIMEOUT: int = 15  # Время ожидания ответа от API в секундах
-    LOG_LEVEL = env.str('LOG_LEVEL', default='INFO')
+    LOG_LEVEL = env.str("LOG_LEVEL", default="INFO")
 
 
 config = Config()

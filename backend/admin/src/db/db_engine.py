@@ -30,7 +30,7 @@ class DBEngine:
         self.session = session
 
     async def add_content_with_file(
-            self, menu_id: UUID, content_data: ContentCreate, file_info: dict
+        self, menu_id: UUID, content_data: ContentCreate, file_info: dict
     ) -> Content:
         """Добавляет контент с информацией о файле"""
         content = Content(
@@ -44,7 +44,7 @@ class DBEngine:
         return content
 
     async def update_content_with_file(
-            self, content_id: UUID, content_data: ContentCreate, file_info: dict
+        self, content_id: UUID, content_data: ContentCreate, file_info: dict
     ) -> Content:
         """Обновляет контент с новым файлом"""
         # Сначала получаем старый контент чтобы удалить старый файл
@@ -56,7 +56,7 @@ class DBEngine:
             .values(
                 type=content_data.type,
                 server_path=file_info["server_path"],
-                updated_at=func.now()
+                updated_at=func.now(),
             )
             .returning(Content)
         )
@@ -82,6 +82,7 @@ class DBEngine:
         stmt = select(Content).where(Content.id == content_id)
         result = await self.session.execute(stmt)
         return result.scalar_one_or_none()
+
     # User methods
     async def get_users(self, pagination: PaginatedParams) -> Sequence[User]:
         stmt = (
@@ -113,7 +114,7 @@ class DBEngine:
         return user
 
     async def get_long_time_lost_users(
-            self, days_count: int, pagination: PaginatedParams
+        self, days_count: int, pagination: PaginatedParams
     ) -> Sequence[User]:
         # Для PostgreSQL (рекомендуемый)
         cutoff_date = func.now() - text(f"INTERVAL '{days_count} days'")
@@ -183,7 +184,9 @@ class DBEngine:
         return question
 
     # History methods
-    async def create_history_record(self, user_id:str,history_data: HistoryCreate) -> History:
+    async def create_history_record(
+        self, user_id: str, history_data: HistoryCreate
+    ) -> History:
         history = History(
             user_id=user_id,
             menu_id=history_data.menu_id,
@@ -361,4 +364,8 @@ class DBEngine:
 
 
 def get_db_engine(session: AsyncSession = Depends(get_async_session)):
+    return DBEngine(session)
+
+
+def create_db_engine(session: AsyncSession) -> DBEngine:
     return DBEngine(session)

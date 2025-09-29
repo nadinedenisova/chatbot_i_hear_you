@@ -22,24 +22,27 @@ class NavigatorService:
 
         # Проверяем, чтобы не было дублирования в стеке:
         # - если стек пустой или последний элемент не равен текущему menu_id
-        if not self.navigation_stack[user_id] or \
-           self.navigation_stack[user_id][-1] != menu_id:
+        if (
+            not self.navigation_stack[user_id]
+            or self.navigation_stack[user_id][-1] != menu_id
+        ):
             self.navigation_stack[user_id].append(menu_id)
 
             # Ограничиваем размер стека до 50 элементов
             if len(self.navigation_stack[user_id]) > 50:
-                self.navigation_stack[user_id] \
-                    = self.navigation_stack[user_id][-50:]
+                self.navigation_stack[user_id] = self.navigation_stack[user_id][-50:]
 
     def go_back(self, user_id: int) -> Optional[str]:
         """Вернуться на предыдущую позицию."""
-        if (user_id in self.navigation_stack and
-                len(self.navigation_stack[user_id]) > 1):
+        if user_id in self.navigation_stack and len(self.navigation_stack[user_id]) > 1:
             self.navigation_stack[user_id].pop()
 
             # Устанавливаем текущую позицию на предыдущую
-            previous = self.navigation_stack[user_id][-1] \
-                if self.navigation_stack[user_id] else None
+            previous = (
+                self.navigation_stack[user_id][-1]
+                if self.navigation_stack[user_id]
+                else None
+            )
             if previous:
                 self.user_positions[user_id] = previous
             return previous

@@ -68,19 +68,27 @@ class UserService:
         questions = await self.db_engine.get_user_questions(user_id)
 
         if not questions:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Questions of that user not found")
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Questions of that user not found",
+            )
 
         if isinstance(questions, QuestionOut):
             questions = [questions]
 
-        return QuestionsListOut(items=[
-            QuestionOut(id=q.id,
-                        user_id=q.user_id,
-                        text=q.text,
-                        admin_answer=q.admin_answer,
-                        created_at=q.created_at,
-                        updated_at=q.updated_at) for q in questions
-        ])
+        return QuestionsListOut(
+            items=[
+                QuestionOut(
+                    id=q.id,
+                    user_id=q.user_id,
+                    text=q.text,
+                    admin_answer=q.admin_answer,
+                    created_at=q.created_at,
+                    updated_at=q.updated_at,
+                )
+                for q in questions
+            ]
+        )
 
     async def get_all_questions(self, pagination: PaginatedParams) -> QuestionsListOut:
         """Получение всех вопросов"""
@@ -112,13 +120,17 @@ class UserService:
         self, user_id: str, history_data: HistoryCreate
     ) -> dict:
         """Создание записи истории пользователя"""
-        user=await self.db_engine.get_user_by_id(user_id)
+        user = await self.db_engine.get_user_by_id(user_id)
         if not user:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail="User not found")
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
+            )
 
-        menu=await self.db_engine.get_menu_node_by_id(history_data.menu_id)
+        menu = await self.db_engine.get_menu_node_by_id(history_data.menu_id)
         if not menu:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail="Menu not found")
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="Menu not found"
+            )
 
         history = await self.db_engine.create_history_record(user_id, history_data)
         return {"detail": "User action recorded successfully"}

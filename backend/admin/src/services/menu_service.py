@@ -21,6 +21,7 @@ from schemas.entity import (
 from services.file_service import file_service
 from fastapi import UploadFile
 
+
 class MenuService:
     """Сервис для работы с меню."""
 
@@ -51,17 +52,21 @@ class MenuService:
 
     def _get_content_list(self, node: MenuNode) -> list[ContentOut]:
         """Получение списка контента для узла меню."""
-        return [
-            ContentOut(
-                id=c.id,
-                menu_id=c.menu_id,
-                type=c.type,
-                server_path=c.server_path,
-                created_at=c.created_at,
-                updated_at=c.updated_at,
-            )
-            for c in node.content
-        ] if node.content else []
+        return (
+            [
+                ContentOut(
+                    id=c.id,
+                    menu_id=c.menu_id,
+                    type=c.type,
+                    server_path=c.server_path,
+                    created_at=c.created_at,
+                    updated_at=c.updated_at,
+                )
+                for c in node.content
+            ]
+            if node.content
+            else []
+        )
 
     async def get_full_menu(self) -> AllMenuNodeOut:
         """Получение полного дерева меню."""
@@ -214,7 +219,7 @@ class MenuService:
         return Message(detail="The node content was deleted")
 
     async def add_menu_content_with_file(
-            self, menu_id: UUID, content_data: ContentCreate, file: UploadFile
+        self, menu_id: UUID, content_data: ContentCreate, file: UploadFile
     ) -> Message:
         """Добавляет контент с загрузкой файла"""
         # Сохраняем файл
@@ -225,14 +230,16 @@ class MenuService:
         return Message(detail="The content was added with file")
 
     async def update_menu_content_with_file(
-            self, content_id: UUID, content_data: ContentCreate, file: UploadFile
+        self, content_id: UUID, content_data: ContentCreate, file: UploadFile
     ) -> Message:
         """Обновляет контент с новым файлом"""
         # Сохраняем новый файл
         file_info = await file_service.save_upload_file(file)
 
         # Обновляем контент в БД
-        await self.db_engine.update_content_with_file(content_id, content_data, file_info)
+        await self.db_engine.update_content_with_file(
+            content_id, content_data, file_info
+        )
         return Message(detail="The content was changed with new file")
 
     # TODO рейтинг это количество оценок "Полезно" и "Не очень" а не цифра

@@ -11,13 +11,13 @@ from utils.texts import TEXTS
 
 
 logger = logging.getLogger(__name__)
-router = Router(name='content')
+router = Router(name="content")
 
 menu_api = MenuAPI()
 keyboard_builder = MenuKeyboard()
 
 
-@router.callback_query(MenuStates.navigating, F.data.startswith('content:'))
+@router.callback_query(MenuStates.navigating, F.data.startswith("content:"))
 async def view_content(callback: CallbackQuery, state: FSMContext):
     """View content handler"""
     try:
@@ -30,4 +30,4 @@ async def view_content(callback: CallbackQuery, state: FSMContext):
         await callback.answer("✅ Контент отправлен")
     except Exception as e:
         logger.error(f"Ошибка загрузки контента: {e}")
-        await callback.answer(TEXTS['error'], show_alert=True)
+        await callback.answer(TEXTS["error"], show_alert=True)
