@@ -17,8 +17,7 @@ class Question(Base):
     )
 
     user_id: Mapped[str] = mapped_column(
-        String(255),
-        ForeignKey("user.id", ondelete="CASCADE")
+        String(255), ForeignKey("user.id", ondelete="CASCADE")
     )
 
     user: Mapped["User"] = relationship("User", back_populates="questions")

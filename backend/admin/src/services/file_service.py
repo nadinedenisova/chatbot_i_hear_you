@@ -3,6 +3,7 @@ import uuid
 from fastapi import UploadFile, HTTPException, status
 from pathlib import Path
 
+
 class FileService:
     def __init__(self, upload_dir: str = "uploads"):
         self.upload_dir = Path(upload_dir)
@@ -16,7 +17,9 @@ class FileService:
         """Сохраняет загруженный файл и возвращает информацию о нем"""
         try:
             # Генерируем уникальное имя файла
-            file_extension = Path(upload_file.filename).suffix if upload_file.filename else ""
+            file_extension = (
+                Path(upload_file.filename).suffix if upload_file.filename else ""
+            )
             unique_filename = f"{uuid.uuid4()}{file_extension}"
 
             # Сохраняем файл
@@ -33,13 +36,13 @@ class FileService:
                 "server_path": str(file_path),
                 "file_size": len(content),
                 "content_type": upload_file.content_type,
-                "saved_filename": unique_filename
+                "saved_filename": unique_filename,
             }
 
         except Exception as e:
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail=f"Ошибка при сохранении файла: {str(e)}"
+                detail=f"Ошибка при сохранении файла: {str(e)}",
             )
 
     def delete_file(self, server_path: str) -> bool:
@@ -52,6 +55,7 @@ class FileService:
             return False
         except Exception:
             return False
+
 
 # Создаем экземпляр сервиса
 file_service = FileService()
