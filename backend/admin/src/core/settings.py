@@ -20,6 +20,7 @@ class Settings(BaseSettings):
 
     # bot
     bot_token: str
+    reminder_polling_interval_in_minutes: int
 
 
 settings = Settings()  # type: ignore

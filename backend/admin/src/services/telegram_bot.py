@@ -1,3 +1,5 @@
+from functools import lru_cache
+
 from aiogram import Bot
 from aiogram.enums import ParseMode
 from aiogram.client.default import DefaultBotProperties
@@ -13,6 +15,6 @@ class TelegramBot:
     async def send_message(self, user_id: int, text: str):
         await self.bot.send_message(user_id, text)
 
-
+@lru_cache()
 def get_telegram_bot():
     return TelegramBot(token=settings.bot_token)

@@ -366,6 +366,5 @@ class DBEngine:
 def get_db_engine(session: AsyncSession = Depends(get_async_session)):
     return DBEngine(session)
 
-
 def create_db_engine(session: AsyncSession) -> DBEngine:
     return DBEngine(session)

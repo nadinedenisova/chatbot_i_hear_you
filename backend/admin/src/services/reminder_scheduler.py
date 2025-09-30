@@ -7,6 +7,7 @@ from schemas.entity import HistoryCreate
 from services.telegram_bot import TelegramBot
 from db.db_engine import DBEngine
 from utils.pagination import PaginatedParams  # если используешь пагинацию
+from core.settings import settings
 import logging
 
 logger = logging.getLogger(__name__)
@@ -19,7 +20,7 @@ def start_scheduler(
     scheduler = AsyncIOScheduler()
     scheduler.add_job(
         notify_inactive_users,
-        IntervalTrigger(seconds=5),  # TODO заменить на час
+        IntervalTrigger(seconds=settings.reminder_polling_interval_in_minutes),  # TODO заменить на час
         # IntervalTrigger(hours=1),
         kwargs={"bot": bot, "db_engine": db_engine},
         name="notify_inactive_users",
