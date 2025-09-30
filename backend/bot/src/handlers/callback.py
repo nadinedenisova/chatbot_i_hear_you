@@ -5,7 +5,7 @@ from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
 from aiogram.types import CallbackQuery
 
-from menu_api import MenuAPI
+from menu_api import API
 from utils.menu_update import update_menu_state
 from utils.texts import TEXTS
 
@@ -14,17 +14,17 @@ logger = logging.getLogger(__name__)
 router = Router(name='callback')
 
 
-class MenuStates(StatesGroup):
+class States(StatesGroup):
     """Состояния для навигации по меню"""
     navigating = State()
 
 
 # Инициализируем API и хранилище для навигации (стек меню)
-menu_api = MenuAPI()
+menu_api = API()
 navigation_stack: dict[int, list[str]] = {}
 
 
-@router.callback_query(MenuStates.navigating, F.data.startswith('menu:'))
+@router.callback_query(States.navigating, F.data.startswith('menu:'))
 async def navigate_menu(callback: CallbackQuery, state: FSMContext):
     """Переход в подменю"""
     # Получаем индекс нажатой клавиши
@@ -71,7 +71,7 @@ async def navigate_menu(callback: CallbackQuery, state: FSMContext):
         await callback.answer(TEXTS['error_start'])
 
 
-@router.callback_query(MenuStates.navigating, F.data.startswith('cnt:'))
+@router.callback_query(States.navigating, F.data.startswith('cnt:'))
 async def show_content(callback: CallbackQuery, state: FSMContext):
     """Показ контента"""
     # Получаем индекс нажатой клавиши
@@ -100,7 +100,7 @@ async def show_content(callback: CallbackQuery, state: FSMContext):
         await callback.answer(TEXTS['content_not_found'])
 
 
-@router.callback_query(MenuStates.navigating, F.data == 'home')
+@router.callback_query(States.navigating, F.data == 'home')
 async def go_home(callback: CallbackQuery, state: FSMContext):
     """Возврат в главное меню"""
     try:
@@ -122,7 +122,7 @@ async def go_home(callback: CallbackQuery, state: FSMContext):
         await callback.answer(TEXTS['error_start'])
 
 
-@router.callback_query(MenuStates.navigating, F.data == 'back')
+@router.callback_query(States.navigating, F.data == 'back')
 async def go_back(callback: CallbackQuery, state: FSMContext):
     """Возврат назад"""
     user_id = callback.from_user.id

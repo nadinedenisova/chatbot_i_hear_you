@@ -9,7 +9,7 @@ from models import Menu
 logger = logging.getLogger(__name__)
 
 
-class MenuAPI:
+class API:
     """API для взаимодействия с меню."""
 
     def __init__(self):

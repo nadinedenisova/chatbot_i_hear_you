@@ -6,7 +6,7 @@ from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
 from aiogram.types import Message
 
-from menu_api import MenuAPI
+from menu_api import API
 from utils.menu_update import update_menu_state
 from utils.texts import TEXTS
 
@@ -15,13 +15,13 @@ logger = logging.getLogger(__name__)
 router = Router(name='command')
 
 
-class MenuStates(StatesGroup):
+class States(StatesGroup):
     """Состояния для навигации по меню"""
     navigating = State()
 
 
 # Инициализируем API и хранилище для навигации (стек меню)
-menu_api = MenuAPI()
+menu_api = API()
 navigation_stack: dict[int, list[str]] = {}
 
 
@@ -33,7 +33,7 @@ async def cmd_start(message: Message, state: FSMContext):
         root_menu = await menu_api.get_root_menu()
         user_id = message.from_user.id
         navigation_stack[user_id] = []  # Пустой стек для корневого меню
-        await state.set_state(MenuStates.navigating)
+        await state.set_state(States.navigating)
 
         # Отправляем сообщение с главным меню
         await update_menu_state(
