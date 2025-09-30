@@ -20,7 +20,7 @@ def start_scheduler(
     scheduler = AsyncIOScheduler()
     scheduler.add_job(
         notify_inactive_users,
-        IntervalTrigger(seconds=settings.reminder_polling_interval_in_minutes),  # TODO заменить на час
+        IntervalTrigger(minutes=settings.reminder_polling_interval_in_minutes),  # TODO заменить на час
         # IntervalTrigger(hours=1),
         kwargs={"bot": bot, "db_engine": db_engine},
         name="notify_inactive_users",
