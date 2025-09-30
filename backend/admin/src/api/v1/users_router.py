@@ -86,6 +86,17 @@ async def answer_question(
 ):
     return await user_service.answer_question(question_id, question_data.admin_answer)
 
+@router.delete(
+    "/questions/{question_id}",
+    summary="Удалить вопрос",
+    response_model=Message
+)
+async def delete_question(
+        question_id: UUID,
+        user_service: UserService = Depends(get_user_service),
+):
+    return await user_service.delete_question(question_id)
+
 
 @router.post(
     "/{user_id}/history/add",

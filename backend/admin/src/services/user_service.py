@@ -108,6 +108,14 @@ class UserService:
         question = await self.db_engine.create_question(question_data)
         return {"detail": "Question created successfully"}
 
+    async def delete_question(self, question_id: UUID) -> dict:
+        success = await self.db_engine.delete_question(question_id)
+        if not success:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="Question not found"
+            )
+        return {"detail":"The question was deleted."}
+
     async def answer_question(self, question_id: UUID, answer: str) -> dict:
         """Ответ на вопрос"""
         question = await self.db_engine.answer_question(question_id, answer)

@@ -48,7 +48,7 @@ services:
     expose:
       - "8000"
     volumes:
-      - ./uploaded_content:/app/src/uploads
+      - ./uploaded_content:/opt/admin/src/uploads
     environment:
       - PYTHONUNBUFFERED=1
       - FASTAPI_RELOAD=1
@@ -88,6 +88,8 @@ services:
     container_name: bot
     env_file:
       - ./.env
+    volumes:
+      - ./uploaded_content:/opt/bot/uploads
     environment:
       - PYTHONUNBUFFERED=1
     develop:
