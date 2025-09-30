@@ -3,7 +3,7 @@ from typing import Dict, List, Optional
 from utils.texts import TEXTS
 
 
-class MenuContent:
+class Content:
     """Класс модели MenuContent."""
 
     CONTENT_TYPES = {
@@ -34,8 +34,8 @@ class MenuContent:
     def get_content_type(self) -> str:
         """Возвращает строковое представление типа контента."""
         if self.type is None:
-            return TEXTS['unknown_type']
-        return self.CONTENT_TYPES.get(self.type, TEXTS['unknown_type'])
+            return TEXTS['unknown_type_content']
+        return self.CONTENT_TYPES.get(self.type, TEXTS['unknown_type_content'])
 
 
 class Menu:
@@ -46,8 +46,8 @@ class Menu:
         self.name = data.get('name')
         self.text: Optional[str] = data.get('text')
         self.subscription_type = data.get('subscription_type')
-        self.content: List[MenuContent] = [
-            MenuContent(content) for content in data.get('content', [])
+        self.content: List[Content] = [
+            Content(content) for content in data.get('content', [])
         ]
         self.children_names: List[str] = data.get('children_names', [])
 

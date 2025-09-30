@@ -50,6 +50,24 @@ def create_menu_keyboard(
     return InlineKeyboardMarkup(inline_keyboard=buttons)
 
 
+def create_rating_keyboard(menu_id: str) -> InlineKeyboardMarkup:
+    """Создает клавиатуру для оценки контента."""
+    buttons = []
+
+    # Создаем ряд кнопок с оценками от 1 до 5
+    rating_buttons = []
+    for rating in range(1, 6):
+        rating_buttons.append(
+            InlineKeyboardButton(
+                text=str(rating) + '⭐',
+                callback_data=f'rate:{menu_id}:{rating}'
+            )
+        )
+    buttons.append(rating_buttons)
+
+    return InlineKeyboardMarkup(inline_keyboard=buttons)
+
+
 async def set_main_commands(bot):
     """Устанавливает команды бота, которые будут видны в меню Telegram."""
 

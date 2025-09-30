@@ -5,7 +5,8 @@ from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
 from aiogram.types import CallbackQuery
 
-from menu_api import MenuAPI
+from keyboards import create_rating_keyboard
+from menu_api import API
 from utils.menu_update import update_menu_state
 from utils.texts import TEXTS
 
@@ -14,17 +15,17 @@ logger = logging.getLogger(__name__)
 router = Router(name='callback')
 
 
-class MenuStates(StatesGroup):
+class States(StatesGroup):
     """Состояния для навигации по меню"""
     navigating = State()
 
 
 # Инициализируем API и хранилище для навигации (стек меню)
-menu_api = MenuAPI()
+menu_api = API()
 navigation_stack: dict[int, list[str]] = {}
 
 
-@router.callback_query(MenuStates.navigating, F.data.startswith('menu:'))
+@router.callback_query(States.navigating, F.data.startswith('menu:'))
 async def navigate_menu(callback: CallbackQuery, state: FSMContext):
     """Переход в подменю"""
     # Получаем индекс нажатой клавиши
@@ -71,36 +72,7 @@ async def navigate_menu(callback: CallbackQuery, state: FSMContext):
         await callback.answer(TEXTS['error_start'])
 
 
-@router.callback_query(MenuStates.navigating, F.data.startswith('cnt:'))
-async def show_content(callback: CallbackQuery, state: FSMContext):
-    """Показ контента"""
-    # Получаем индекс нажатой клавиши
-    content_index = callback.data.split(':', 1)[1]
-
-    try:
-        # Получаем текущее меню из состояния
-        state_data = await state.get_data()
-        current_content = state_data.get('current_content', [])
-
-        # Получаем контент по индексу
-        content_index = int(content_index)
-        if content_index >= len(current_content):
-            await callback.answer(TEXTS['content_not_found'])
-            return
-        content = current_content[content_index]
-        content_url = content.get('server_path', '')
-
-        await callback.message.answer(
-            f'{TEXTS['get_content']}'
-            f'{content_url}'
-        )
-
-    except Exception as e:
-        logger.error(f'Ошибка при показе контента: {e}')
-        await callback.answer(TEXTS['content_not_found'])
-
-
-@router.callback_query(MenuStates.navigating, F.data == 'home')
+@router.callback_query(States.navigating, F.data == 'home')
 async def go_home(callback: CallbackQuery, state: FSMContext):
     """Возврат в главное меню"""
     try:
@@ -122,7 +94,7 @@ async def go_home(callback: CallbackQuery, state: FSMContext):
         await callback.answer(TEXTS['error_start'])
 
 
-@router.callback_query(MenuStates.navigating, F.data == 'back')
+@router.callback_query(States.navigating, F.data == 'back')
 async def go_back(callback: CallbackQuery, state: FSMContext):
     """Возврат назад"""
     user_id = callback.from_user.id
@@ -152,3 +124,65 @@ async def go_back(callback: CallbackQuery, state: FSMContext):
     except Exception as e:
         logger.error(f'Ошибка при возврате назад: {e}')
         await callback.answer(TEXTS['error'])
+
+
+@router.callback_query(States.navigating, F.data.startswith('cnt:'))
+async def show_content(callback: CallbackQuery, state: FSMContext):
+    """Показ контента"""
+    # Получаем индекс нажатой клавиши
+    content_index = callback.data.split(':', 1)[1]
+
+    try:
+        # Получаем текущее меню из состояния
+        state_data = await state.get_data()
+        current_content = state_data.get('current_content', [])
+        current_menu_id = state_data.get('current_menu_id')
+
+        # Получаем контент по индексу
+        content_index = int(content_index)
+        if content_index >= len(current_content):
+            await callback.answer(TEXTS['content_not_found'])
+            return
+        content = current_content[content_index]
+        content_url = content.get('server_path', '')
+        # content_menu_id = content.get('id')
+
+        rating_keyboard = create_rating_keyboard(current_menu_id)
+        await callback.message.answer(
+            f'{TEXTS['get_content']}'
+            f'{content_url}\n\n'
+        )
+        await callback.message.answer(
+            f'{TEXTS['rate_content']}',
+            reply_markup=rating_keyboard
+        )
+
+    except Exception as e:
+        logger.error(f'Ошибка при показе контента: {e}')
+        await callback.answer(TEXTS['content_not_found'])
+
+
+@router.callback_query(F.data.startswith('rate:'))
+async def rate_content(callback: CallbackQuery):
+    """Обработка оценки контента"""
+    try:
+        _, menu_id, rating = callback.data.split(':')
+        rating = int(rating)
+        user_id = callback.from_user.id
+
+        # Отправляем рейтинг на API
+        success = await menu_api.send_rating(menu_id, user_id, rating)
+
+        if success:
+            # Убираем клавиатуру и обновляем сообщение
+            await callback.message.edit_text(
+                text=TEXTS['rating_success'],
+                reply_markup=None
+            )
+
+        else:
+            await callback.answer(TEXTS['rating_error'])
+
+    except Exception as e:
+        logger.error(f'Ошибка при оценке контента: {e}')
+        await callback.answer(TEXTS['rating_error'])
