@@ -469,7 +469,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UserOut'
+                $ref: '#/components/schemas/QuestionsListOut'
         '422':
           description: Validation Error
           content:
@@ -575,6 +575,33 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/users/questions/{question_id}:
+    delete:
+      tags:
+        - Пользователи
+      summary: Удалить вопрос
+      operationId: delete_question_api_v1_users_questions__question_id__delete
+      parameters:
+        - name: question_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+            title: Question Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
   /api/v1/users/{user_id}/history/add:
     post:
       tags:
@@ -647,7 +674,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/HistoryOut'
+                $ref: '#/components/schemas/HistoryListOut'
         '422':
           description: Validation Error
           content:
@@ -947,6 +974,18 @@ components:
       required:
         - action_date
       title: HistoryCreate
+    HistoryListOut:
+      properties:
+        items:
+          items:
+            $ref: '#/components/schemas/HistoryOut'
+          type: array
+          title: Items
+          description: Список действий
+      type: object
+      required:
+        - items
+      title: HistoryListOut
     HistoryOut:
       properties:
         menu_id:
