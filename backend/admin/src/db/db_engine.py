@@ -167,6 +167,12 @@ class DBEngine:
         await self.session.refresh(question)
         return question
 
+    async def delete_question(self, question_id: UUID) -> bool:
+        stmt = delete(Question).where(Question.id == question_id)
+        result = await self.session.execute(stmt)
+        await self.session.commit()
+        return result.rowcount > 0
+
     async def answer_question(self, question_id: UUID, answer: str) -> Question:
         stmt = (
             update(Question)
