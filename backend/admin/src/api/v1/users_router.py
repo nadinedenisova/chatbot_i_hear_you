@@ -1,8 +1,8 @@
 from uuid import UUID
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.ext.asyncio import AsyncSession
-from db.postgres import get_async_session
-from schemas.entity import (
+from src.db.postgres import get_async_session
+from src.schemas.entity import (
     Message,
     UserOut,
     UsersListOut,
@@ -14,8 +14,8 @@ from schemas.entity import (
     QuestionsListOut,
     QuestionAnswer, HistoryListOut
 )
-from services.user_service import UserService, get_user_service
-from utils.pagination import PaginatedParams
+from src.services.user_service import UserService, get_user_service
+from src.utils.pagination import PaginatedParams
 
 router = APIRouter()
 

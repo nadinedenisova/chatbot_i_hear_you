@@ -2,8 +2,8 @@
 from uuid import UUID
 from fastapi import Depends, HTTPException, status
 
-from db.db_engine import DBEngine, get_db_engine
-from schemas.entity import (
+from src.db.db_engine import DBEngine, get_db_engine
+from src.schemas.entity import (
     UserCreate,
     UserOut,
     UsersListOut,
@@ -13,7 +13,7 @@ from schemas.entity import (
     QuestionOut,
     QuestionsListOut, HistoryListOut,
 )
-from utils.pagination import PaginatedParams
+from src.utils.pagination import PaginatedParams
 
 
 class UserService:
@@ -68,10 +68,7 @@ class UserService:
         questions = await self.db_engine.get_user_questions(user_id)
 
         if not questions:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="Questions of that user not found",
-            )
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Questions of that user not found")
 
         if isinstance(questions, QuestionOut):
             questions = [questions]

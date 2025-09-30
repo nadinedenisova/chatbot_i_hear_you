@@ -2,7 +2,7 @@ import uuid
 
 from sqlalchemy import text, String
 from sqlalchemy.orm import mapped_column, relationship, Mapped
-from db.postgres import Base
+from src.db.postgres import Base
 
 
 class MenuNode(Base):

@@ -5,9 +5,9 @@ from typing import Sequence
 from fastapi import Depends, HTTPException, status
 from sqlalchemy import select
 
-from db.db_engine import DBEngine, get_db_engine
-from models.nodes import MenuNode
-from schemas.entity import (
+from src.db.db_engine import DBEngine, get_db_engine
+from src.models.nodes import MenuNode
+from src.schemas.entity import (
     MenuNodeCreate,
     MenuNodeUpdate,
     MenuNodeOut,
@@ -18,8 +18,9 @@ from schemas.entity import (
     Message,
     ContentOut,
 )
-from services.file_service import file_service
+from src.services.file_service import file_service
 from fastapi import UploadFile
+
 
 class MenuService:
     """Сервис для работы с меню."""

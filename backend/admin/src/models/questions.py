@@ -3,7 +3,7 @@ from datetime import datetime, timezone
 
 from sqlalchemy import text, func, String, DateTime, ForeignKey
 from sqlalchemy.orm import mapped_column, relationship, Mapped
-from db.postgres import Base
+from src.db.postgres import Base
 
 
 class Question(Base):

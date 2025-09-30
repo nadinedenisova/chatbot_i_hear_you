@@ -6,14 +6,14 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 from fastapi import Depends, HTTPException, status
 
-from db.postgres import get_async_session
-from models.users import User
-from models.questions import Question
-from models.history import History
-from models.ratings import UserMenuNode
-from models.nodes import MenuNode
-from models.contents import Content
-from schemas.entity import (
+from src.db.postgres import get_async_session
+from src.models.users import User
+from src.models.questions import Question
+from src.models.history import History
+from src.models.ratings import UserMenuNode
+from src.models.nodes import MenuNode
+from src.models.contents import Content
+from src.schemas.entity import (
     UserCreate,
     QuestionCreate,
     HistoryCreate,
@@ -22,7 +22,7 @@ from schemas.entity import (
     MenuNodeUpdate,
     ContentCreate,
 )
-from utils.pagination import PaginatedParams
+from src.utils.pagination import PaginatedParams
 
 
 class DBEngine:
@@ -30,13 +30,14 @@ class DBEngine:
         self.session = session
 
     async def add_content_with_file(
-        self, menu_id: UUID, content_data: ContentCreate, file_info: dict
+            self, menu_id: UUID, content_data: ContentCreate, file_info: dict
     ) -> Content:
         """Добавляет контент с информацией о файле"""
         content = Content(
             menu_id=menu_id,
             type=content_data.type,
-            server_path=file_info["server_path"],  # Используем реальный путь к файлу
+            # Используем реальный путь к файлу
+            server_path=file_info["server_path"],
         )
         self.session.add(content)
         await self.session.commit()
@@ -56,7 +57,7 @@ class DBEngine:
             .values(
                 type=content_data.type,
                 server_path=file_info["server_path"],
-                updated_at=func.now(),
+                updated_at=func.now()
             )
             .returning(Content)
         )
@@ -82,8 +83,8 @@ class DBEngine:
         stmt = select(Content).where(Content.id == content_id)
         result = await self.session.execute(stmt)
         return result.scalar_one_or_none()
-
     # User methods
+
     async def get_users(self, pagination: PaginatedParams) -> Sequence[User]:
         stmt = (
             select(User)
@@ -114,7 +115,7 @@ class DBEngine:
         return user
 
     async def get_long_time_lost_users(
-        self, days_count: int, pagination: PaginatedParams
+            self, days_count: int, pagination: PaginatedParams
     ) -> Sequence[User]:
         # Для PostgreSQL (рекомендуемый)
         cutoff_date = func.now() - text(f"INTERVAL '{days_count} days'")
@@ -159,7 +160,8 @@ class DBEngine:
         return result.scalars().all()
 
     async def create_question(self, question_data: QuestionCreate) -> Question:
-        question = Question(user_id=question_data.user_id, text=question_data.text)
+        question = Question(user_id=question_data.user_id,
+                            text=question_data.text)
         self.session.add(question)
         await self.session.commit()
         await self.session.refresh(question)

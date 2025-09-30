@@ -3,11 +3,11 @@ import datetime
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.interval import IntervalTrigger
 
-from schemas.entity import HistoryCreate
-from services.telegram_bot import TelegramBot
-from db.db_engine import DBEngine
-from utils.pagination import PaginatedParams  # если используешь пагинацию
-from core.settings import settings
+from src.schemas.entity import HistoryCreate
+from src.services.telegram_bot import TelegramBot
+from src.db.db_engine import DBEngine
+from src.utils.pagination import PaginatedParams  # если используешь пагинацию
+from src.core.settings import settings
 import logging
 
 logger = logging.getLogger(__name__)

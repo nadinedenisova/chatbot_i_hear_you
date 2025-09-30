@@ -1,8 +1,8 @@
 from uuid import UUID
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.ext.asyncio import AsyncSession
-from db.postgres import get_async_session
-from schemas.entity import (
+from src.db.postgres import get_async_session
+from src.schemas.entity import (
     ContentCreate,
     MenuNodeOut,
     MenuNodeCreate,
@@ -12,7 +12,7 @@ from schemas.entity import (
     RatingOut,
     AllMenuNodeOut,
 )
-from services.menu_service import MenuService, get_menu_service
+from src.services.menu_service import MenuService, get_menu_service
 
 router = APIRouter()
 
