@@ -1,12 +1,14 @@
-import { Outlet } from 'react-router-dom';
+// import { Outlet } from 'react-router-dom';
 import Box from '@mui/material/Box';
 import CssBaseline from '@mui/material/CssBaseline';
 import { useState } from 'react';
+import { Outlet } from 'react-router-dom';
 
 import { useCurrentRouteData } from '@hooks/useCurrentRouteData';
 import { AppHeader } from '@components/AppHeader/AppHeader';
-import { Main } from '@components/Main/Main';
+// import { Main } from '@components/Main/Main';
 import { DrawerHeader, Sidebar } from '@components/Sidebar/Sidebar';
+import { Main } from '@components/Main/Main';
 
 function App() {
   const [open, setOpen] = useState(false);

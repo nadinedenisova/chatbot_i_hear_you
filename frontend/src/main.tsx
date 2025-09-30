@@ -6,14 +6,18 @@ import {
   RouterProvider,
 } from 'react-router-dom';
 import { Provider } from 'react-redux';
+import { createTheme, ThemeProvider } from '@mui/material/styles';
 
 import { ROUTES } from '@shared/routes/ROUTES';
 import store from '@store/store';
+import QuestionsPage from '@pages/QuestionsPage/QuestionsPage';
 import App from '@components/App/App';
-import { Main } from '@components/Main/Main';
 import ErrorPage from '@pages/ErrorPage/ErrorPage';
+// eslint-disable-next-line import/order
+import Login from '@pages/LoginPage/LoginPage';
 
 import './index.css';
+import { Main } from '@components/Main/Main';
 
 async function enableMocking() {
   // if (process.env.NODE_ENV !== "development") {
@@ -26,6 +30,15 @@ async function enableMocking() {
 }
 
 await enableMocking();
+
+const theme = createTheme({
+  palette: {
+    background: {
+      default: '#e6f2fa',
+      paper: '#fff',
+    },
+  },
+});
 
 export interface AppRouteHandle {
   title?: string;
@@ -49,15 +62,15 @@ const router = createBrowserRouter([
       },
       {
         path: ROUTES.QUESTIONS,
-        element: <div>Вопросы и ответы</div>,
-        handle: { title: 'Вопросы и ответы', id: 'questions' },
+        element: <QuestionsPage />,
+        handle: { title: 'Обратная связь', id: 'questions' },
       },
     ],
   },
-  // {
-  //   path: ROUTES.LOGIN,
-  //    element: </>,
-  // },
+  {
+    path: ROUTES.LOGIN,
+    element: <Login />,
+  },
 ]);
 
 const rootElement = createRoot(document.getElementById('root')!);
@@ -65,7 +78,9 @@ const rootElement = createRoot(document.getElementById('root')!);
 rootElement.render(
   <StrictMode>
     <Provider store={store}>
-      <RouterProvider router={router} />
+      <ThemeProvider theme={theme}>
+        <RouterProvider router={router} />
+      </ThemeProvider>
     </Provider>
   </StrictMode>,
 );

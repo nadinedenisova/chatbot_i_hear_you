@@ -21,7 +21,7 @@ const menuItems = [
     id: 'menu',
   },
   {
-    title: 'Вопросы',
+    title: 'Обратная связь',
     icon: <QuestionAnswerIcon />,
     path: ROUTES.QUESTIONS,
     id: 'questions',
@@ -63,7 +63,7 @@ export const Sidebar: FC<SidebarProps> = ({ open, onClick }) => (
     <Divider />
     <List component="nav">
       {menuItems.map((data, i) => (
-        <MenuItem key={i} {...data} />
+        <MenuItem key={i} {...data} onClick={onClick} />
       ))}
     </List>
   </Drawer>
