@@ -34,8 +34,8 @@ class Content:
     def get_content_type(self) -> str:
         """Возвращает строковое представление типа контента."""
         if self.type is None:
-            return TEXTS['unknown_type']
-        return self.CONTENT_TYPES.get(self.type, TEXTS['unknown_type'])
+            return TEXTS['unknown_type_content']
+        return self.CONTENT_TYPES.get(self.type, TEXTS['unknown_type_content'])
 
 
 class Menu:

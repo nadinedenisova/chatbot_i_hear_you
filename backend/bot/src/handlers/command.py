@@ -28,7 +28,13 @@ navigation_stack: dict[int, list[str]] = {}
 @router.message(Command('start'))
 async def cmd_start(message: Message, state: FSMContext):
     """Команда /start"""
+
     try:
+        user = await menu_api.get_user(user_id=message.from_user.id)
+        if not user:
+            # Регистрируем пользователя
+            await menu_api.register_user(user_id=message.from_user.id)
+
         # Загружаем корневое меню с API и инициализируем навигацию
         root_menu = await menu_api.get_root_menu()
         user_id = message.from_user.id
