@@ -3,7 +3,7 @@ from functools import lru_cache
 from aiogram import Bot
 from aiogram.enums import ParseMode
 from aiogram.client.default import DefaultBotProperties
-from core.settings import settings
+from src.core.settings import settings
 
 
 class TelegramBot:
