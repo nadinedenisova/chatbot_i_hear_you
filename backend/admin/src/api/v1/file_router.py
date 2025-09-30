@@ -31,17 +31,16 @@ async def add_menu_content_with_upload(
     if file_type == 1 and file.content_type not in allowed_image_types:
         raise HTTPException(
             status_code=400,
-            detail="Недопустимый тип изображения. Разрешены: JPEG, PNG, GIF"
+            detail="Недопустимый тип изображения. Разрешены: JPEG, PNG, GIF",
         )
     elif file_type == 2 and file.content_type not in allowed_video_types:
         raise HTTPException(
-            status_code=400,
-            detail="Недопустимый тип видео. Разрешены: MP4, AVI, MKV"
+            status_code=400, detail="Недопустимый тип видео. Разрешены: MP4, AVI, MKV"
         )
     elif file_type == 3 and file.content_type not in allowed_document_types:
         raise HTTPException(
             status_code=400,
-            detail="Недопустимый тип документа. Разрешены: PDF, DOC, DOCX"
+            detail="Недопустимый тип документа. Разрешены: PDF, DOC, DOCX",
         )
 
     # server_path будет заполнен автоматически

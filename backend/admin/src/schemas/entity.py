@@ -18,7 +18,9 @@ class QuestionOut(BaseModel):
         None, description="Ответ администратора (может отсутствовать)"
     )
     created_at: datetime = Field(..., description="Дата и время создания")  # Изменено
-    updated_at: datetime = Field(..., description="Дата и время последнего обновления")  # Изменено
+    updated_at: datetime = Field(
+        ..., description="Дата и время последнего обновления"
+    )  # Изменено
 
 
 class QuestionsListOut(BaseModel):
@@ -33,7 +35,9 @@ class ContentOut(BaseModel):
     type: int = Field(..., description="Тип контента (числовой код)")
     server_path: str = Field(..., description="Серверный путь до контента")
     created_at: datetime = Field(..., description="Дата и время создания")  # Изменено
-    updated_at: datetime = Field(..., description="Дата и время последнего обновления")  # Изменено
+    updated_at: datetime = Field(
+        ..., description="Дата и время последнего обновления"
+    )  # Изменено
 
 
 class MenuNodeOut(BaseModel):
@@ -87,6 +91,7 @@ class QuestionCreate(BaseModel):
     )
     text: str = Field(..., description="Текст вопроса")
 
+
 class QuestionAnswer(BaseModel):
     admin_answer: str = Field(..., description="Текст вопроса")
 
@@ -97,8 +102,12 @@ class UserCreate(BaseModel):
 
 
 class UserOut(UserCreate):
-    created_at: datetime = Field(..., description="Дата и время создания пользователя")  # Изменено
-    updated_at: datetime = Field(..., description="Дата и время последнего обновления пользователя")  # Изменено
+    created_at: datetime = Field(
+        ..., description="Дата и время создания пользователя"
+    )  # Изменено
+    updated_at: datetime = Field(
+        ..., description="Дата и время последнего обновления пользователя"
+    )  # Изменено
 
 
 class UsersListOut(BaseModel):
@@ -115,7 +124,9 @@ class HistoryCreate(BaseModel):
 class HistoryOut(HistoryCreate):
     user_id: str = Field(..., description="Идентификатор пользователя")
     action_id: UUID = Field(..., description="Идентификатор действия")
-    created_at: datetime = Field(..., description="Дата и время создания записи истории")  # Изменено
+    created_at: datetime = Field(
+        ..., description="Дата и время создания записи истории"
+    )  # Изменено
 
 class HistoryListOut(BaseModel):
     items: list[HistoryOut] = Field(..., description="Список действий")
@@ -131,8 +142,12 @@ class RatingOut(RatingCreate):
     menu_id: UUID = Field(
         ..., description="Идентификатор меню/узла, к которому привязана оценка"
     )
-    created_at: datetime = Field(..., description="Дата и время создания оценки")  # Изменено
-    updated_at: datetime = Field(..., description="Дата и время обновления оценки")  # Изменено
+    created_at: datetime = Field(
+        ..., description="Дата и время создания оценки"
+    )  # Изменено
+    updated_at: datetime = Field(
+        ..., description="Дата и время обновления оценки"
+    )  # Изменено
 
 
 AllMenuNodeOut.model_rebuild()

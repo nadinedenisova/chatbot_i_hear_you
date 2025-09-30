@@ -45,7 +45,7 @@ class DBEngine:
         return content
 
     async def update_content_with_file(
-            self, content_id: UUID, content_data: ContentCreate, file_info: dict
+        self, content_id: UUID, content_data: ContentCreate, file_info: dict
     ) -> Content:
         """Обновляет контент с новым файлом"""
         # Сначала получаем старый контент чтобы удалить старый файл
@@ -186,7 +186,9 @@ class DBEngine:
         return question
 
     # History methods
-    async def create_history_record(self, user_id: str, history_data: HistoryCreate) -> History:
+    async def create_history_record(
+        self, user_id: str, history_data: HistoryCreate
+    ) -> History:
         history = History(
             user_id=user_id,
             menu_id=history_data.menu_id,
@@ -364,4 +366,7 @@ class DBEngine:
 
 
 def get_db_engine(session: AsyncSession = Depends(get_async_session)):
+    return DBEngine(session)
+
+def create_db_engine(session: AsyncSession) -> DBEngine:
     return DBEngine(session)
