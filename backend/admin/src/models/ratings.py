@@ -16,11 +16,15 @@ class UserMenuNode(Base):
         index=True,
     )
 
-    user_id: Mapped[str] = mapped_column(String(255), ForeignKey("user.id"))
+    user_id: Mapped[str] = mapped_column(
+        String(255),
+        ForeignKey("user.id", ondelete="CASCADE"),
+        unique=True
+    )
 
     user: Mapped["User"] = relationship("User", back_populates="ratings")
 
-    menu_id: Mapped[uuid.UUID]
+    menu_id: Mapped[uuid.UUID] = mapped_column(unique=True)
 
     post_rating: Mapped[int]
 

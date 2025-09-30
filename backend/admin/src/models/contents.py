@@ -17,7 +17,8 @@ class Content(Base):
     )
 
     menu_id: Mapped[uuid.UUID] = mapped_column(
-        ForeignKey("menu_node.id"), nullable=False
+        ForeignKey("menu_node.id", ondelete="CASCADE"),
+        nullable=False
     )
 
     menu_node: Mapped["MenuNode"] = relationship(

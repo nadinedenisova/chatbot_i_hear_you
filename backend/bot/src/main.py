@@ -5,8 +5,8 @@ from pathlib import Path
 from aiogram import Bot, Dispatcher
 
 from config import config
-from handlers import commands, common, content, navigation
-from utils.menu_commands import set_main_commands
+from handlers import callback, command
+from keyboards import set_main_commands
 
 
 # Настройка логирования
@@ -31,10 +31,8 @@ async def main() -> None:
     dp = Dispatcher()
 
     # Регистрация роутеров
-    dp.include_router(commands.router)
-    dp.include_router(common.router)
-    dp.include_router(content.router)
-    dp.include_router(navigation.router)
+    dp.include_router(callback.router)
+    dp.include_router(command.router)
 
     await set_main_commands(bot)
 
