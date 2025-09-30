@@ -180,6 +180,15 @@ export const injectedRtkApi = api.injectEndpoints({
         body: queryArg.questionAnswer,
       }),
     }),
+    deleteQuestionApiV1UsersQuestionsQuestionIdDelete: build.mutation<
+      DeleteQuestionApiV1UsersQuestionsQuestionIdDeleteApiResponse,
+      DeleteQuestionApiV1UsersQuestionsQuestionIdDeleteApiArg
+    >({
+      query: (queryArg) => ({
+        url: `/api/v1/users/questions/${queryArg.questionId}`,
+        method: 'DELETE',
+      }),
+    }),
     createUserActionRecordApiV1UsersUserIdHistoryAddPost: build.mutation<
       CreateUserActionRecordApiV1UsersUserIdHistoryAddPostApiResponse,
       CreateUserActionRecordApiV1UsersUserIdHistoryAddPostApiArg
@@ -322,7 +331,7 @@ export interface GetLongTimeLostUsersApiV1UsersLongTimeLostGetApiArg {
   pageNumber?: number;
 }
 export type GetUserQuestionsApiV1UsersQuestionsUserIdGetApiResponse =
-  /** status 200 Successful Response */ UserOut;
+  /** status 200 Successful Response */ QuestionsListOut;
 export interface GetUserQuestionsApiV1UsersQuestionsUserIdGetApiArg {
   userId: string;
 }
@@ -345,6 +354,11 @@ export interface AnswerQuestionApiV1UsersQuestionsQuestionIdAnswerPutApiArg {
   questionId: string;
   questionAnswer: QuestionAnswer;
 }
+export type DeleteQuestionApiV1UsersQuestionsQuestionIdDeleteApiResponse =
+  /** status 200 Successful Response */ Message;
+export interface DeleteQuestionApiV1UsersQuestionsQuestionIdDeleteApiArg {
+  questionId: string;
+}
 export type CreateUserActionRecordApiV1UsersUserIdHistoryAddPostApiResponse =
   /** status 200 Successful Response */ Message;
 export interface CreateUserActionRecordApiV1UsersUserIdHistoryAddPostApiArg {
@@ -352,7 +366,7 @@ export interface CreateUserActionRecordApiV1UsersUserIdHistoryAddPostApiArg {
   historyCreate: HistoryCreate;
 }
 export type GetUserHistoryApiV1UsersUserIdHistoryGetApiResponse =
-  /** status 200 Successful Response */ HistoryOut;
+  /** status 200 Successful Response */ HistoryListOut;
 export interface GetUserHistoryApiV1UsersUserIdHistoryGetApiArg {
   userId: string;
   /** Количество записей на странице */
@@ -551,6 +565,10 @@ export interface HistoryOut {
   /** Дата и время создания записи истории */
   created_at: string;
 }
+export interface HistoryListOut {
+  /** Список действий */
+  items: HistoryOut[];
+}
 export interface BodyAddMenuContentWithUploadApiFilesMenuIdContentUploadPost {
   /** Тип контента (1-изображение, 2-видео, 3-документ) */
   file_type: number;
@@ -586,6 +604,7 @@ export const {
   useGetAllQuestionsApiV1UsersQuestionsGetQuery,
   useCreateQuestionApiV1UsersQuestionsCreatePostMutation,
   useAnswerQuestionApiV1UsersQuestionsQuestionIdAnswerPutMutation,
+  useDeleteQuestionApiV1UsersQuestionsQuestionIdDeleteMutation,
   useCreateUserActionRecordApiV1UsersUserIdHistoryAddPostMutation,
   useGetUserHistoryApiV1UsersUserIdHistoryGetQuery,
   useAddMenuContentWithUploadApiFilesMenuIdContentUploadPostMutation,
