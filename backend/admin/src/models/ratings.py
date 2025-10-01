@@ -1,13 +1,16 @@
 import uuid
 from datetime import datetime, timezone
 
-from sqlalchemy import text, func, String, DateTime, ForeignKey
+from sqlalchemy import text, func, String, DateTime, ForeignKey, Boolean, UniqueConstraint
 from sqlalchemy.orm import mapped_column, relationship, Mapped
 from src.db.postgres import Base
 
 
 class UserMenuNode(Base):
     __tablename__ = "user_menu_node"
+    __table_args__ = (
+        UniqueConstraint('user_id', 'menu_id', name='unique_user_menu_rating'),
+    )
 
     id: Mapped[uuid.UUID] = mapped_column(
         primary_key=True,
@@ -17,14 +20,14 @@ class UserMenuNode(Base):
     )
 
     user_id: Mapped[str] = mapped_column(
-        String(255), ForeignKey("user.id", ondelete="CASCADE"), unique=True
+        String(255), ForeignKey("user.id", ondelete="CASCADE")
     )
 
     user: Mapped["User"] = relationship("User", back_populates="ratings")
 
-    menu_id: Mapped[uuid.UUID] = mapped_column(unique=True)
+    menu_id: Mapped[uuid.UUID] = mapped_column()
 
-    post_rating: Mapped[int]
+    post_rating: Mapped[bool] = mapped_column(Boolean, nullable=True)
 
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
@@ -37,6 +40,7 @@ class UserMenuNode(Base):
         DateTime(timezone=True),
         default=datetime.now(timezone.utc),
         server_default=func.now(),
+        onupdate=func.now(),
         nullable=False,
     )
 

@@ -9,7 +9,8 @@ from src.schemas.entity import (
     MenuNodeUpdate,
     Message,
     RatingCreate,
-    RatingOut,
+    RatingSummaryOut,
+    RatingListOut,
     AllMenuNodeOut,
 )
 from src.services.menu_service import MenuService, get_menu_service
@@ -116,7 +117,7 @@ async def delete_menu_content(
 
 
 @router.get(
-    "/{menu_id}/rate", summary="Получить рейтинг узла меню", response_model=RatingOut
+    "/{menu_id}/rate", summary="Получить рейтинг узла меню", response_model=RatingSummaryOut
 )
 async def get_menu_node_rate(
     menu_id: UUID, menu_service: MenuService = Depends(get_menu_service)
@@ -131,3 +132,15 @@ async def rate_menu_node(
     menu_service: MenuService = Depends(get_menu_service),
 ):
     return await menu_service.rate_menu_node(menu_id, rating_data)
+
+
+@router.get(
+        "/{menu_id}/rates-all",
+        summary="Получить все оценки пользователей для узла меню",
+        response_model=RatingListOut
+        )
+async def get_menu_ratings_all(
+    menu_id: UUID,
+    menu_service: MenuService = Depends(get_menu_service)
+):
+    return await menu_service.db_engine.get_menu_ratings_all(menu_id)

@@ -19,7 +19,7 @@ class Settings(BaseSettings):
     redis_db: int
 
     # bot
-    bot_token: str
+    bot_token: str = "yourToken"
     reminder_polling_interval_in_minutes: int
 
 
