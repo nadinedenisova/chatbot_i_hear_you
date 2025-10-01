@@ -26,6 +26,9 @@ async def lifespan(app: FastAPI):
 
         await telegram_bot.bot.session.close()
 
+        if _redis:
+            await _redis.aclose()
+
 
 app = FastAPI(
     title=settings.project_name,
@@ -39,7 +42,8 @@ app = FastAPI(
 
 app.include_router(example.router, prefix="/api/v1/example", tags=["Пример"])
 app.include_router(menu_router.router, prefix="/api/v1/menu", tags=["Меню"])
-app.include_router(users_router.router, prefix="/api/v1/users", tags=["Пользователи"])
+app.include_router(users_router.router,
+                   prefix="/api/v1/users", tags=["Пользователи"])
 
 app.include_router(file_router.router, prefix="/api/files",
                    tags=["Загрузка файлов"])

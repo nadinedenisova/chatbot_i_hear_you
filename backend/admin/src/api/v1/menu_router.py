@@ -1,7 +1,7 @@
 from uuid import UUID
 from fastapi import APIRouter, Depends, Query
-from sqlalchemy.ext.asyncio import AsyncSession
-from src.db.postgres import get_async_session
+from redis.asyncio import Redis
+from src.db.redis import get_redis
 from src.schemas.entity import (
     ContentCreate,
     MenuNodeOut,
@@ -23,8 +23,22 @@ router = APIRouter()
 @router.get(
     "/", summary="Получить всё дерево меню навигации", response_model=AllMenuNodeOut
 )
-async def get_full_menu(menu_service: MenuService = Depends(get_menu_service)):
-    return await menu_service.get_full_menu()
+async def get_full_menu(
+    menu_service: MenuService = Depends(get_menu_service),
+    redis: Redis = Depends(get_redis)
+):
+    full_menu_key = 'full_menu'
+    full_menu = await redis.get(full_menu_key)
+
+    if full_menu:
+        return AllMenuNodeOut.model_validate_json(full_menu)
+
+    full_menu = await menu_service.get_full_menu()
+
+    # закешируем на 1 час
+    await redis.setex(full_menu_key, 3600, full_menu.model_dump_json())
+
+    return full_menu
 
 
 @router.get(
@@ -137,10 +151,10 @@ async def rate_menu_node(
 
 
 @router.get(
-        "/{menu_id}/rates-all",
-        summary="Получить все оценки пользователей для узла меню",
-        response_model=RatingListOut
-        )
+    "/{menu_id}/rates-all",
+    summary="Получить все оценки пользователей для узла меню",
+    response_model=RatingListOut
+)
 async def get_menu_ratings_all(
     menu_id: UUID,
     pagination: PaginatedParams = Depends(),
