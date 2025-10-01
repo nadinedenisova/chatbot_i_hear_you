@@ -14,7 +14,7 @@ from src.schemas.entity import (
     AllMenuNodeOut,
     ContentCreate,
     RatingCreate,
-    RatingOut,
+    RatingSummaryOut,
     Message,
     ContentOut,
 )
@@ -256,7 +256,7 @@ class MenuService:
     async def update_menu_content_with_file(
             self, content_id: UUID, content_data: ContentCreate, file: UploadFile
     ) -> Message:
-        """Обновляет контент с новым файлом"""
+        """Обновляет контент с новым файлом."""
         await self._get_node_by_id(content_data.menu_id)  # проверка есть ли menu_node с таким id
 
         # Сохраняем новый файл
@@ -266,28 +266,20 @@ class MenuService:
         await self.db_engine.update_content_with_file(content_id, content_data, file_info)
         return Message(detail="The content was changed with new file")
 
-    # TODO рейтинг это количество оценок "Полезно" и "Не очень" а не цифра
-    async def get_menu_node_rate(self, menu_id: UUID) -> RatingOut:
-        """Получение рейтинга узла меню."""
-        avg_rating = await self.db_engine.get_menu_rating(menu_id)
-
-        return RatingOut(
-            user_id="system",
+    async def get_menu_node_rate(self, menu_id: UUID) -> RatingSummaryOut:
+        """Получение сводки по рейтингам узла меню."""
+        rating_summary = await self.db_engine.get_menu_rating_summary(menu_id)
+        return RatingSummaryOut(
             menu_id=menu_id,
-            node_rating=int(avg_rating) if avg_rating else 0,
-            created_at=None,
-            updated_at=None,
+            useful_count=rating_summary["useful_count"],
+            not_useful_count=rating_summary["not_useful_count"]
         )
 
     async def rate_menu_node(self, menu_id: UUID, rating_data: RatingCreate) -> Message:
-        """Оценка узла меню."""
-        await self._get_node_by_id(menu_id) #проверка есть ли menu_node с таким id
-
-        user= await self.db_engine.get_user_by_id(rating_data.user_id)
-        if not user:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+        """Оценка узла меню (Полезно/Не очень)."""
         await self.db_engine.rate_menu_node(rating_data, menu_id)
-        return Message(detail="The node was successfully rated!")
+        rating_text = "Useful" if rating_data.is_useful else "Not useful"
+        return Message(detail=f"Rating '{rating_text}' saved successfully!")
 
 
 def get_menu_service(db_engine: DBEngine = Depends(get_db_engine)) -> MenuService:

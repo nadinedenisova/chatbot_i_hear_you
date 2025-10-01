@@ -18,6 +18,8 @@ from src.schemas.entity import (
     QuestionCreate,
     HistoryCreate,
     RatingCreate,
+    RatingDetailOut,
+    RatingListOut,
     MenuNodeCreate,
     MenuNodeUpdate,
     ContentCreate,
@@ -333,18 +335,43 @@ class DBEngine:
         await self.session.commit()
         return result.rowcount > 0
 
-    # Rating methods
-    async def get_menu_rating(self, menu_id: UUID) -> float | None:
-        stmt = select(func.avg(UserMenuNode.post_rating)).where(
-            UserMenuNode.menu_id == menu_id
+    async def get_menu_rating_summary(self, menu_id: UUID) -> dict:
+        useful_stmt = select(func.count(UserMenuNode.id)).where(
+            and_(
+                UserMenuNode.menu_id == menu_id,
+                UserMenuNode.post_rating == True
+            )
         )
-        result = await self.session.execute(stmt)
-        return result.scalar()
+        useful_result = await self.session.execute(useful_stmt)
+        useful_count = useful_result.scalar() or 0
+        not_useful_stmt = select(func.count(UserMenuNode.id)).where(
+            and_(
+                UserMenuNode.menu_id == menu_id,
+                UserMenuNode.post_rating == False
+            )
+        )
+        not_useful_result = await self.session.execute(not_useful_stmt)
+        not_useful_count = not_useful_result.scalar() or 0
+        return {
+            "useful_count": useful_count,
+            "not_useful_count": not_useful_count
+        }
 
     async def rate_menu_node(
         self, rating_data: RatingCreate, menu_id: UUID
     ) -> UserMenuNode:
-        # Проверяем существующую оценку
+        user = await self.get_user_by_id(rating_data.user_id)
+        if not user:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"User with id {rating_data.user_id} not found"
+            )
+        menu_node = await self.get_menu_node_by_id(menu_id)
+        if not menu_node:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"Menu node with id {menu_id} not found"
+            )
         existing_stmt = select(UserMenuNode).where(
             and_(
                 UserMenuNode.user_id == rating_data.user_id,
@@ -353,9 +380,9 @@ class DBEngine:
         )
         existing_result = await self.session.execute(existing_stmt)
         existing_rating = existing_result.scalar_one_or_none()
-
         if existing_rating:
-            existing_rating.post_rating = rating_data.node_rating
+            existing_rating.post_rating = rating_data.is_useful
+            existing_rating.updated_at = func.now()
             await self.session.commit()
             await self.session.refresh(existing_rating)
             return existing_rating
@@ -363,16 +390,38 @@ class DBEngine:
             rating = UserMenuNode(
                 user_id=rating_data.user_id,
                 menu_id=menu_id,
-                post_rating=rating_data.node_rating,
+                post_rating=rating_data.is_useful,
             )
             self.session.add(rating)
             await self.session.commit()
             await self.session.refresh(rating)
             return rating
 
+    async def get_menu_ratings_all(self, menu_id: UUID) -> RatingListOut:
+        menu_node = await self.get_menu_node_by_id(menu_id)
+        if not menu_node:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"Menu node with id {menu_id} not found"
+            )
+        stmt = select(UserMenuNode).where(UserMenuNode.menu_id == menu_id)
+        result = await self.session.execute(stmt)
+        ratings = result.scalars().all()
+        rating_out_list = []
+        for rating in ratings:
+            rating_out = RatingDetailOut(
+                user_id=rating.user_id,
+                is_useful=rating.post_rating,
+                created_at=rating.created_at,
+                updated_at=rating.updated_at
+                )
+            rating_out_list.append(rating_out)
+        return RatingListOut(menu_id=menu_id, ratings=rating_out_list)
+
 
 def get_db_engine(session: AsyncSession = Depends(get_async_session)):
     return DBEngine(session)
+
 
 def create_db_engine(session: AsyncSession) -> DBEngine:
     return DBEngine(session)
