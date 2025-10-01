@@ -2,6 +2,7 @@
 
 from uuid import UUID
 from typing import Sequence
+from src.utils.pagination import PaginatedParams
 from fastapi import Depends, HTTPException, status
 from sqlalchemy import select
 
@@ -14,11 +15,12 @@ from src.schemas.entity import (
     AllMenuNodeOut,
     ContentCreate,
     RatingCreate,
+    RatingListOut,
     RatingSummaryOut,
     Message,
     ContentOut,
 )
-from src.services.file_service import file_service
+from .file_service import file_service
 from fastapi import UploadFile
 
 
@@ -281,7 +283,16 @@ class MenuService:
         rating_text = "Useful" if rating_data.is_useful else "Not useful"
         return Message(detail=f"Rating '{rating_text}' saved successfully!")
 
+    async def get_menu_ratings_all(
+        self, 
+        menu_id: UUID, 
+        pagination: PaginatedParams
+    ) -> RatingListOut:
+        """Получение всех оценок узла меню с пагинацией"""
+        return await self.db_engine.get_menu_ratings_all(menu_id, pagination)
+
 
 def get_menu_service(db_engine: DBEngine = Depends(get_db_engine)) -> MenuService:
     """Зависимость для получения MenuService."""
     return MenuService(db_engine)
+

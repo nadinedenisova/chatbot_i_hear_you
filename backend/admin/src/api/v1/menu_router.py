@@ -14,6 +14,8 @@ from src.schemas.entity import (
     AllMenuNodeOut,
 )
 from src.services.menu_service import MenuService, get_menu_service
+from src.utils.pagination import PaginatedParams
+
 
 router = APIRouter()
 
@@ -141,6 +143,7 @@ async def rate_menu_node(
         )
 async def get_menu_ratings_all(
     menu_id: UUID,
+    pagination: PaginatedParams = Depends(),
     menu_service: MenuService = Depends(get_menu_service)
 ):
-    return await menu_service.db_engine.get_menu_ratings_all(menu_id)
+    return await menu_service.get_menu_ratings_all(menu_id, pagination)
