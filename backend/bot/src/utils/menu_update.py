@@ -1,6 +1,7 @@
 from aiogram.types import Message, CallbackQuery
 from aiogram.fsm.context import FSMContext
 
+from menu_api import API
 from models import Menu
 from keyboards import create_menu_keyboard, create_rating_keyboard
 from utils.texts import TEXTS
@@ -11,16 +12,30 @@ async def update_menu_state(
     menu: Menu,
     message: Message = None,
     callback: CallbackQuery = None,
-    is_root: bool = False
+    is_root: bool = False,
+    save_history: bool = True
 ):
     """Универсальная функция для обновления меню."""
+
+    user_id = message.from_user.id if message else callback.from_user.id
+
+    # Сохраняем в историю только если это новое действие
+    if save_history:
+        state_data = await state.get_data()
+        last_menu_id = state_data.get('last_history_menu_id')
+
+        # Сохраняем только если это переход в другое меню
+        if last_menu_id != menu.id:
+            menu_api = API()
+            await menu_api.add_to_history(user_id, menu.id)
 
     # Обновляем состояние
     await state.update_data(
         current_menu_id=menu.id,
         current_children=menu.children_names,
         current_content=[content.to_dict() for content in menu.content],
-        rating_shown=False  # флаг для отслеживания показа оценки
+        rating_shown=False,  # флаг для отслеживания показа оценки
+        last_history_menu_id=menu.id
     )
 
     # Создаем клавиатуру и текст

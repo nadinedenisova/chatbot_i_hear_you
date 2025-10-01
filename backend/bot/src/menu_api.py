@@ -1,3 +1,4 @@
+from datetime import datetime
 import logging
 from typing import Optional
 
@@ -15,10 +16,13 @@ class API:
     def __init__(self):
         self.api_url = config.API_URL
         self.timeout = aiohttp.ClientTimeout(total=config.API_TIMEOUT)
+        self.last_saved_menu = {} 
 
     async def get_user(self, user_id: int) -> bool:
         """Проверка существования пользователя в системе."""
+
         url = f'{self.api_url}/users/users'
+
         try:
             async with aiohttp.ClientSession(timeout=self.timeout) as session:
                 async with session.get(url) as response:
@@ -44,7 +48,9 @@ class API:
 
     async def register_user(self, user_id: int) -> bool:
         """Регистрация пользователя в системе."""
+
         url = f'{self.api_url}/users/create'
+
         data = {
             'id': str(user_id),
             'phone_number': '+7{user_id}' # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! УБРАТЬ!?
@@ -77,7 +83,9 @@ class API:
 
     async def get_root_menu(self) -> Menu:
         """Получение корневого меню."""
+
         url = f'{self.api_url}/menu/root'
+
         try:
             async with aiohttp.ClientSession(timeout=self.timeout) as session:
                 async with session.get(url) as response:
@@ -98,6 +106,7 @@ class API:
             return None
 
         url = f'{self.api_url}/menu/search-by-name'
+
         params = {'name': menu_name}
         try:
             async with aiohttp.ClientSession(timeout=self.timeout) as session:
@@ -119,7 +128,9 @@ class API:
 
     async def get_menu_by_id(self, menu_id: int) -> Optional[Menu]:
         """Получение меню по ID."""
+
         url = f'{self.api_url}/menu/{menu_id}'
+
         try:
             async with aiohttp.ClientSession(timeout=self.timeout) as session:
                 async with session.get(url) as response:
@@ -139,7 +150,9 @@ class API:
     async def send_rating(
             self, menu_id: int, user_id: int, rating: int) -> bool:
         """Отправка рейтинга для меню."""
+
         url = f'{self.api_url}/menu/{menu_id}/rate'
+
         data = {
             'user_id': str(user_id),
             'node_rating': rating
@@ -157,4 +170,39 @@ class API:
             return False
         except Exception as e:
             logger.error(f'Ошибка при отправке рейтинга: {e}')
+            return False
+
+    async def add_to_history(self, user_id: int, menu_id: str) -> bool:
+        """Добавление записи в историю пользователя."""
+
+        url = f'{self.api_url}/users/{user_id}/history/add'
+
+        if self.last_saved_menu.get(user_id) == menu_id:
+            logger.debug(f'Пропускаем дублирование истории для меню {menu_id}')
+            return True
+
+        # Форматируем дату в нужный формат
+        current_time = datetime.utcnow()
+        formatted_date = current_time.strftime('%Y-%m-%d %H:%M:%S')
+        data = {
+            'menu_id': str(menu_id),
+            'action_date': formatted_date
+        }
+
+        try:
+            async with aiohttp.ClientSession(timeout=self.timeout) as session:
+                async with session.post(url, json=data) as response:
+                    if response.status in [200, 201]:
+                        logger.debug(
+                            f'История сохранена для пользователя {user_id},'
+                            f' меню {menu_id}')
+                        return True
+                    else:
+                        response_text = await response.text()
+                        logger.error(
+                            f'Ошибка при сохранении истории: {response.status},'
+                            f' {response_text}')
+                        return False
+        except Exception as e:
+            logger.error(f'Ошибка при добавлении в историю: {e}')
             return False
