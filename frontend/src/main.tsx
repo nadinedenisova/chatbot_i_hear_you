@@ -10,8 +10,8 @@ import { Provider } from 'react-redux';
 import { ROUTES } from '@shared/routes/ROUTES';
 import store from '@store/store';
 import App from '@components/App/App';
-import { Main } from '@components/Main/Main';
 import ErrorPage from '@pages/ErrorPage/ErrorPage';
+import { MenuPage } from '@pages/MenuPage/MenuPage';
 
 import './index.css';
 
@@ -44,7 +44,7 @@ const router = createBrowserRouter([
       },
       {
         path: ROUTES.MENU,
-        element: <Main />,
+        element: <MenuPage />,
         handle: { title: 'Меню', id: 'menu' },
       },
       {
