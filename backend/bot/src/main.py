@@ -5,7 +5,7 @@ from pathlib import Path
 from aiogram import Bot, Dispatcher
 
 from config import config
-from handlers import callback, command
+from handlers import message, callback
 from keyboards import set_main_commands
 
 
@@ -32,7 +32,7 @@ async def main() -> None:
 
     # Регистрация роутеров
     dp.include_router(callback.router)
-    dp.include_router(command.router)
+    dp.include_router(message.router)
 
     await set_main_commands(bot)
 

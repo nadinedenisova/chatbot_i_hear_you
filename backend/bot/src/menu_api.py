@@ -75,7 +75,7 @@ class API:
                     else:
                         logger.error(
                             f'Не удалось зарегистрировать пользователя:'
-                            f'{response_text}')
+                            f' {response_text}')
                         return False
         except Exception as e:
             logger.error(f'Ошибка при регистрации пользователя: {e}')
@@ -200,9 +200,36 @@ class API:
                     else:
                         response_text = await response.text()
                         logger.error(
-                            f'Ошибка при сохранении истории: {response.status},'
+                            f'Ошибка cохранения истории: {response.status},'
                             f' {response_text}')
                         return False
         except Exception as e:
             logger.error(f'Ошибка при добавлении в историю: {e}')
+            return False
+
+    async def send_question(self, user_id: int, text: str) -> bool:
+        """Отправка вопроса пользователя."""
+
+        url = f'{self.api_url}/users/questions/create'
+
+        data = {
+            'user_id': str(user_id),
+            'text': text
+        }
+
+        try:
+            async with aiohttp.ClientSession(timeout=self.timeout) as session:
+                async with session.post(url, json=data) as response:
+                    if response.status in [200, 201]:
+                        logger.debug(
+                            f'Вопрос от пользователя {user_id} отправлен')
+                        return True
+                    else:
+                        response_text = await response.text()
+                        logger.error(
+                            f'Ошибка при отправке вопроса: {response.status},'
+                            f' {response_text}')
+                        return False
+        except Exception as e:
+            logger.error(f'Ошибка при отправке вопроса: {e}')
             return False

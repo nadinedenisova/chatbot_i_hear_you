@@ -24,12 +24,19 @@ def create_menu_keyboard(
                     callback_data=f'menu:{index}'
                 )
             ])
+        # Кнопка с вопросом от пользователя. Создаем в дочернем меню.
+        if not is_root and not menu.content:
+            buttons.append([
+                InlineKeyboardButton(
+                    text=TEXTS['ask_question_btn'],
+                    callback_data='ask_question'
+                )
+            ])
 
     # Кнопки для контента
     if menu.content:
         for index, content in enumerate(menu.content):
             content_type = content.get_content_type()
-            # Используем индекс контента и сохраняем URL отдельно
             buttons.append([
                 InlineKeyboardButton(
                     text=content_type,

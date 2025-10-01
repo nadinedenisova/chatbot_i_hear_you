@@ -15,7 +15,7 @@ async def update_menu_state(
     is_root: bool = False,
     save_history: bool = True
 ):
-    """Универсальная функция для обновления меню."""
+    """Универсальная функция для создания/обновления меню."""
 
     user_id = message.from_user.id if message else callback.from_user.id
 

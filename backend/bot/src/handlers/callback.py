@@ -3,22 +3,17 @@ import logging
 
 from aiogram import Router, F
 from aiogram.fsm.context import FSMContext
-from aiogram.fsm.state import State, StatesGroup
 from aiogram.types import CallbackQuery
 
 from keyboards import create_menu_keyboard
 from menu_api import API
 from utils.menu_update import update_menu_state
 from utils.texts import TEXTS
+from utils.states import UserStates
 
 logger = logging.getLogger(__name__)
 
 router = Router(name='callback')
-
-
-class States(StatesGroup):
-    """Состояния для навигации по меню"""
-    navigating = State()
 
 
 # Инициализируем API и хранилище для навигации (стек меню)
@@ -26,7 +21,7 @@ menu_api = API()
 navigation_stack: dict[int, list[str]] = {}
 
 
-@router.callback_query(States.navigating, F.data.startswith('menu:'))
+@router.callback_query(UserStates.navigating, F.data.startswith('menu:'))
 async def navigate_menu(callback: CallbackQuery, state: FSMContext):
     """Переход в подменю"""
     # Получаем индекс нажатой клавиши
@@ -76,7 +71,7 @@ async def navigate_menu(callback: CallbackQuery, state: FSMContext):
         await callback.answer(TEXTS['error_start'])
 
 
-@router.callback_query(States.navigating, F.data == 'home')
+@router.callback_query(UserStates.navigating, F.data == 'home')
 async def go_home(callback: CallbackQuery, state: FSMContext):
     """Возврат в главное меню"""
     try:
@@ -101,7 +96,7 @@ async def go_home(callback: CallbackQuery, state: FSMContext):
         await callback.answer(TEXTS['error_start'])
 
 
-@router.callback_query(States.navigating, F.data == 'back')
+@router.callback_query(UserStates.navigating, F.data == 'back')
 async def go_back(callback: CallbackQuery, state: FSMContext):
     """Возврат назад"""
     user_id = callback.from_user.id
@@ -136,7 +131,7 @@ async def go_back(callback: CallbackQuery, state: FSMContext):
         await callback.answer(TEXTS['error'])
 
 
-@router.callback_query(States.navigating, F.data.startswith('cnt:'))
+@router.callback_query(UserStates.navigating, F.data.startswith('cnt:'))
 async def show_content(callback: CallbackQuery, state: FSMContext):
     """Показ контента"""
     # Получаем индекс нажатой клавиши
@@ -191,3 +186,28 @@ async def rate_content(callback: CallbackQuery, state: FSMContext):
     except Exception as e:
         logger.error(f'Ошибка при оценке контента: {e}')
         await callback.answer(TEXTS['rating_error'])
+
+
+@router.callback_query(F.data == 'ask_question')
+async def ask_question(callback: CallbackQuery, state: FSMContext):
+    """Обработка вопроса пользователя."""
+    await state.set_state(UserStates.waiting_for_question)
+
+    # Сохраняем текущее состояние меню для возврата
+    current_data = await state.get_data()
+    await state.update_data(
+        previous_menu_id=current_data.get('current_menu_id'),
+        previous_children=current_data.get('current_children'),
+        previous_content=current_data.get('current_content')
+    )
+
+    # Отправляем сообщение и сохраняем его ID
+    bot_message = await callback.message.answer(
+        TEXTS['enter_question'],
+        parse_mode='HTML'
+    )
+
+    # Сохраняем ID сообщения бота для последующего удаления
+    await state.update_data(question_prompt_message_id=bot_message.message_id)
+
+    await callback.answer()
