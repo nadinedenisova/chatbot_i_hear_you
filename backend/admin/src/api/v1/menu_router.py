@@ -43,6 +43,16 @@ async def get_menu_node_by_name(
 async def get_menu_root(menu_service: MenuService = Depends(get_menu_service)):
     return await menu_service.get_menu_root()
 
+@router.get(
+    "/search",
+    summary="Поиск узлов меню по ключевым словам",
+    response_model=list[MenuNodeOut],
+)
+async def search_menu_nodes(
+    keywords: str = Query(..., title="Ключевые слова для поиска", min_length=1),
+    menu_service: MenuService = Depends(get_menu_service),
+):
+    return await menu_service.search_menu_nodes(keywords)
 
 @router.post("/add", summary="Добавить узел меню навигации", response_model=Message)
 async def add_menu_node(
