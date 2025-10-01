@@ -1,7 +1,7 @@
 # db_engine.py
 from uuid import UUID
 from typing import Sequence
-from sqlalchemy import select, update, delete, and_, func, text
+from sqlalchemy import select, update, delete, and_, func, text, or_
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 from fastapi import Depends, HTTPException, status
@@ -256,6 +256,27 @@ class DBEngine:
         )
         result = await self.session.execute(stmt)
         return result.scalar_one_or_none()
+
+    async def search_menu_nodes(self, keywords: str) -> Sequence[MenuNode]:
+        """Поиск узлов меню по ключевым словам с использованием ILIKE."""
+        terms = keywords.split()  # Разделяем на отдельные слова
+        conditions = []
+        for term in terms:
+            conditions.append(MenuNode.name.ilike(f"%{term}%"))
+            if MenuNode.text is not None:  # Проверяем, чтобы избежать ошибок если text NULL
+                conditions.append(MenuNode.text.ilike(f"%{term}%"))
+
+        if not conditions:
+            return []
+
+        stmt = (
+            select(MenuNode)
+            .options(selectinload(MenuNode.content))
+            .where(or_(*conditions))
+            .order_by(MenuNode.name)
+        )
+        result = await self.session.execute(stmt)
+        return result.scalars().all()
 
     async def create_menu_node(self, node_data: MenuNodeCreate) -> MenuNode:
         menu_node = MenuNode(

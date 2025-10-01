@@ -167,6 +167,32 @@ class MenuService:
             children_names=children_names,
         )
 
+    async def search_menu_nodes(self, keywords: str) -> list[MenuNodeOut]:
+        """Поиск узлов меню по ключевым словам в названии или тексте."""
+        menu_nodes = await self.db_engine.search_menu_nodes(keywords)
+
+        if not menu_nodes:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="No menu nodes found matching the keywords"
+            )
+
+        # Преобразование в MenuNodeOut с вычислением children_names
+        node_out_list = []
+        for node in menu_nodes:
+            children_names = await self._get_children_names(node.id)
+            node_out = MenuNodeOut(
+                id=node.id,
+                parent_id=node.parent_id,
+                name=node.name,
+                text=node.text,
+                subscription_type=node.subscription_type,
+                content=self._get_content_list(node),
+                children_names=children_names,
+            )
+            node_out_list.append(node_out)
+
+        return node_out_list
+
     async def add_menu_node(self, node_data: MenuNodeCreate) -> Message:
         """Добавление узла меню."""
 
