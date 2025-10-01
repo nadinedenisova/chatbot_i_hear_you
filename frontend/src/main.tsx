@@ -11,13 +11,12 @@ import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { ROUTES } from '@shared/routes/ROUTES';
 import store from '@store/store';
 import QuestionsPage from '@pages/QuestionsPage/QuestionsPage';
-import App from '@components/App/App';
 import ErrorPage from '@pages/ErrorPage/ErrorPage';
-// eslint-disable-next-line import/order
 import Login from '@pages/LoginPage/LoginPage';
+import App from '@components/App/App';
+import { Main } from '@components/Main/Main';
 
 import './index.css';
-import { Main } from '@components/Main/Main';
 
 async function enableMocking() {
   // if (process.env.NODE_ENV !== "development") {

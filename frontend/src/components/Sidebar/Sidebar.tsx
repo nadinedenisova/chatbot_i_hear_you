@@ -63,7 +63,7 @@ export const Sidebar: FC<SidebarProps> = ({ open, onClick }) => (
     <Divider />
     <List component="nav">
       {menuItems.map((data, i) => (
-        <MenuItem key={i} {...data} onClick={onClick} />
+        <MenuItem key={i} {...data} />
       ))}
     </List>
   </Drawer>

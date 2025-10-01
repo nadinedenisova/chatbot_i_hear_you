@@ -1,7 +1,8 @@
 import { TextField, Button, Typography } from '@mui/material';
-import './LoginPage.css';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+
+import styles from './LoginPage.module.css';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -31,7 +32,7 @@ export default function LoginPage() {
     if (valid) void navigate('/');
   };
   return (
-    <form noValidate className="login" onSubmit={handleSubmit}>
+    <form noValidate className={styles.login} onSubmit={handleSubmit}>
       <Typography variant="h5" align="center">
         Вход
       </Typography>

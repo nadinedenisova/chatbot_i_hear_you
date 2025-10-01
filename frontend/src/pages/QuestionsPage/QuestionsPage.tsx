@@ -1,19 +1,16 @@
 import Pagination from '@mui/material/Pagination';
+import Box from '@mui/material/Box';
 
-import { drawerWidth } from '@components/AppHeader/AppHeader';
 import QuestionCard from '@components/QuestionCard/QuestionCard';
 
 export default function QuestionsPage() {
   return (
-    <div
-      style={{
+    <Box
+      sx={{
         display: 'flex',
-        position: 'absolute',
-        top: '83px',
-        left: `calc(${drawerWidth}px + 20px)`,
         flexDirection: 'column',
-        gap: '20px',
-        paddingBottom: '10px',
+        gap: 2,
+        pb: 1,
       }}
     >
       <QuestionCard
@@ -22,63 +19,39 @@ export default function QuestionsPage() {
         content={
           'Есть ли что-то, что мне нужно знать о тебе, но ты боишься это рассказать?'
         }
-        isChecked={'true'}
+        isAnswered={'true'}
       />
       <QuestionCard
         phone={'+79992352525'}
         date={'24.01.2025'}
         content={'Есть ли что-то, что тебя сейчас беспокоит?'}
-        isChecked={''}
+        isAnswered={''}
       />
       <QuestionCard
         phone={'+79992352525'}
         date={'24.01.2025'}
         content={'Есть ли что-то, что тебя сейчас беспокоит?'}
-        isChecked={''}
+        isAnswered={'true'}
       />
       <QuestionCard
         phone={'+79992352525'}
         date={'24.01.2025'}
         content={'Есть ли что-то, что тебя сейчас беспокоит?'}
-        isChecked={''}
+        isAnswered={''}
       />
       <QuestionCard
         phone={'+79992352525'}
         date={'24.01.2025'}
         content={'Есть ли что-то, что тебя сейчас беспокоит?'}
-        isChecked={''}
+        isAnswered={''}
       />
       <QuestionCard
         phone={'+79992352525'}
         date={'24.01.2025'}
         content={'Есть ли что-то, что тебя сейчас беспокоит?'}
-        isChecked={'true'}
-      />
-      <QuestionCard
-        phone={'+79992352525'}
-        date={'24.01.2025'}
-        content={'Есть ли что-то, что тебя сейчас беспокоит?'}
-        isChecked={'true'}
-      />
-      <QuestionCard
-        phone={'+79992352525'}
-        date={'24.01.2025'}
-        content={'Есть ли что-то, что тебя сейчас беспокоит?'}
-        isChecked={'true'}
-      />
-      <QuestionCard
-        phone={'+79992352525'}
-        date={'24.01.2025'}
-        content={'Есть ли что-то, что тебя сейчас беспокоит?'}
-        isChecked={''}
-      />
-      <QuestionCard
-        phone={'+79992352525'}
-        date={'24.01.2025'}
-        content={'Есть ли что-то, что тебя сейчас беспокоит?'}
-        isChecked={'true'}
+        isAnswered={'true'}
       />
       <Pagination count={10} />
-    </div>
+    </Box>
   );
 }

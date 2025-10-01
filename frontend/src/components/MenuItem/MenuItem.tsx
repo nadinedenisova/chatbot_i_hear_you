@@ -16,6 +16,7 @@ import type { FC } from 'react';
 
 const StyledListItemButton = styled(ListItemButton)(() => ({
   '&.Mui-selected': {
+    backgroundColor: '#d7ebff',
     color: '#1976d2',
     borderRadius: '5px',
   },
@@ -27,7 +28,6 @@ interface MenuItemProps {
   path: string;
   selected?: boolean;
   id: string;
-  onClick?: () => void;
 }
 
 export const MenuItem: FC<MenuItemProps> = ({
@@ -36,19 +36,11 @@ export const MenuItem: FC<MenuItemProps> = ({
   path,
   selected,
   id,
-  onClick,
 }) => {
   const { selectedMenuItem } = useCurrentRouteData();
 
   return (
-    <ListItem
-      className={styles.item}
-      disablePadding
-      component={Link}
-      to={path}
-      button
-      onClick={onClick}
-    >
+    <ListItem className={styles.item} disablePadding component={Link} to={path}>
       <StyledListItemButton selected={selectedMenuItem === id}>
         <ListItemIcon sx={{ color: selected ? '#1976d2' : 'inherit' }}>
           {icon}

@@ -36,16 +36,16 @@ interface QuestionCardProps {
   phone: string;
   date: string;
   content: string;
-  isChecked?: string;
+  isAnswered?: string;
 }
 
 export default function QuestionCard({
   phone,
   date,
   content,
-  isChecked,
+  isAnswered,
 }: QuestionCardProps) {
-  const [expanded, setExpanded] = React.useState(false);
+  const [expanded, setExpanded] = React.useState(!isAnswered);
 
   const handleExpandClick = () => {
     setExpanded(!expanded);
@@ -90,7 +90,7 @@ export default function QuestionCard({
           </Box>
           <CheckOutlinedIcon
             sx={{
-              color: isChecked ? 'green' : 'red',
+              color: isAnswered ? 'green' : 'red',
               cursor: 'default',
               pointerEvents: 'none',
               fontSize: 25,
