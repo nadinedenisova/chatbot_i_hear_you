@@ -397,14 +397,22 @@ class DBEngine:
             await self.session.refresh(rating)
             return rating
 
-    async def get_menu_ratings_all(self, menu_id: UUID) -> RatingListOut:
+    async def get_menu_ratings_all(
+        self, menu_id: UUID, pagination: PaginatedParams
+    ) -> RatingListOut:
         menu_node = await self.get_menu_node_by_id(menu_id)
         if not menu_node:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail=f"Menu node with id {menu_id} not found"
             )
-        stmt = select(UserMenuNode).where(UserMenuNode.menu_id == menu_id)
+        stmt = (
+            select(UserMenuNode)
+            .where(UserMenuNode.menu_id == menu_id)
+            .offset(pagination.offset)
+            .limit(pagination.limit)
+            .order_by(UserMenuNode.created_at.desc())
+        )
         result = await self.session.execute(stmt)
         ratings = result.scalars().all()
         rating_out_list = []
