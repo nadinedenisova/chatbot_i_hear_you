@@ -1,7 +1,7 @@
 import uuid
 from datetime import datetime, timezone
 
-from sqlalchemy import text, func, String, DateTime, ForeignKey
+from sqlalchemy import text, func, String, DateTime, ForeignKey, Boolean
 from sqlalchemy.orm import mapped_column, relationship, Mapped
 from src.db.postgres import Base
 
@@ -24,7 +24,7 @@ class UserMenuNode(Base):
 
     menu_id: Mapped[uuid.UUID] = mapped_column(unique=True)
 
-    post_rating: Mapped[int]
+    post_rating: Mapped[bool] = mapped_column(Boolean, nullable=True)
 
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
@@ -37,6 +37,7 @@ class UserMenuNode(Base):
         DateTime(timezone=True),
         default=datetime.now(timezone.utc),
         server_default=func.now(),
+        onupdate=func.now(),
         nullable=False,
     )
 

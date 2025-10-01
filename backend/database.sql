@@ -50,7 +50,7 @@ CREATE TABLE content.user_menu_node (
 	"id" UUID PRIMARY KEY DEFAULT gen_random_uuid(),
 	"user_id" VARCHAR(255) NOT NULL,
 	"menu_id" UUID NOT NULL,
-	"post_rating" SMALLINT,
+	"post_rating" BOOLEAN,
 	"created_at" TIMESTAMP NOT NULL DEFAULT now(),
     "updated_at" TIMESTAMP NOT NULL DEFAULT now(),
 	UNIQUE ("user_id", "menu_id")
@@ -108,10 +108,16 @@ INSERT INTO content.history ("user_id", "menu_id", "action_date") VALUES
 ('225894988', '00000000-0000-0000-0000-000000000001', '2024-01-16 11:15:00');
 
 INSERT INTO content.user_menu_node ("user_id", "menu_id", "post_rating") VALUES 
-('user_001', '00000000-0000-0000-0000-000000000011', 5),
-('user_001', '00000000-0000-0000-0000-000000000012', 4),
-('user_002', '00000000-0000-0000-0000-000000000011', 2),
-('user_003', '00000000-0000-0000-0000-000000000013', 5);
+('user_001', '00000000-0000-0000-0000-000000000001', TRUE),
+('user_001', '00000000-0000-0000-0000-000000000011', TRUE),
+('user_001', '00000000-0000-0000-0000-000000000012', TRUE),
+('user_002', '00000000-0000-0000-0000-000000000001', TRUE),
+('user_002', '00000000-0000-0000-0000-000000000011', FALSE),
+('user_002', '00000000-0000-0000-0000-000000000012', FALSE),
+('user_002', '00000000-0000-0000-0000-000000000013', FALSE),
+('user_003', '00000000-0000-0000-0000-000000000001', FALSE),
+('user_003', '00000000-0000-0000-0000-000000000011', TRUE),
+('user_003', '00000000-0000-0000-0000-000000000013', FALSE);
 
 
 -- Создание индексов
@@ -121,3 +127,5 @@ CREATE INDEX CONCURRENTLY idx_history_user_id ON content.history(user_id);
 CREATE INDEX CONCURRENTLY idx_history_menu_id ON content.history(menu_id) WHERE menu_id IS NOT NULL;
 CREATE INDEX CONCURRENTLY idx_question_user_id ON content.question(user_id);
 CREATE INDEX CONCURRENTLY idx_history_user_action_date ON content.history(user_id, action_date);
+CREATE INDEX CONCURRENTLY idx_user_menu_node_menu_id_rating ON content.user_menu_node (menu_id, post_rating);
+CREATE INDEX CONCURRENTLY idx_user_menu_node_menu_id ON content.user_menu_node(menu_id);

@@ -128,26 +128,23 @@ class HistoryOut(HistoryCreate):
         ..., description="Дата и время создания записи истории"
     )  # Изменено
 
+
 class HistoryListOut(BaseModel):
     items: list[HistoryOut] = Field(..., description="Список действий")
 
+
 class RatingCreate(BaseModel):
     user_id: str = Field(..., description="Идентификатор пользователя")
-    node_rating: int = Field(
-        ..., ge=1, le=5, description="Оценка (например, от 1 до 5)"
-    )
+    is_useful: bool = Field(..., description="true - Полезно, false - Не очень")
 
 
-class RatingOut(RatingCreate):
-    menu_id: UUID = Field(
-        ..., description="Идентификатор меню/узла, к которому привязана оценка"
-    )
-    created_at: datetime = Field(
-        ..., description="Дата и время создания оценки"
-    )  # Изменено
-    updated_at: datetime = Field(
-        ..., description="Дата и время обновления оценки"
-    )  # Изменено
+class RatingSummaryOut(BaseModel):
+    menu_id: UUID
+    useful_count: int = Field(..., description="Количество оценок 'Полезно'")
+    not_useful_count: int = Field(..., description="Количество оценок 'Не очень'")
+
+    class Config:
+        from_attributes = True
 
 
 AllMenuNodeOut.model_rebuild()
