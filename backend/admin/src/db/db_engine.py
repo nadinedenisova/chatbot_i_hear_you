@@ -18,6 +18,8 @@ from src.schemas.entity import (
     QuestionCreate,
     HistoryCreate,
     RatingCreate,
+    RatingDetailOut,
+    RatingListOut,
     MenuNodeCreate,
     MenuNodeUpdate,
     ContentCreate,
@@ -395,7 +397,7 @@ class DBEngine:
             await self.session.refresh(rating)
             return rating
 
-    async def get_menu_ratings_all(self, menu_id: UUID) -> list:
+    async def get_menu_ratings_all(self, menu_id: UUID) -> RatingListOut:
         menu_node = await self.get_menu_node_by_id(menu_id)
         if not menu_node:
             raise HTTPException(
@@ -405,16 +407,16 @@ class DBEngine:
         stmt = select(UserMenuNode).where(UserMenuNode.menu_id == menu_id)
         result = await self.session.execute(stmt)
         ratings = result.scalars().all()
-        debug_data = []
+        rating_out_list = []
         for rating in ratings:
-            debug_data.append({
-                "id": rating.id,
-                "user_id": rating.user_id,
-                "menu_id": rating.menu_id,
-                "post_rating": rating.post_rating,
-                "created_at": rating.created_at
-            })
-        return debug_data
+            rating_out = RatingDetailOut(
+                user_id=rating.user_id,
+                is_useful=rating.post_rating,
+                created_at=rating.created_at,
+                updated_at=rating.updated_at
+                )
+            rating_out_list.append(rating_out)
+        return RatingListOut(menu_id=menu_id, ratings=rating_out_list)
 
 
 def get_db_engine(session: AsyncSession = Depends(get_async_session)):

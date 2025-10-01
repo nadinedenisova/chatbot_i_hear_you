@@ -147,4 +147,18 @@ class RatingSummaryOut(BaseModel):
         from_attributes = True
 
 
+class RatingDetailOut(RatingCreate):
+    created_at: datetime = Field(..., description="Дата и время создания оценки")
+    updated_at: datetime = Field(..., description="Дата и время обновления оценки")
+
+    class Config:
+        from_attributes = True
+
+
+class RatingListOut(BaseModel):
+    """Схема для возврата списка всех оценок узла меню"""
+    menu_id: UUID
+    ratings: list[RatingDetailOut]
+
+
 AllMenuNodeOut.model_rebuild()
