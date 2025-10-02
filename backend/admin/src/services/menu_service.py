@@ -54,17 +54,22 @@ class MenuService:
 
     def _get_content_list(self, node: MenuNode) -> list[ContentOut]:
         """Получение списка контента для узла меню."""
-        return [
-            ContentOut(
-                id=c.id,
-                menu_id=c.menu_id,
-                type=c.type,
-                server_path=c.server_path,
-                created_at=c.created_at,
-                updated_at=c.updated_at,
-            )
-            for c in node.content
-        ] if node.content else []
+        return (
+            [
+                ContentOut(
+                    id=c.id,
+                    menu_id=c.menu_id,
+                    type=c.type,
+                    server_path=c.server_path,
+                    created_at=c.created_at,
+                    updated_at=c.updated_at,
+                )
+                for c in node.content
+            ]
+            if node.content
+            else []
+        )
+
     async def _get_node_by_id(self, node_id: UUID) -> MenuNode:
         node = await self.db_engine.get_menu_node_by_id(node_id)
         if not node:
@@ -173,7 +178,8 @@ class MenuService:
 
         if not menu_nodes:
             raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND, detail="No menu nodes found matching the keywords"
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="No menu nodes found matching the keywords",
             )
 
         # Преобразование в MenuNodeOut с вычислением children_names
@@ -256,7 +262,9 @@ class MenuService:
         self, content_id: UUID, content_data: ContentCreate
     ) -> Message:
         """Обновление контента."""
-        await self._get_node_by_id(content_data.menu_id)  # проверка есть ли menu_node с таким id
+        await self._get_node_by_id(
+            content_data.menu_id
+        )  # проверка есть ли menu_node с таким id
         await self.db_engine.update_content(content_id, content_data)
         return Message(detail="The content was changed")
 
@@ -270,7 +278,7 @@ class MenuService:
         return Message(detail="The node content was deleted")
 
     async def add_menu_content_with_file(
-            self, menu_id: UUID, content_data: ContentCreate, file: UploadFile
+        self, menu_id: UUID, content_data: ContentCreate, file: UploadFile
     ) -> Message:
         """Добавляет контент с загрузкой файла"""
         await self._get_node_by_id(menu_id)  # проверка есть ли menu_node с таким id
@@ -282,16 +290,20 @@ class MenuService:
         return Message(detail="The content was added with file")
 
     async def update_menu_content_with_file(
-            self, content_id: UUID, content_data: ContentCreate, file: UploadFile
+        self, content_id: UUID, content_data: ContentCreate, file: UploadFile
     ) -> Message:
         """Обновляет контент с новым файлом."""
-        await self._get_node_by_id(content_data.menu_id)  # проверка есть ли menu_node с таким id
+        await self._get_node_by_id(
+            content_data.menu_id
+        )  # проверка есть ли menu_node с таким id
 
         # Сохраняем новый файл
         file_info = await file_service.save_upload_file(file)
 
         # Обновляем контент в БД
-        await self.db_engine.update_content_with_file(content_id, content_data, file_info)
+        await self.db_engine.update_content_with_file(
+            content_id, content_data, file_info
+        )
         return Message(detail="The content was changed with new file")
 
     async def get_menu_node_rate(self, menu_id: UUID) -> RatingSummaryOut:
@@ -300,7 +312,7 @@ class MenuService:
         return RatingSummaryOut(
             menu_id=menu_id,
             useful_count=rating_summary["useful_count"],
-            not_useful_count=rating_summary["not_useful_count"]
+            not_useful_count=rating_summary["not_useful_count"],
         )
 
     async def rate_menu_node(self, menu_id: UUID, rating_data: RatingCreate) -> Message:
@@ -310,9 +322,7 @@ class MenuService:
         return Message(detail=f"Rating '{rating_text}' saved successfully!")
 
     async def get_menu_ratings_all(
-        self, 
-        menu_id: UUID, 
-        pagination: PaginatedParams
+        self, menu_id: UUID, pagination: PaginatedParams
     ) -> RatingListOut:
         """Получение всех оценок узла меню с пагинацией"""
         return await self.db_engine.get_menu_ratings_all(menu_id, pagination)
@@ -321,4 +331,3 @@ class MenuService:
 def get_menu_service(db_engine: DBEngine = Depends(get_db_engine)) -> MenuService:
     """Зависимость для получения MenuService."""
     return MenuService(db_engine)
-

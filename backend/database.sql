@@ -93,12 +93,13 @@ INSERT INTO content.content ("menu_id", "type", "server_path") VALUES
 ('00000000-0000-0000-0000-000000000012', 1, 'https://example.com/images/hearing_aids.jpg'),
 ('00000000-0000-0000-0000-000000000012', 3, 'https://example.com/documents/guide.pdf');
 
-INSERT INTO content.question ("user_id", "text", "admin_answer") VALUES 
+INSERT INTO content.question ("user_id", "text", "admin_answer") VALUES
 ('user_001', 'Какой график работы вашей службы поддержки?', 'Наша служба поддержки работает с 9:00 до 18:00 по московскому времени в рабочие дни.'),
 ('user_002', 'Можно ли получить консультацию сурдолога онлайн?', 'Да, мы организуем онлайн-консультации со специалистами. Заполните форму на нашем сайте.'),
-('user_003', 'Какие документы нужны для получения слухового аппарата?', NULL);
+('user_003', 'Какие документы нужны для получения слухового аппарата?', NULL),
+('225894988', 'Какие документы?', NULL);
 
-INSERT INTO content.history ("user_id", "menu_id", "action_date") VALUES 
+INSERT INTO content.history ("user_id", "menu_id", "action_date") VALUES
 ('user_001', '00000000-0000-0000-0000-000000000001', '2024-01-15 10:00:00'),
 ('user_001', '00000000-0000-0000-0000-000000000002', '2024-01-15 10:05:00'),
 ('user_001', '00000000-0000-0000-0000-000000000011', '2024-01-15 10:10:00'),

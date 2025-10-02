@@ -20,7 +20,9 @@ def start_scheduler(
     scheduler = AsyncIOScheduler()
     scheduler.add_job(
         notify_inactive_users,
-        IntervalTrigger(minutes=settings.reminder_polling_interval_in_minutes),  # TODO заменить на час
+        IntervalTrigger(
+            minutes=settings.reminder_polling_interval_in_minutes
+        ),  # TODO заменить на час
         # IntervalTrigger(hours=1),
         kwargs={"bot": bot, "db_engine": db_engine},
         name="notify_inactive_users",
@@ -45,7 +47,7 @@ async def notify_inactive_users(bot: TelegramBot, db_engine: DBEngine):
         try:
             await bot.send_message(
                 user_id=int(user.id),
-                text="Привет! Мы давно не видели твоей активности. Возвращайся! 😊",
+                text="Появились вопросы? Получите быстрый ответ в боте!",
             )
             await db_engine.create_history_record(
                 user_id=user.id,
