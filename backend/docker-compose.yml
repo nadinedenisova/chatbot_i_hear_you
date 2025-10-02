@@ -48,24 +48,6 @@ services:
           path: ./admin/src
           target: /opt/admin/src
 
-  admin-tests:
-    build:
-      context: ./admin
-      dockerfile: Dockerfile tests
-    container_name: admin-tests
-    env_file:
-      - ./.env
-    environment:
-      - PYTHONUNBUFFERED=1
-    depends_on:
-      admin-postgres-db:
-        condition: service_healthy
-    develop:
-      watch:
-        - action: sync+restart
-          path: ./admin/src
-          target: /opt/admin/src
-
   bot:
     build: bot
     container_name: bot
