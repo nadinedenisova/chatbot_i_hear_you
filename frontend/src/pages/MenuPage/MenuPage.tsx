@@ -1,33 +1,34 @@
 import Button from '@mui/material/Button';
 import { RichTreeView } from '@mui/x-tree-view/RichTreeView';
-import { useState, type SyntheticEvent } from 'react';
+import { useMemo, useState, type SyntheticEvent } from 'react';
 import { styled, alpha } from '@mui/material/styles';
 import { TreeItem, treeItemClasses } from '@mui/x-tree-view/TreeItem';
-import Card from '@mui/material/Card';
-import CardContent from '@mui/material/CardContent';
-import Typography from '@mui/material/Typography';
 import { useTreeViewApiRef } from '@mui/x-tree-view/hooks';
 import { Grid } from '@mui/material';
+import CircularProgress from '@mui/material/CircularProgress';
+import Box from '@mui/material/Box';
+import Alert from '@mui/material/Alert';
 
 import {
-  MOCK_MENU_TREE,
-  type TreeViewBaseItem,
-} from '../../mocks/generateTree';
+  useGetFullMenuApiV1MenuGetQuery,
+  type AllMenuNodeOut,
+} from '@store/api';
+import { Article } from '@components/Article/Article';
 
 import type { TreeViewItemId } from '@mui/x-tree-view';
 
-const getItemLabel = (item: TreeViewBaseItem) => item.name;
+const getItemLabel = (item: AllMenuNodeOut) => item.name;
 
-const getAllItemsWithChildrenItemIds = () => {
+const getAllItemsWithChildrenItemIds = (menu: AllMenuNodeOut[]) => {
   const itemIds: TreeViewItemId[] = [];
-  const registerItemId = (item: TreeViewBaseItem) => {
+  const registerItemId = (item: AllMenuNodeOut) => {
     if (item.children?.length) {
       itemIds.push(item.id);
       item.children.forEach(registerItemId);
     }
   };
 
-  MOCK_MENU_TREE.forEach(registerItemId);
+  menu.forEach(registerItemId);
 
   return itemIds;
 };
@@ -67,19 +68,23 @@ const CustomTreeItem = styled(TreeItem)(({ theme }) => ({
 export const MenuPage = () => {
   const apiRef = useTreeViewApiRef();
   const [expandedItems, setExpandedItems] = useState<string[]>([]);
-  const [selectedItem, setSelectedItem] = useState<TreeViewBaseItem | null>(
-    null,
-  );
+  const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
+
+  const {
+    data: menuData,
+    isLoading,
+    isError,
+  } = useGetFullMenuApiV1MenuGetQuery();
+
+  const menu = useMemo(() => {
+    return menuData ? [menuData] : [];
+  }, [menuData]);
 
   const handleSelectedItemsChange = (
     _: SyntheticEvent | null,
     itemId: string | null,
   ) => {
-    if (itemId == null) {
-      setSelectedItem(null);
-    } else {
-      setSelectedItem(apiRef.current!.getItem(itemId) as TreeViewBaseItem);
-    }
+    setSelectedItemId(itemId);
   };
 
   const handleExpandedItemsChange = (
@@ -91,40 +96,69 @@ export const MenuPage = () => {
 
   const handleExpandClick = () => {
     setExpandedItems((oldExpanded) =>
-      oldExpanded.length === 0 ? getAllItemsWithChildrenItemIds() : [],
+      oldExpanded.length === 0 ? getAllItemsWithChildrenItemIds(menu) : [],
     );
   };
 
+  if (isLoading) {
+    return (
+      <Box
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        height="100%"
+      >
+        <CircularProgress />
+      </Box>
+    );
+  }
+  if (isError) {
+    return (
+      <Alert severity="error">
+        Не удалось загрузить меню, попробуйте обновить страницу
+      </Alert>
+    );
+  }
+
   return (
-    <Grid container spacing={2}>
-      <Grid size={3}>
-        <Button onClick={handleExpandClick}>
-          {expandedItems.length === 0 ? 'Развернуть всё' : 'Свернуть всё'}
-        </Button>
-        <RichTreeView
-          items={MOCK_MENU_TREE}
-          expandedItems={expandedItems}
-          onExpandedItemsChange={handleExpandedItemsChange}
-          getItemLabel={getItemLabel}
-          defaultExpandedItems={['grid']}
-          slots={{ item: CustomTreeItem }}
-          apiRef={apiRef}
-          selectedItems={selectedItem?.id ?? null}
-          onSelectedItemsChange={handleSelectedItemsChange}
-        />
+    <>
+      <Grid container spacing={2}>
+        <Grid
+          size={5}
+          sx={{
+            maxHeight: '100vh',
+            overflowY: 'auto',
+            pr: 2,
+          }}
+        >
+          <Button onClick={handleExpandClick}>
+            {expandedItems.length === 0 ? 'Развернуть всё' : 'Свернуть всё'}
+          </Button>
+          <RichTreeView
+            items={menu}
+            expandedItems={expandedItems}
+            onExpandedItemsChange={handleExpandedItemsChange}
+            getItemLabel={getItemLabel}
+            defaultExpandedItems={['grid']}
+            slots={{ item: CustomTreeItem }}
+            apiRef={apiRef}
+            selectedItems={selectedItemId}
+            onSelectedItemsChange={handleSelectedItemsChange}
+          />
+        </Grid>
+        <Grid
+          size={7}
+          sx={{
+            position: 'sticky',
+            top: 0,
+            alignSelf: 'flex-start',
+            height: '100vh',
+            overflowY: 'auto',
+          }}
+        >
+          {selectedItemId && <Article id={selectedItemId} />}
+        </Grid>
       </Grid>
-      <Grid size={9}>
-        {selectedItem && (
-          <Card variant="outlined">
-            <CardContent>
-              <Typography variant="h5" component="div">
-                {selectedItem?.name}
-              </Typography>
-              <Typography variant="body2">{selectedItem?.text}</Typography>
-            </CardContent>
-          </Card>
-        )}
-      </Grid>
-    </Grid>
+    </>
   );
 };
