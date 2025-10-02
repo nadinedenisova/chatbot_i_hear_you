@@ -129,7 +129,7 @@ docker-compose build
 3. Запустить контейнеры в режиме прослушивания и дождаться их полного запуска:
 
 ```bash
-docker-compose up --watch admin-tests admin-postgres-db admin-redis-db
+docker-compose up --watch admin-tests admin-postgres-db
 ```
 
 4. После запуска контейнеров будут отслеживаться и автоматически применяться изменения в следующих директориях:

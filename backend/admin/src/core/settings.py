@@ -13,11 +13,6 @@ class Settings(BaseSettings):
     postgres_user: str
     postgres_password: str
 
-    # redis
-    redis_port: int
-    redis_host: str
-    redis_db: int
-
     # bot
     bot_token: str = "yourToken"
     reminder_polling_interval_in_minutes: int
