@@ -16,7 +16,7 @@ class API:
     def __init__(self):
         self.api_url = config.API_URL
         self.timeout = aiohttp.ClientTimeout(total=config.API_TIMEOUT)
-        self.last_saved_menu = {} 
+        self.last_saved_menu = {}
 
     async def get_user(self, user_id: int) -> bool:
         """Проверка существования пользователя в системе."""
@@ -53,7 +53,7 @@ class API:
 
         data = {
             'id': str(user_id),
-            'phone_number': '+7{user_id}' # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! УБРАТЬ!?
+            'phone_number': '+7{user_id}'
         }
 
         try:
@@ -148,21 +148,21 @@ class API:
             raise
 
     async def send_rating(
-            self, menu_id: int, user_id: int, rating: int) -> bool:
+            self, menu_id: int, user_id: int, rating: bool) -> bool:
         """Отправка рейтинга для меню."""
 
         url = f'{self.api_url}/menu/{menu_id}/rate'
 
         data = {
             'user_id': str(user_id),
-            'node_rating': rating
+            'is_useful': bool(rating)
         }
         try:
             async with aiohttp.ClientSession(timeout=self.timeout) as session:
                 async with session.post(url, json=data) as response:
                     response.raise_for_status()
                     logger.debug(
-                        f'Рейтинг {rating} для меню {menu_id} отправлен')
+                        f'Рейтинг для меню {menu_id} отправлен')
                     return True
         except aiohttp.ClientError as e:
             logger.error(
