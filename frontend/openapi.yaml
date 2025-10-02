@@ -57,6 +57,36 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/MenuNodeOut'
+  /api/v1/menu/search:
+    get:
+      tags:
+        - Меню
+      summary: Поиск узлов меню по ключевым словам
+      operationId: search_menu_nodes_api_v1_menu_search_get
+      parameters:
+        - name: keywords
+          in: query
+          required: true
+          schema:
+            type: string
+            minLength: 1
+            title: Ключевые слова для поиска
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/MenuNodeOut'
+                title: Response Search Menu Nodes Api V1 Menu Search Get
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
   /api/v1/menu/add:
     post:
       tags:
@@ -296,7 +326,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/RatingOut'
+                $ref: '#/components/schemas/RatingSummaryOut'
         '422':
           description: Validation Error
           content:
@@ -329,6 +359,54 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Message'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/menu/{menu_id}/rates-all:
+    get:
+      tags:
+        - Меню
+      summary: Получить все оценки пользователей для узла меню
+      operationId: get_menu_ratings_all_api_v1_menu__menu_id__rates_all_get
+      parameters:
+        - name: menu_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+            title: Menu Id
+        - name: page_size
+          in: query
+          required: false
+          schema:
+            type: integer
+            maximum: 100
+            minimum: 1
+            description: Количество записей на странице
+            default: 50
+            title: Page Size
+          description: Количество записей на странице
+        - name: page_number
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            description: Номер страницы
+            default: 1
+            title: Page Number
+          description: Номер страницы
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RatingListOut'
         '422':
           description: Validation Error
           content:
@@ -1220,34 +1298,25 @@ components:
           type: string
           title: User Id
           description: Идентификатор пользователя
-        node_rating:
-          type: integer
-          maximum: 5
-          minimum: 1
-          title: Node Rating
-          description: Оценка (например, от 1 до 5)
+        is_useful:
+          type: boolean
+          title: Is Useful
+          description: true - Полезно, false - Не очень
       type: object
       required:
         - user_id
-        - node_rating
+        - is_useful
       title: RatingCreate
-    RatingOut:
+    RatingDetailOut:
       properties:
         user_id:
           type: string
           title: User Id
           description: Идентификатор пользователя
-        node_rating:
-          type: integer
-          maximum: 5
-          minimum: 1
-          title: Node Rating
-          description: Оценка (например, от 1 до 5)
-        menu_id:
-          type: string
-          format: uuid
-          title: Menu Id
-          description: Идентификатор меню/узла, к которому привязана оценка
+        is_useful:
+          type: boolean
+          title: Is Useful
+          description: true - Полезно, false - Не очень
         created_at:
           type: string
           format: date-time
@@ -1261,11 +1330,47 @@ components:
       type: object
       required:
         - user_id
-        - node_rating
-        - menu_id
+        - is_useful
         - created_at
         - updated_at
-      title: RatingOut
+      title: RatingDetailOut
+    RatingListOut:
+      properties:
+        menu_id:
+          type: string
+          format: uuid
+          title: Menu Id
+        ratings:
+          items:
+            $ref: '#/components/schemas/RatingDetailOut'
+          type: array
+          title: Ratings
+      type: object
+      required:
+        - menu_id
+        - ratings
+      title: RatingListOut
+      description: Схема для возврата списка всех оценок узла меню
+    RatingSummaryOut:
+      properties:
+        menu_id:
+          type: string
+          format: uuid
+          title: Menu Id
+        useful_count:
+          type: integer
+          title: Useful Count
+          description: Количество оценок 'Полезно'
+        not_useful_count:
+          type: integer
+          title: Not Useful Count
+          description: Количество оценок 'Не очень'
+      type: object
+      required:
+        - menu_id
+        - useful_count
+        - not_useful_count
+      title: RatingSummaryOut
     UserCreate:
       properties:
         id:
