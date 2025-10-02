@@ -5,7 +5,6 @@ from fastapi.responses import ORJSONResponse
 from fastapi.staticfiles import StaticFiles
 
 from src.api.v1 import example, menu_router, users_router, file_router
-from src.db.redis import _redis
 from src.core.settings import settings
 from src.db.db_engine import create_db_engine
 from src.db.postgres import async_session_maker
@@ -39,7 +38,8 @@ app = FastAPI(
 
 app.include_router(example.router, prefix="/api/v1/example", tags=["Пример"])
 app.include_router(menu_router.router, prefix="/api/v1/menu", tags=["Меню"])
-app.include_router(users_router.router, prefix="/api/v1/users", tags=["Пользователи"])
+app.include_router(users_router.router,
+                   prefix="/api/v1/users", tags=["Пользователи"])
 
 app.include_router(file_router.router, prefix="/api/files",
                    tags=["Загрузка файлов"])
