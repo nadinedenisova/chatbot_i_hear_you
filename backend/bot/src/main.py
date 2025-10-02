@@ -7,19 +7,10 @@ from aiogram import Bot, Dispatcher
 from config import config
 from handlers import message, callback
 from keyboards import set_main_commands
+from utils.logger import setup_logging
 
 
-# Настройка логирования
-Path("logs").mkdir(exist_ok=True)
-logging.basicConfig(
-    level=getattr(logging, config.LOG_LEVEL),
-    format="%(asctime)s - %(name)s - %(levelname)s - %(lineno)d - %(message)s",
-    handlers=[
-        logging.StreamHandler(),  # Вывод в консоль
-        logging.FileHandler("logs/bot.log", encoding="utf-8"),
-    ],
-)
-logger = logging.getLogger(__name__)
+logger = setup_logging()
 
 
 async def main() -> None:
@@ -38,23 +29,23 @@ async def main() -> None:
 
     # Удаляем вебхуки и запускаем polling
     await bot.delete_webhook(drop_pending_updates=True)
-    logger.info("Бот запущен!")
+    logger.info('Бот запущен!')
 
     try:
         await dp.start_polling(bot)
     except Exception as e:
-        logger.error(f"Ошибка при работе бота: {e}")
+        logger.error(f'Ошибка при работе бота: {e}')
     finally:
         logger.info("Бот остановлен")
         await bot.session.close()
 
 
-if __name__ == "__main__":
-    logger.info("Запуск приложения")
+if __name__ == '__main__':
+    logger.info('Запуск приложения')
 
     try:
         asyncio.run(main())
     except KeyboardInterrupt:
-        logger.info("Бот остановлен пользователем (Ctrl+C)")
+        logger.info('Бот остановлен пользователем (Ctrl+C)')
     except Exception as e:
-        logger.critical(f"Критическая ошибка: {e}")
+        logger.critical(f'Критическая ошибка: {e}')
