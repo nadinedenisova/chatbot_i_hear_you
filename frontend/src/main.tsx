@@ -15,7 +15,6 @@ import ErrorPage from '@pages/ErrorPage/ErrorPage';
 import Login from '@pages/LoginPage/LoginPage';
 import { MenuPage } from '@pages/MenuPage/MenuPage';
 import App from '@components/App/App';
-import { Main } from '@components/Main/Main';
 
 import './index.css';
 
