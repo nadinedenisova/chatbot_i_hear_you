@@ -9,15 +9,14 @@ from utils.menu_update import update_menu_state
 from utils.texts import TEXTS
 from utils.send_content import send_content_to_user
 from utils.states import UserStates
+from utils.storage import navigation_stack, rated_menus
 
 logger = logging.getLogger(__name__)
 
 router = Router(name='callback')
 
 
-# Инициализируем API и хранилище для навигации (стек меню)
 menu_api = API()
-navigation_stack: dict[int, list[str]] = {}
 
 
 @router.callback_query(UserStates.navigating, F.data.startswith('menu:'))
@@ -168,6 +167,11 @@ async def rate_content(callback: CallbackQuery, state: FSMContext):
         success = await menu_api.send_rating(menu_id, user_id, rating)
 
         if success:
+            # Добавляем меню в список оцененных
+            if user_id not in rated_menus:
+                rated_menus[user_id] = set()
+            rated_menus[user_id].add(menu_id)
+
             # Убираем клавиатуру и обновляем сообщение
             rating_text = TEXTS['rating_positive_feedback'] \
                 if rating is False else TEXTS['rating_negative_feedback']

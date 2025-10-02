@@ -5,6 +5,7 @@ from menu_api import API
 from models import Menu
 from keyboards import create_menu_keyboard, create_rating_keyboard
 from utils.texts import TEXTS
+from utils.storage import rated_menus
 
 
 async def update_menu_state(
@@ -58,7 +59,13 @@ async def update_menu_state(
 
     # Универсальная отправка сообщения с оценкой
     state_data = await state.get_data()
-    if menu.content and not state_data.get('rating_shown', False):
+    # Проверяем, что контент есть, оценка не показана и меню не оценено ранее
+    if (
+        menu.content
+        and not state_data.get('rating_shown', False)
+        and menu.id not in rated_menus.get(user_id, set())
+    ):
+
         rating_keyboard = create_rating_keyboard(menu.id)
         await target_message.answer(
             TEXTS['rate_content'],

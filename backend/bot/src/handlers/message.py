@@ -10,6 +10,7 @@ from menu_api import API
 from utils.menu_update import update_menu_state
 from utils.texts import TEXTS
 from utils.states import UserStates
+from utils.storage import navigation_stack
 
 logger = logging.getLogger(__name__)
 
@@ -18,7 +19,6 @@ router = Router(name='command')
 
 # Инициализируем API и хранилище для навигации (стек меню)
 menu_api = API()
-navigation_stack: dict[int, list[str]] = {}
 
 
 @router.message(Command('start'))
