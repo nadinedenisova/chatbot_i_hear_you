@@ -10,7 +10,7 @@ from utils.texts import TEXTS
 
 def create_menu_keyboard(
         menu: Menu,
-        is_root: bool = False
+        is_root: bool = False,
         ) -> InlineKeyboardMarkup:
     """Создает клавиатуру для меню."""
     buttons = []
@@ -24,12 +24,19 @@ def create_menu_keyboard(
                     callback_data=f'menu:{index}'
                 )
             ])
+        # Кнопка с вопросом от пользователя. Создаем в дочернем меню.
+        if not is_root and not menu.content:
+            buttons.append([
+                InlineKeyboardButton(
+                    text=TEXTS['ask_question_btn'],
+                    callback_data='ask_question'
+                )
+            ])
 
     # Кнопки для контента
     if menu.content:
         for index, content in enumerate(menu.content):
             content_type = content.get_content_type()
-            # Используем индекс контента и сохраняем URL отдельно
             buttons.append([
                 InlineKeyboardButton(
                     text=content_type,
@@ -53,17 +60,16 @@ def create_menu_keyboard(
 def create_rating_keyboard(menu_id: str) -> InlineKeyboardMarkup:
     """Создает клавиатуру для оценки контента."""
     buttons = []
-
-    # Создаем ряд кнопок с оценками от 1 до 5
-    rating_buttons = []
-    for rating in range(1, 6):
-        rating_buttons.append(
-            InlineKeyboardButton(
-                text=str(rating) + '⭐',
-                callback_data=f'rate:{menu_id}:{rating}'
-            )
+    buttons.append([
+        InlineKeyboardButton(
+            text=TEXTS['useful_btn'],
+            callback_data=f'rate:{menu_id}:5'
+        ),
+        InlineKeyboardButton(
+            text=TEXTS['not_useful_btn'],
+            callback_data=f'rate:{menu_id}:1'
         )
-    buttons.append(rating_buttons)
+    ])
 
     return InlineKeyboardMarkup(inline_keyboard=buttons)
 
