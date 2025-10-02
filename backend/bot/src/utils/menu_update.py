@@ -18,54 +18,107 @@ async def update_menu_state(
 ):
     """Универсальная функция для создания/обновления меню."""
 
-    user_id = message.from_user.id if message else callback.from_user.id
+    user_id = _get_user_id(message, callback)
 
-    # Сохраняем в историю только если это новое действие
+    # Сохраняем историю навигации при необходимости
     if save_history:
-        state_data = await state.get_data()
-        last_menu_id = state_data.get('last_history_menu_id')
+        await _save_navigation_history(state, menu, user_id)
 
-        # Сохраняем только если это переход в другое меню
-        if last_menu_id != menu.id:
-            menu_api = API()
-            await menu_api.add_to_history(user_id, menu.id)
+    # Обновляем состояние пользователя
+    await _update_user_state(state, menu)
 
-    # Обновляем состояние
+    # Отправляем или обновляем сообщение меню
+    target_message = await _send_or_update_menu_message(
+        menu, message, callback, is_root
+    )
+
+    # Показываем запрос оценки при необходимости
+    await _show_rating_if_needed(
+        state, menu, user_id, target_message
+    )
+
+
+def _get_user_id(
+        message: Message = None, callback: CallbackQuery = None) -> int:
+    """Получает ID пользователя из message или callback."""
+    if message:
+        return message.from_user.id
+    if callback:
+        return callback.from_user.id
+    return 0
+
+
+async def _save_navigation_history(
+    state: FSMContext,
+    menu: Menu,
+    user_id: int
+):
+    """Сохраняет историю навигации пользователя."""
+    state_data = await state.get_data()
+    last_menu_id = state_data.get('last_history_menu_id')
+
+    # Сохраняем только при переходе в другое меню
+    if last_menu_id != menu.id:
+        menu_api = API()
+        await menu_api.add_to_history(user_id, menu.id)
+
+
+async def _update_user_state(state: FSMContext, menu: Menu):
+    """Обновляет состояние FSM с данными текущего меню."""
     await state.update_data(
         current_menu_id=menu.id,
         current_children=menu.children_names,
         current_content=[content.to_dict() for content in menu.content],
-        rating_shown=False,  # флаг для отслеживания показа оценки
+        rating_shown=False,
         last_history_menu_id=menu.id
     )
 
-    # Создаем клавиатуру и текст
+
+async def _send_or_update_menu_message(
+    menu: Menu,
+    message: Message = None,
+    callback: CallbackQuery = None,
+    is_root: bool = False
+) -> Message:
+    """Отправляет новое сообщение или редактирует существующее."""
     keyboard = create_menu_keyboard(menu, is_root=is_root)
     text = f'<b>{menu.name}</b>\n\n{menu.text}'
 
-    # Отправляем или редактируем основное сообщение
     if message:
         await message.answer(text, reply_markup=keyboard, parse_mode='HTML')
-        target_message = message  # Для отправки рейтинга
+        return message
     elif callback:
         await callback.message.edit_text(
             text,
             reply_markup=keyboard,
-            parse_mode='HTML')
+            parse_mode='HTML'
+        )
         await callback.answer()
-        target_message = callback.message  # Для отправки рейтинга
-    else:
-        return  # Если нет ни message, ни callback
+        return callback.message
 
-    # Универсальная отправка сообщения с оценкой
+    return None
+
+
+async def _show_rating_if_needed(
+    state: FSMContext,
+    menu: Menu,
+    user_id: int,
+    target_message: Message
+):
+    """Показывает запрос на оценку контента при необходимости."""
+    if not target_message:
+        return
+
     state_data = await state.get_data()
-    # Проверяем, что контент есть, оценка не показана и меню не оценено ранее
-    if (
+
+    # Условия для показа оценки
+    should_show_rating = (
         menu.content
         and not state_data.get('rating_shown', False)
         and menu.id not in rated_menus.get(user_id, set())
-    ):
+    )
 
+    if should_show_rating:
         rating_keyboard = create_rating_keyboard(menu.id)
         await target_message.answer(
             TEXTS['rate_content'],

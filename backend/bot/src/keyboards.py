@@ -52,12 +52,23 @@ def create_menu_keyboard(
     return InlineKeyboardMarkup(inline_keyboard=buttons)
 
 
-def create_navigation_buttons() -> InlineKeyboardMarkup:
-    """Создает клавиатуру только с навигационными кнопками (Назад/Домой)."""
+def create_navigation_buttons(
+        restore_menu: bool = False) -> InlineKeyboardMarkup:
+    """
+    Создает клавиатуру только с навигационными кнопками (Назад/Домой).
+
+    Args:
+        restore_menu: Если True, кнопка "Назад"
+        восстанавливает меню после просмотра контента.
+    """
+    back_callback = 'restore_menu' if restore_menu else 'back'
+
     buttons = [
         [
-            InlineKeyboardButton(text=TEXTS['back'], callback_data='back'),
-            InlineKeyboardButton(text=TEXTS['home'], callback_data='home')
+            InlineKeyboardButton(
+                text=TEXTS['back'], callback_data=back_callback),
+            InlineKeyboardButton(
+                text=TEXTS['home'], callback_data='home')
         ]
     ]
     return InlineKeyboardMarkup(inline_keyboard=buttons)
@@ -69,11 +80,11 @@ def create_rating_keyboard(menu_id: str) -> InlineKeyboardMarkup:
     buttons.append([
         InlineKeyboardButton(
             text=TEXTS['useful_btn'],
-            callback_data=f'rate:{menu_id}:5'
+            callback_data=f'rate:{menu_id}:1'
         ),
         InlineKeyboardButton(
             text=TEXTS['not_useful_btn'],
-            callback_data=f'rate:{menu_id}:1'
+            callback_data=f'rate:{menu_id}:0'
         )
     ])
 
