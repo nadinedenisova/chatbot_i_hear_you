@@ -83,20 +83,20 @@ services:
           path: ./admin/src
           target: /opt/admin/src
 
-   bot:
-     build: bot
-     container_name: bot
-     env_file:
-       - ./.env
-     volumes:
-       - ./uploaded_content:/opt/bot/uploads
-     environment:
-       - PYTHONUNBUFFERED=1
-     develop:
-       watch:
-         - action: sync+restart
-           path: ./bot/src
-           target: /opt/bot/src
+    bot:
+      build: bot
+      container_name: bot
+      env_file:
+        - ./.env
+      volumes:
+        - ./uploaded_content:/opt/bot/uploads
+      environment:
+        - PYTHONUNBUFFERED=1
+      develop:
+        watch:
+          - action: sync+restart
+            path: ./bot/src
+            target: /opt/bot/src
 
 volumes:
   admin_redis_db_data:
