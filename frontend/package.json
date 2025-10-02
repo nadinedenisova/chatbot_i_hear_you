@@ -10,7 +10,8 @@
     "lint:fix": "eslint --fix",
     "lint:style": "stylelint \"**/*.{scss,css}\" --fix",
     "format": "prettier --write \"**/*.{ts,tsx,scss,css,md}\"",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "generate:api": "npx @rtk-query/codegen-openapi openapi-config.cts"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
