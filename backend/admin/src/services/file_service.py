@@ -5,7 +5,7 @@ from pathlib import Path
 
 
 class FileService:
-    def __init__(self, upload_dir: str = "uploads"):
+    def __init__(self, upload_dir: str = "uploaded_content"):
         self.upload_dir = Path(upload_dir)
         self.create_upload_dir()
 
