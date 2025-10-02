@@ -44,4 +44,4 @@ app.include_router(users_router.router,
 app.include_router(file_router.router, prefix="/api/files",
                    tags=["Загрузка файлов"])
 
-app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
+app.mount("/uploaded_content", StaticFiles(directory="uploaded_content"), name="uploaded_content")
