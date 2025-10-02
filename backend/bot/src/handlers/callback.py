@@ -1,14 +1,13 @@
-import asyncio
 import logging
 
 from aiogram import Router, F
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery
 
-from keyboards import create_menu_keyboard
 from menu_api import API
 from utils.menu_update import update_menu_state
 from utils.texts import TEXTS
+from utils.send_content import send_content_to_user
 from utils.states import UserStates
 
 logger = logging.getLogger(__name__)
@@ -148,13 +147,9 @@ async def show_content(callback: CallbackQuery, state: FSMContext):
             await callback.answer(TEXTS['content_not_found'])
             return
         content = current_content[content_index]
-        content_url = content.get('server_path', '')
 
-        # Отправляем контент пользователю
-        await callback.message.answer(
-            f'{TEXTS['get_content']}'
-            f'{content_url}\n\n'
-        )
+        await send_content_to_user(callback.message, content)
+        await callback.answer()
 
     except Exception as e:
         logger.error(f'Ошибка при показе контента: {e}')
@@ -166,7 +161,7 @@ async def rate_content(callback: CallbackQuery, state: FSMContext):
     """Обработка оценки контента"""
     try:
         _, menu_id, rating = callback.data.split(':')
-        rating = int(rating)
+        rating = bool(rating)
         user_id = callback.from_user.id
 
         # Отправляем рейтинг на API
@@ -175,7 +170,7 @@ async def rate_content(callback: CallbackQuery, state: FSMContext):
         if success:
             # Убираем клавиатуру и обновляем сообщение
             rating_text = TEXTS['rating_positive_feedback'] \
-                if rating == 5 else TEXTS['rating_negative_feedback']
+                if rating is False else TEXTS['rating_negative_feedback']
 
             # Показываем всплывающее окно
             await callback.answer(text=rating_text)

@@ -44,16 +44,20 @@ def create_menu_keyboard(
                 )
             ])
 
-    # Навигационные кнопки
-    navigation = []
-    if not is_root:  # Если не корневое меню, добавляем кнопки
-        navigation.append(InlineKeyboardButton(
-            text=TEXTS['back'], callback_data='back'))
-        navigation.append(InlineKeyboardButton(
-            text=TEXTS['home'], callback_data='home'))
-    if navigation:
-        buttons.append(navigation)
+        # Навигационные кнопки
+        if not is_root:
+            nav_markup = create_navigation_buttons()
+            buttons.extend(nav_markup.inline_keyboard)
 
+
+def create_navigation_buttons() -> InlineKeyboardMarkup:
+    """Создает клавиатуру только с навигационными кнопками (Назад/Домой)."""
+    buttons = [
+        [
+            InlineKeyboardButton(text=TEXTS['back'], callback_data='back'),
+            InlineKeyboardButton(text=TEXTS['home'], callback_data='home')
+        ]
+    ]
     return InlineKeyboardMarkup(inline_keyboard=buttons)
 
 
