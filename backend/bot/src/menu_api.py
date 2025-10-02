@@ -115,9 +115,6 @@ class API:
                     data = await response.json()
                     logger.debug(f'Меню "{menu_name}" загружено')
 
-                    logger.debug(f'Тип данных от API: {type(data)}')
-                    logger.debug(f'Данные от API: {data}')
-
                     return Menu(data)
         except aiohttp.ClientError as e:
             logger.error(f'Ошибка HTTP при загрузке меню "{menu_name}": {e}')

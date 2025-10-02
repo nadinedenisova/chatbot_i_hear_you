@@ -44,10 +44,12 @@ def create_menu_keyboard(
                 )
             ])
 
-        # Навигационные кнопки
-        if not is_root:
-            nav_markup = create_navigation_buttons()
-            buttons.extend(nav_markup.inline_keyboard)
+    # Навигационные кнопки
+    if not is_root:
+        nav_markup = create_navigation_buttons()
+        buttons.extend(nav_markup.inline_keyboard)
+
+    return InlineKeyboardMarkup(inline_keyboard=buttons)
 
 
 def create_navigation_buttons() -> InlineKeyboardMarkup:
