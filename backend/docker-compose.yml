@@ -10,19 +10,6 @@ services:
     depends_on:
       - admin
 
-  admin-redis-db:
-    image: redis:latest
-    container_name: admin-redis-db
-    volumes:
-      - admin_redis_db_data:/data
-    expose:
-      - "6379"
-    healthcheck:
-      test: ["CMD", "redis-cli", "-p", "6379", "ping"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
-
   admin-postgres-db:
     image: postgres:latest
     container_name: admin-postgres-db
@@ -53,8 +40,6 @@ services:
       - PYTHONUNBUFFERED=1
       - FASTAPI_RELOAD=1
     depends_on:
-      admin-redis-db:
-        condition: service_healthy
       admin-postgres-db:
         condition: service_healthy
     develop:
@@ -73,8 +58,6 @@ services:
     environment:
       - PYTHONUNBUFFERED=1
     depends_on:
-      admin-redis-db:
-        condition: service_healthy
       admin-postgres-db:
         condition: service_healthy
     develop:
@@ -99,5 +82,4 @@ services:
           target: /opt/bot/src
 
 volumes:
-  admin_redis_db_data:
   admin_postgres_db_data:
