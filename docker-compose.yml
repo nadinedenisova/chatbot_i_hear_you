@@ -50,23 +50,23 @@ services:
           path: ./backend/admin/src
           target: /opt/admin/src
 
-  # admin-tests:
-  #   build:
-  #     context: ./backend/admin
-  #     dockerfile: Dockerfile tests
-  #   container_name: admin-tests
-  #   env_file:
-  #     - ./.env
-  #   environment:
-  #     - PYTHONUNBUFFERED=1
-  #   depends_on:
-  #     admin-postgres-db:
-  #       condition: service_healthy
-  #   develop:
-  #     watch:
-  #       - action: sync+restart
-  #         path: ./backend/admin/src
-  #         target: /opt/admin/src
+  admin-tests:
+    build:
+      context: ./backend/admin
+      dockerfile: Dockerfile tests
+    container_name: admin-tests
+    env_file:
+      - ./.env
+    environment:
+      - PYTHONUNBUFFERED=1
+    depends_on:
+      admin-postgres-db:
+        condition: service_healthy
+    develop:
+      watch:
+        - action: sync+restart
+          path: ./backend/admin/src
+          target: /opt/admin/src
 
   bot:
     build: ./backend/bot
