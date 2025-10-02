@@ -1,73 +1,93 @@
-# React + TypeScript + Vite
+# Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## 📦 Технологии
 
-Currently, two official plugins are available:
+- **React 19** + **TypeScript 5**
+- **Vite 7** — сборка и dev-сервер
+- **Redux Toolkit** + RTK Query — управление состоянием и API-клиент
+- **React Router 7** — маршрутизация
+- **MUI v7** + Emotion — UI-компоненты и стили
+- **MUI X** — используется для реализации древовидного меню с поддержкой  
+- **@rtk-query/codegen-openapi** — автогенерация типизированного API-клиента из OpenAPI спецификации
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 🚀 Установка и запуск
 
-## React Compiler
+```bash
+# установка зависимостей
+npm install
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+# запуск dev-сервера
+npm run dev
 
-## Expanding the ESLint configuration
+# сборка для продакшена
+npm run build
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-]);
+# предпросмотр билда
+npm run preview
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## 🧹Линтинг и форматирование
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x';
-import reactDom from 'eslint-plugin-react-dom';
+В проекте настроены следующие инструменты для поддержания качества кода и удобства разработки:
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-]);
+- **ESLint** — проверка TypeScript/React-кода.
+- **Prettier** — автоформатирование кода.
+- **EditorConfig** — стандартизация настроек редактора.
+- **Stylelint** — проверка CSS/SCSS.
+- **Husky** — хуки Git для автоматического запуска проверок перед коммитом.
+- **MSW (Mock Service Worker)** — моки API для локальной разработки.
+
+```bash
+# ESLint
+npm run lint
+npm run lint:fix
+
+# Stylelint (scss/css)
+npm run lint:style
+
+# Prettier
+npm run format
 ```
+
+### 🔌 Рекомендации для разработчиков
+
+Если у вас ещё не установлены расширения VSCode, рекомендуем добавить:
+
+- **Prettier**
+- **Stylelint**
+- **EditorConfig**
+
+### 🐶 Husky
+
+Husky запускает перед коммитом только в директорию frontend:
+
+1. Prettier
+2. Stylelint
+3. ESLint
+
+## 🔗 API
+
+Генерация API-клиента из OpenAPI-спецификации:
+
+Проект использует RTK Query для работы с API.
+API-клиент генерируется из OpenAPI спецификации:
+
+### Генерация API
+
+При обновлении API на бэкенде:
+
+- Обновите файл `frontend/openapi.yaml` (новая спецификация API).
+- Выполните скрипт генерации: `npm run generate:api`
+- Вы великолепны!
+- После генерации создаются типизированные endpoint’ы в `frontend/src/api.ts`, которые можно использовать напрямую в компонентах React через hooks (useGetSomethingQuery, usePostSomethingMutation и т.д.)
+
+### Разработка с локальным бэкендом
+
+В Vite dev-сервере настроено проксирование `/api` на локальный бэкенд.
+Quick старт бэкенда:
+
+- перейти в директорию `backend`
+- скопировать `.env-example` в `.env`
+- задать `BOT_TOKEN` в `.env` (токен можно получить у бэкендеров или самому зарегистрировать бот в телеграм)
+- запустить `docker compose up --build`
+- после этих шагов бэкенд должен запустится на 80 порту, а если что-то не работает, смотри `backend/README.md`
