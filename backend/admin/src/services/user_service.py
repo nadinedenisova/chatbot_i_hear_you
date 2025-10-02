@@ -11,16 +11,19 @@ from src.schemas.entity import (
     HistoryCreate,
     HistoryOut,
     QuestionOut,
-    QuestionsListOut, HistoryListOut,
+    QuestionsListOut,
+    HistoryListOut,
 )
+from src.services.telegram_bot import TelegramBot, get_telegram_bot
 from src.utils.pagination import PaginatedParams
 
 
 class UserService:
     """Сервис для работы с пользователями"""
 
-    def __init__(self, db_engine: DBEngine):
+    def __init__(self, db_engine: DBEngine, bot: TelegramBot):
         self.db_engine = db_engine
+        self.bot = bot
 
     async def get_users(self, pagination: PaginatedParams) -> UsersListOut:
         """Получение списка пользователей"""
@@ -68,7 +71,10 @@ class UserService:
         questions = await self.db_engine.get_user_questions(user_id)
 
         if not questions:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Questions of that user not found")
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Questions of that user not found",
+            )
 
         if isinstance(questions, QuestionOut):
             questions = [questions]
@@ -114,11 +120,19 @@ class UserService:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND, detail="Question not found"
             )
-        return {"detail":"The question was deleted."}
+        return {"detail": "The question was deleted."}
 
     async def answer_question(self, question_id: UUID, answer: str) -> dict:
         """Ответ на вопрос"""
         question = await self.db_engine.answer_question(question_id, answer)
+        text = (
+            "💬 *Администратор ответил на ваш вопрос:*\n"
+            f"> {question.text}\n\n"
+            "✨ *Ответ администратора:*\n"
+            f"> {answer}\n\n"
+            "🫶 *Спасибо за обращение!*"
+        )
+        await self.bot.send_message(int(question.user_id),text)
         return {"detail": "Question answered successfully"}
 
     async def create_user_action_record(
@@ -158,6 +172,9 @@ class UserService:
         return HistoryListOut(items=history_out_list)
 
 
-def get_user_service(db_engine: DBEngine = Depends(get_db_engine)) -> UserService:
+def get_user_service(
+    db_engine: DBEngine = Depends(get_db_engine),
+    bot: TelegramBot = Depends(get_telegram_bot),
+) -> UserService:
     """Зависимость для получения UserService"""
-    return UserService(db_engine)
+    return UserService(db_engine, bot)
