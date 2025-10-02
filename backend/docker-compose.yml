@@ -5,6 +5,7 @@ services:
     volumes:
       - ./configs/nginx.conf:/etc/nginx/nginx.conf:ro
       - ./configs/site.conf:/etc/nginx/conf.d/site.conf:ro
+      - /srv/ihearyou/frontend:/data
     ports:
       - "80:80"
     depends_on:
