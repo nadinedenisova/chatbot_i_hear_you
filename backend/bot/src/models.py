@@ -7,7 +7,7 @@ class Content:
     """Класс модели MenuContent."""
 
     CONTENT_TYPES = {
-            1: TEXTS['image_type'],
+            1: TEXTS['photo_type'],
             2: TEXTS['video_type'],
             3: TEXTS['doc_type']
         }

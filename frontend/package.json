@@ -10,7 +10,8 @@
     "lint:fix": "eslint --fix",
     "lint:style": "stylelint \"**/*.{scss,css}\" --fix",
     "format": "prettier --write \"**/*.{ts,tsx,scss,css,md}\"",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "generate:api": "npx @rtk-query/codegen-openapi openapi-config.cts"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
@@ -18,6 +19,7 @@
     "@fontsource/roboto": "^5.2.8",
     "@mui/icons-material": "^7.3.2",
     "@mui/material": "^7.3.2",
+    "@mui/x-tree-view": "^8.13.1",
     "@reduxjs/toolkit": "^2.9.0",
     "normalize.css": "^8.0.1",
     "react": "^19.1.1",
@@ -25,6 +27,7 @@
     "react-redux": "^9.2.0",
     "react-router-dom": "^7.9.2",
     "redux": "^5.0.1",
+    "uuid": "^13.0.0",
     "vite-tsconfig-paths": "^5.1.4"
   },
   "devDependencies": {

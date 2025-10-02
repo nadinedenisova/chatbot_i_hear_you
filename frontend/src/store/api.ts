@@ -24,6 +24,17 @@ export const injectedRtkApi = api.injectEndpoints({
     >({
       query: () => ({ url: `/api/v1/menu/root` }),
     }),
+    searchMenuNodesApiV1MenuSearchGet: build.query<
+      SearchMenuNodesApiV1MenuSearchGetApiResponse,
+      SearchMenuNodesApiV1MenuSearchGetApiArg
+    >({
+      query: (queryArg) => ({
+        url: `/api/v1/menu/search`,
+        params: {
+          keywords: queryArg.keywords,
+        },
+      }),
+    }),
     addMenuNodeApiV1MenuAddPost: build.mutation<
       AddMenuNodeApiV1MenuAddPostApiResponse,
       AddMenuNodeApiV1MenuAddPostApiArg
@@ -103,6 +114,18 @@ export const injectedRtkApi = api.injectEndpoints({
         url: `/api/v1/menu/${queryArg.menuId}/rate`,
         method: 'POST',
         body: queryArg.ratingCreate,
+      }),
+    }),
+    getMenuRatingsAllApiV1MenuMenuIdRatesAllGet: build.query<
+      GetMenuRatingsAllApiV1MenuMenuIdRatesAllGetApiResponse,
+      GetMenuRatingsAllApiV1MenuMenuIdRatesAllGetApiArg
+    >({
+      query: (queryArg) => ({
+        url: `/api/v1/menu/${queryArg.menuId}/rates-all`,
+        params: {
+          page_size: queryArg.pageSize,
+          page_number: queryArg.pageNumber,
+        },
       }),
     }),
     getUsersApiV1UsersUsersGet: build.query<
@@ -257,6 +280,11 @@ export interface GetMenuNodeByNameApiV1MenuSearchByNameGetApiArg {
 export type GetMenuRootApiV1MenuRootGetApiResponse =
   /** status 200 Successful Response */ MenuNodeOut;
 export type GetMenuRootApiV1MenuRootGetApiArg = void;
+export type SearchMenuNodesApiV1MenuSearchGetApiResponse =
+  /** status 200 Successful Response */ MenuNodeOut[];
+export interface SearchMenuNodesApiV1MenuSearchGetApiArg {
+  keywords: string;
+}
 export type AddMenuNodeApiV1MenuAddPostApiResponse =
   /** status 200 Successful Response */ Message;
 export interface AddMenuNodeApiV1MenuAddPostApiArg {
@@ -298,7 +326,7 @@ export interface DeleteMenuContentApiV1MenuMenuIdContentDeleteContentIdDeleteApi
   contentId: string;
 }
 export type GetMenuNodeRateApiV1MenuMenuIdRateGetApiResponse =
-  /** status 200 Successful Response */ RatingOut;
+  /** status 200 Successful Response */ RatingSummaryOut;
 export interface GetMenuNodeRateApiV1MenuMenuIdRateGetApiArg {
   menuId: string;
 }
@@ -307,6 +335,15 @@ export type RateMenuNodeApiV1MenuMenuIdRatePostApiResponse =
 export interface RateMenuNodeApiV1MenuMenuIdRatePostApiArg {
   menuId: string;
   ratingCreate: RatingCreate;
+}
+export type GetMenuRatingsAllApiV1MenuMenuIdRatesAllGetApiResponse =
+  /** status 200 Successful Response */ RatingListOut;
+export interface GetMenuRatingsAllApiV1MenuMenuIdRatesAllGetApiArg {
+  menuId: string;
+  /** Количество записей на странице */
+  pageSize?: number;
+  /** Номер страницы */
+  pageNumber?: number;
 }
 export type GetUsersApiV1UsersUsersGetApiResponse =
   /** status 200 Successful Response */ UsersListOut;
@@ -481,23 +518,32 @@ export interface ContentCreate {
   /** Серверный путь для загружаемого контента */
   server_path: string;
 }
-export interface RatingOut {
+export interface RatingSummaryOut {
+  menu_id: string;
+  /** Количество оценок 'Полезно' */
+  useful_count: number;
+  /** Количество оценок 'Не очень' */
+  not_useful_count: number;
+}
+export interface RatingCreate {
   /** Идентификатор пользователя */
   user_id: string;
-  /** Оценка (например, от 1 до 5) */
-  node_rating: number;
-  /** Идентификатор меню/узла, к которому привязана оценка */
-  menu_id: string;
+  /** true - Полезно, false - Не очень */
+  is_useful: boolean;
+}
+export interface RatingDetailOut {
+  /** Идентификатор пользователя */
+  user_id: string;
+  /** true - Полезно, false - Не очень */
+  is_useful: boolean;
   /** Дата и время создания оценки */
   created_at: string;
   /** Дата и время обновления оценки */
   updated_at: string;
 }
-export interface RatingCreate {
-  /** Идентификатор пользователя */
-  user_id: string;
-  /** Оценка (например, от 1 до 5) */
-  node_rating: number;
+export interface RatingListOut {
+  menu_id: string;
+  ratings: RatingDetailOut[];
 }
 export interface UserOut {
   /** Уникальный идентификатор пользователя */
@@ -588,6 +634,7 @@ export const {
   useGetFullMenuApiV1MenuGetQuery,
   useGetMenuNodeByNameApiV1MenuSearchByNameGetQuery,
   useGetMenuRootApiV1MenuRootGetQuery,
+  useSearchMenuNodesApiV1MenuSearchGetQuery,
   useAddMenuNodeApiV1MenuAddPostMutation,
   useGetMenuNodeApiV1MenuMenuIdGetQuery,
   useUpdateMenuNodeApiV1MenuMenuIdPutMutation,
@@ -597,6 +644,7 @@ export const {
   useDeleteMenuContentApiV1MenuMenuIdContentDeleteContentIdDeleteMutation,
   useGetMenuNodeRateApiV1MenuMenuIdRateGetQuery,
   useRateMenuNodeApiV1MenuMenuIdRatePostMutation,
+  useGetMenuRatingsAllApiV1MenuMenuIdRatesAllGetQuery,
   useGetUsersApiV1UsersUsersGetQuery,
   useCreateUserApiV1UsersCreatePostMutation,
   useGetLongTimeLostUsersApiV1UsersLongTimeLostGetQuery,

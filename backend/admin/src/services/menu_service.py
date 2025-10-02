@@ -2,6 +2,7 @@
 
 from uuid import UUID
 from typing import Sequence
+from src.utils.pagination import PaginatedParams
 from fastapi import Depends, HTTPException, status
 from sqlalchemy import select
 
@@ -14,11 +15,12 @@ from src.schemas.entity import (
     AllMenuNodeOut,
     ContentCreate,
     RatingCreate,
-    RatingOut,
+    RatingListOut,
+    RatingSummaryOut,
     Message,
     ContentOut,
 )
-from src.services.file_service import file_service
+from .file_service import file_service
 from fastapi import UploadFile
 
 
@@ -165,6 +167,32 @@ class MenuService:
             children_names=children_names,
         )
 
+    async def search_menu_nodes(self, keywords: str) -> list[MenuNodeOut]:
+        """Поиск узлов меню по ключевым словам в названии или тексте."""
+        menu_nodes = await self.db_engine.search_menu_nodes(keywords)
+
+        if not menu_nodes:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="No menu nodes found matching the keywords"
+            )
+
+        # Преобразование в MenuNodeOut с вычислением children_names
+        node_out_list = []
+        for node in menu_nodes:
+            children_names = await self._get_children_names(node.id)
+            node_out = MenuNodeOut(
+                id=node.id,
+                parent_id=node.parent_id,
+                name=node.name,
+                text=node.text,
+                subscription_type=node.subscription_type,
+                content=self._get_content_list(node),
+                children_names=children_names,
+            )
+            node_out_list.append(node_out)
+
+        return node_out_list
+
     async def add_menu_node(self, node_data: MenuNodeCreate) -> Message:
         """Добавление узла меню."""
 
@@ -256,7 +284,7 @@ class MenuService:
     async def update_menu_content_with_file(
             self, content_id: UUID, content_data: ContentCreate, file: UploadFile
     ) -> Message:
-        """Обновляет контент с новым файлом"""
+        """Обновляет контент с новым файлом."""
         await self._get_node_by_id(content_data.menu_id)  # проверка есть ли menu_node с таким id
 
         # Сохраняем новый файл
@@ -266,30 +294,31 @@ class MenuService:
         await self.db_engine.update_content_with_file(content_id, content_data, file_info)
         return Message(detail="The content was changed with new file")
 
-    # TODO рейтинг это количество оценок "Полезно" и "Не очень" а не цифра
-    async def get_menu_node_rate(self, menu_id: UUID) -> RatingOut:
-        """Получение рейтинга узла меню."""
-        avg_rating = await self.db_engine.get_menu_rating(menu_id)
-
-        return RatingOut(
-            user_id="system",
+    async def get_menu_node_rate(self, menu_id: UUID) -> RatingSummaryOut:
+        """Получение сводки по рейтингам узла меню."""
+        rating_summary = await self.db_engine.get_menu_rating_summary(menu_id)
+        return RatingSummaryOut(
             menu_id=menu_id,
-            node_rating=int(avg_rating) if avg_rating else 0,
-            created_at=None,
-            updated_at=None,
+            useful_count=rating_summary["useful_count"],
+            not_useful_count=rating_summary["not_useful_count"]
         )
 
     async def rate_menu_node(self, menu_id: UUID, rating_data: RatingCreate) -> Message:
-        """Оценка узла меню."""
-        await self._get_node_by_id(menu_id) #проверка есть ли menu_node с таким id
-
-        user= await self.db_engine.get_user_by_id(rating_data.user_id)
-        if not user:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+        """Оценка узла меню (Полезно/Не очень)."""
         await self.db_engine.rate_menu_node(rating_data, menu_id)
-        return Message(detail="The node was successfully rated!")
+        rating_text = "Useful" if rating_data.is_useful else "Not useful"
+        return Message(detail=f"Rating '{rating_text}' saved successfully!")
+
+    async def get_menu_ratings_all(
+        self, 
+        menu_id: UUID, 
+        pagination: PaginatedParams
+    ) -> RatingListOut:
+        """Получение всех оценок узла меню с пагинацией"""
+        return await self.db_engine.get_menu_ratings_all(menu_id, pagination)
 
 
 def get_menu_service(db_engine: DBEngine = Depends(get_db_engine)) -> MenuService:
     """Зависимость для получения MenuService."""
     return MenuService(db_engine)
+

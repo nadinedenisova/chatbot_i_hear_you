@@ -8,6 +8,8 @@ import { AppHeader } from '@components/AppHeader/AppHeader';
 import { DrawerHeader, Sidebar } from '@components/Sidebar/Sidebar';
 import { Main } from '@components/Main/Main';
 
+import './App.css';
+
 function App() {
   const [open, setOpen] = useState(false);
   const { title } = useCurrentRouteData();

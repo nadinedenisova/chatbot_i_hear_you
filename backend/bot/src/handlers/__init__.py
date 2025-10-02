@@ -1,3 +1,3 @@
-from . import callback, command
+from . import callback, message
 
-__all__ = ['callback', 'command']
+__all__ = ['callback', 'message']

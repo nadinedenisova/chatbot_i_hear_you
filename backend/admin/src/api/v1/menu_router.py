@@ -9,10 +9,13 @@ from src.schemas.entity import (
     MenuNodeUpdate,
     Message,
     RatingCreate,
-    RatingOut,
+    RatingSummaryOut,
+    RatingListOut,
     AllMenuNodeOut,
 )
 from src.services.menu_service import MenuService, get_menu_service
+from src.utils.pagination import PaginatedParams
+
 
 router = APIRouter()
 
@@ -42,6 +45,16 @@ async def get_menu_node_by_name(
 async def get_menu_root(menu_service: MenuService = Depends(get_menu_service)):
     return await menu_service.get_menu_root()
 
+@router.get(
+    "/search",
+    summary="Поиск узлов меню по ключевым словам",
+    response_model=list[MenuNodeOut],
+)
+async def search_menu_nodes(
+    keywords: str = Query(..., title="Ключевые слова для поиска", min_length=1),
+    menu_service: MenuService = Depends(get_menu_service),
+):
+    return await menu_service.search_menu_nodes(keywords)
 
 @router.post("/add", summary="Добавить узел меню навигации", response_model=Message)
 async def add_menu_node(
@@ -116,7 +129,7 @@ async def delete_menu_content(
 
 
 @router.get(
-    "/{menu_id}/rate", summary="Получить рейтинг узла меню", response_model=RatingOut
+    "/{menu_id}/rate", summary="Получить рейтинг узла меню", response_model=RatingSummaryOut
 )
 async def get_menu_node_rate(
     menu_id: UUID, menu_service: MenuService = Depends(get_menu_service)
@@ -131,3 +144,16 @@ async def rate_menu_node(
     menu_service: MenuService = Depends(get_menu_service),
 ):
     return await menu_service.rate_menu_node(menu_id, rating_data)
+
+
+@router.get(
+        "/{menu_id}/rates-all",
+        summary="Получить все оценки пользователей для узла меню",
+        response_model=RatingListOut
+        )
+async def get_menu_ratings_all(
+    menu_id: UUID,
+    pagination: PaginatedParams = Depends(),
+    menu_service: MenuService = Depends(get_menu_service)
+):
+    return await menu_service.get_menu_ratings_all(menu_id, pagination)

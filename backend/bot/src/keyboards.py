@@ -10,7 +10,7 @@ from utils.texts import TEXTS
 
 def create_menu_keyboard(
         menu: Menu,
-        is_root: bool = False
+        is_root: bool = False,
         ) -> InlineKeyboardMarkup:
     """Создает клавиатуру для меню."""
     buttons = []
@@ -24,12 +24,19 @@ def create_menu_keyboard(
                     callback_data=f'menu:{index}'
                 )
             ])
+        # Кнопка с вопросом от пользователя. Создаем в дочернем меню.
+        if not is_root and not menu.content:
+            buttons.append([
+                InlineKeyboardButton(
+                    text=TEXTS['ask_question_btn'],
+                    callback_data='ask_question'
+                )
+            ])
 
     # Кнопки для контента
     if menu.content:
         for index, content in enumerate(menu.content):
             content_type = content.get_content_type()
-            # Используем индекс контента и сохраняем URL отдельно
             buttons.append([
                 InlineKeyboardButton(
                     text=content_type,
@@ -38,32 +45,48 @@ def create_menu_keyboard(
             ])
 
     # Навигационные кнопки
-    navigation = []
-    if not is_root:  # Если не корневое меню, добавляем кнопки
-        navigation.append(InlineKeyboardButton(
-            text=TEXTS['back'], callback_data='back'))
-        navigation.append(InlineKeyboardButton(
-            text=TEXTS['home'], callback_data='home'))
-    if navigation:
-        buttons.append(navigation)
+    if not is_root:
+        nav_markup = create_navigation_buttons()
+        buttons.extend(nav_markup.inline_keyboard)
 
+    return InlineKeyboardMarkup(inline_keyboard=buttons)
+
+
+def create_navigation_buttons(
+        restore_menu: bool = False) -> InlineKeyboardMarkup:
+    """
+    Создает клавиатуру только с навигационными кнопками (Назад/Домой).
+
+    Args:
+        restore_menu: Если True, кнопка "Назад"
+        восстанавливает меню после просмотра контента.
+    """
+    back_callback = 'restore_menu' if restore_menu else 'back'
+
+    buttons = [
+        [
+            InlineKeyboardButton(
+                text=TEXTS['back'], callback_data=back_callback),
+            InlineKeyboardButton(
+                text=TEXTS['home'], callback_data='home')
+        ]
+    ]
     return InlineKeyboardMarkup(inline_keyboard=buttons)
 
 
 def create_rating_keyboard(menu_id: str) -> InlineKeyboardMarkup:
     """Создает клавиатуру для оценки контента."""
     buttons = []
-
-    # Создаем ряд кнопок с оценками от 1 до 5
-    rating_buttons = []
-    for rating in range(1, 6):
-        rating_buttons.append(
-            InlineKeyboardButton(
-                text=str(rating) + '⭐',
-                callback_data=f'rate:{menu_id}:{rating}'
-            )
+    buttons.append([
+        InlineKeyboardButton(
+            text=TEXTS['useful_btn'],
+            callback_data=f'rate:{menu_id}:1'
+        ),
+        InlineKeyboardButton(
+            text=TEXTS['not_useful_btn'],
+            callback_data=f'rate:{menu_id}:0'
         )
-    buttons.append(rating_buttons)
+    ])
 
     return InlineKeyboardMarkup(inline_keyboard=buttons)
 
