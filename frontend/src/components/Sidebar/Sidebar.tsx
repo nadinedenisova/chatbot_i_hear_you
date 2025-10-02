@@ -21,7 +21,7 @@ const menuItems = [
     id: 'menu',
   },
   {
-    title: 'Вопросы',
+    title: 'Обратная связь',
     icon: <QuestionAnswerIcon />,
     path: ROUTES.QUESTIONS,
     id: 'questions',
