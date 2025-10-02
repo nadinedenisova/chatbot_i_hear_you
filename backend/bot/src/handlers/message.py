@@ -23,21 +23,27 @@ menu_api = API()
 
 @router.message(Command('start'))
 async def cmd_start(message: Message, state: FSMContext):
-    """Команда /start"""
+    """
+    Обработчик команды "/start":
+
+    Функционал:
+        - Проверяет существование пользователя в базе данных и
+          регистрирует его, если пользователь новый,
+        - Загружает корневую структуру меню из API и
+          устанавливает пустую навигационную цепочку для пользователя,
+        - Переводит пользователя в режим навигации и выводит главное меню.
+    """
 
     try:
         user = await menu_api.get_user(user_id=message.from_user.id)
         if not user:
-            # Регистрируем пользователя
             await menu_api.register_user(user_id=message.from_user.id)
 
-        # Загружаем корневое меню с API и инициализируем навигацию
         root_menu = await menu_api.get_root_menu()
         user_id = message.from_user.id
         navigation_stack[user_id] = []  # Пустой стек для корневого меню
         await state.set_state(UserStates.navigating)
 
-        # Отправляем сообщение с главным меню
         await update_menu_state(
             state,
             root_menu,
@@ -58,34 +64,37 @@ async def cmd_help(message: Message):
 
 @router.message(StateFilter(UserStates.waiting_for_question), F.text)
 async def process_question(message: Message, state: FSMContext):
-    """Обработка введенного вопроса."""
+    """Обработчик ввода вопроса пользователем:
 
-    # Получаем ID сохраненного сообщения
+    Функционал:
+        - Проверяет текущее состояние пользователя и ожидает ввод текста,
+        - Отправляет введённый вопрос на внешний API,
+        - После успешной отправки вопроса отображает временное сообщение
+          о завершении отправки и удаляет его через три секунды,
+        - Удаляет исходное и предыдущее сообщение пользователя,
+        - Возвращает пользователя обратно в режим навигации по меню.
+    """
+
     state_data = await state.get_data()
     question_prompt_message_id = state_data.get('question_prompt_message_id')
 
-    # Отправляем вопрос на API
     success = await menu_api.send_question(
         user_id=message.from_user.id,
         text=message.text
     )
 
     if success:
-        # Через 5 секунд удаляем сообщение бота
         bot_message = await message.answer(
             TEXTS['send_question_done'], parse_mode='HTML')
-        await asyncio.sleep(5)
+        await asyncio.sleep(3)
         await bot_message.delete()
     else:
         bot_message = await message.answer(
             TEXTS['send_question_error'], parse_mode='HTML')
-        await asyncio.sleep(5)
+        await asyncio.sleep(3)
         await bot_message.delete()
 
-    # Удаляем сообщение пользователя
     await message.delete()
-
-    # Удаляем сообщение с запросом вопроса
     if question_prompt_message_id:
         try:
             await message.bot.delete_message(
