@@ -46,7 +46,7 @@ async def test_get_menu_root(client: AsyncClient):
 async def test_add_menu_node(client: AsyncClient):
     """Тест на добавление узла меню."""
     node_data = {
-        "parent_id": UUID("00000000-0000-0000-0000-000000000003"),
+        "parent_id": str(UUID("00000000-0000-0000-0000-000000000003")),
         "name": f"Test Node",
         "text": "Test text",
         "subscription_type": "free"

@@ -123,7 +123,7 @@ docker compose up --watch
 2. Собрать контейнеры. Если переменные среды будут изменены, этот шаг необходимо повторить.
 
 ```bash
-docker-compose build
+docker-compose -f docker-compose.yml -f docker-compose.tests.yml build
 ```
 
 3. Запустить контейнеры в режиме прослушивания и дождаться их полного запуска:
