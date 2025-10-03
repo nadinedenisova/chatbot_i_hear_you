@@ -1,4 +1,5 @@
 # services/user_service.py
+from datetime import datetime
 from uuid import UUID
 from fastapi import Depends, HTTPException, status
 
@@ -93,9 +94,22 @@ class UserService:
             ]
         )
 
-    async def get_all_questions(self, pagination: PaginatedParams) -> QuestionsListOut:
-        """Получение всех вопросов"""
-        questions = await self.db_engine.get_all_questions(pagination)
+    async def get_all_questions(
+        self,
+        pagination: PaginatedParams,
+        start_date: datetime|None = None,
+        end_date: datetime|None = None,
+        sort_by: str = "created_at",
+        sort_order: str = "desc"
+    ) -> QuestionsListOut:
+        """Получение всех вопросов с фильтрацией и сортировкой"""
+        questions = await self.db_engine.get_all_questions(
+            pagination,
+            start_date,
+            end_date,
+            sort_by,
+            sort_order
+        )
         question_out_list = [
             QuestionOut(
                 id=question.id,
