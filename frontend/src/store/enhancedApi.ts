@@ -22,5 +22,8 @@ export const enhancedApi = injectedRtkApi.enhanceEndpoints({
     deleteMenuNodeApiV1MenuMenuIdDelete: {
       invalidatesTags: [TAGS_CONFIG.ARTICLES],
     },
+    addMenuNodeApiV1MenuAddPost: {
+      invalidatesTags: [TAGS_CONFIG.ARTICLES],
+    },
   },
 });

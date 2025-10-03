@@ -14,6 +14,7 @@ interface ArticleEditorProps {
   initialTitle?: string;
   initialDescription?: string;
   disableSaveButton?: boolean;
+  dialogTitle?: string;
   onSave: (data: { title: string; description: string }) => Promise<void>;
   onClose: () => void;
 }
@@ -23,6 +24,7 @@ export const ArticleEditor: FC<ArticleEditorProps> = ({
   initialTitle = '',
   initialDescription = '',
   disableSaveButton,
+  dialogTitle,
   onSave,
   onClose,
 }) => {
@@ -36,7 +38,7 @@ export const ArticleEditor: FC<ArticleEditorProps> = ({
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
-      <DialogTitle>Редактирование статьи</DialogTitle>
+      <DialogTitle>{dialogTitle}</DialogTitle>
       <form onSubmit={handleSubmit}>
         <DialogContent>
           <Stack spacing={2} mt={1}>
