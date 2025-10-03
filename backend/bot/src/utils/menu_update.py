@@ -1,9 +1,12 @@
+import asyncio
+
 from aiogram.types import Message, CallbackQuery
 from aiogram.fsm.context import FSMContext
 
 from menu_api import API
 from models import Menu
 from keyboards import create_menu_keyboard, create_rating_keyboard
+from utils.constants import SHOW_RATING_MES_DEL
 from utils.texts import TEXTS
 from utils.storage import rated_menus
 
@@ -120,9 +123,10 @@ async def _show_rating_if_needed(
 
     if should_show_rating:
         rating_keyboard = create_rating_keyboard(menu.id)
-        await target_message.answer(
+        rating_message = await target_message.answer(
             TEXTS['rate_content'],
             reply_markup=rating_keyboard,
             parse_mode='HTML'
         )
-        await state.update_data(rating_shown=True)
+        await asyncio.sleep(SHOW_RATING_MES_DEL)
+        await rating_message.delete()

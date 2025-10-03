@@ -9,6 +9,7 @@ from aiogram.types import Message
 from menu_api import API
 from utils.menu_update import update_menu_state
 from utils.texts import TEXTS
+from utils.constants import SEND_QUESTION_MES_DEL
 from utils.states import UserStates
 from utils.storage import navigation_stack
 
@@ -86,12 +87,12 @@ async def process_question(message: Message, state: FSMContext):
     if success:
         bot_message = await message.answer(
             TEXTS['send_question_done'], parse_mode='HTML')
-        await asyncio.sleep(3)
+        await asyncio.sleep(SEND_QUESTION_MES_DEL)
         await bot_message.delete()
     else:
         bot_message = await message.answer(
             TEXTS['send_question_error'], parse_mode='HTML')
-        await asyncio.sleep(3)
+        await asyncio.sleep(SEND_QUESTION_MES_DEL)
         await bot_message.delete()
 
     await message.delete()
