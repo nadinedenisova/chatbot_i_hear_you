@@ -90,4 +90,4 @@ Quick старт бэкенда:
 - скопировать `.env-example` в `.env`
 - задать `BOT_TOKEN` в `.env` (токен можно получить у бэкендеров или самому зарегистрировать бот в телеграм)
 - запустить `docker compose up --build`
-- после этих шагов бэкенд должен запустится на 80 порту, а если что-то не работает, смотри [`backend/README.md`](https://github.com/nadinedenisova/chatbot_i_hear_you/blob/main/backend/README.md)
+- после этих шагов бэкенд должен запустится на 80 порту, а если что-то не работает, смотри [`backend/README.md`](../backend/README.md)
