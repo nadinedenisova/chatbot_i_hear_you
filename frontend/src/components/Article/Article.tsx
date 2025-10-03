@@ -19,6 +19,7 @@ import {
   useUpdateMenuNodeApiV1MenuMenuIdPutMutation,
 } from '@store/api';
 import { ArticleEditor } from '@components/ArticleEditor/ArticleEditor';
+import AttachmentList from '@components/AttachmentList/AttachmentList';
 
 export interface ArticleProps {
   id: string;
@@ -160,6 +161,14 @@ export const Article: FC<ArticleProps> = ({ id }) => {
         <CardContent sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
           <Typography variant="subtitle1">{data?.text}</Typography>
         </CardContent>
+        <CardHeader
+          title={
+            <Typography variant="h6" fontWeight={'bold'}>
+              Материалы
+            </Typography>
+          }
+        />
+        <AttachmentList />
       </Card>
     </>
   );
