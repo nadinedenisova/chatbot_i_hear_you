@@ -1,3 +1,4 @@
+from datetime import datetime
 from uuid import UUID
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -62,9 +63,19 @@ async def get_user_questions(
 @router.get("/questions", summary="Все вопросы", response_model=QuestionsListOut)
 async def get_all_questions(
     pagination: PaginatedParams = Depends(),
+    start_date: datetime|None = Query(None, description="Начальные дата и время фильтрации (ГГГГ-ММ-ДД ЧЧ:мм:сс)"),
+    end_date: datetime|None = Query(None, description="Конечные дата и время фильтрации (ГГГГ-ММ-ДД ЧЧ:мм:сс)"),
+    sort_by: str = Query("created_at", description="Поле для сортировки (created_at, updated_at)"),
+    sort_order: str = Query("desc", description="Порядок сортировки (asc, desc)"),
     user_service: UserService = Depends(get_user_service),
 ):
-    return await user_service.get_all_questions(pagination)
+    return await user_service.get_all_questions(
+        pagination,
+        start_date,
+        end_date,
+        sort_by,
+        sort_order
+    )
 
 
 @router.post("/questions/create", summary="Добавить вопрос", response_model=Message)

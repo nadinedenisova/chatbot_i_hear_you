@@ -1,4 +1,5 @@
 # db_engine.py
+from datetime import datetime
 from uuid import UUID
 from typing import Sequence
 from sqlalchemy import select, update, delete, and_, func, text, or_
@@ -150,14 +151,30 @@ class DBEngine:
         return result.scalars().all()
 
     async def get_all_questions(
-        self, pagination: PaginatedParams
+            self,
+            pagination: PaginatedParams,
+            start_date: datetime|None = None,
+            end_date: datetime|None = None,
+            sort_by: str = "created_at",
+            sort_order: str = "desc"
     ) -> Sequence[Question]:
-        stmt = (
-            select(Question)
-            .offset(pagination.offset)
-            .limit(pagination.limit)
-            .order_by(Question.created_at.desc())
-        )
+        stmt = select(Question)
+
+        # Применяем фильтрацию по дате
+        if start_date:
+            stmt = stmt.where(Question.created_at >= start_date)
+        if end_date:
+            stmt = stmt.where(Question.created_at <= end_date)
+
+        # Применяем сортировку
+        sort_column = Question.created_at if sort_by == "created_at" else Question.updated_at
+        if sort_order == "asc":
+            stmt = stmt.order_by(sort_column.asc())
+        else:
+            stmt = stmt.order_by(sort_column.desc())
+
+        stmt = stmt.offset(pagination.offset).limit(pagination.limit)
+
         result = await self.session.execute(stmt)
         return result.scalars().all()
 
