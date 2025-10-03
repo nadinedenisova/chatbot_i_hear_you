@@ -12,5 +12,8 @@
     "frontend/**/*.{js,jsx,ts,tsx}": "npm --prefix frontend run lint:fix",
     "frontend/**/*.{scss,css}": "npm --prefix frontend run lint:style",
     "frontend/**/*.{ts,tsx,scss,css,md}": "npm --prefix frontend run format"
+  },
+  "dependencies": {
+    "dayjs": "^1.11.18"
   }
 }
