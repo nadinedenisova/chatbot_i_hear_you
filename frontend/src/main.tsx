@@ -7,6 +7,7 @@ import {
 } from 'react-router-dom';
 import { Provider } from 'react-redux';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
+import { ConfirmProvider } from 'material-ui-confirm';
 
 import { ROUTES } from '@shared/routes/ROUTES';
 import store from '@store/store';
@@ -78,7 +79,9 @@ rootElement.render(
   <StrictMode>
     <Provider store={store}>
       <ThemeProvider theme={theme}>
-        <RouterProvider router={router} />
+        <ConfirmProvider>
+          <RouterProvider router={router} />
+        </ConfirmProvider>
       </ThemeProvider>
     </Provider>
   </StrictMode>,

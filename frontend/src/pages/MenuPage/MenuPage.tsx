@@ -1,6 +1,6 @@
 import Button from '@mui/material/Button';
 import { RichTreeView } from '@mui/x-tree-view/RichTreeView';
-import { useMemo, useState, type SyntheticEvent } from 'react';
+import { useEffect, useMemo, useState, type SyntheticEvent } from 'react';
 import { styled, alpha } from '@mui/material/styles';
 import { TreeItem, treeItemClasses } from '@mui/x-tree-view/TreeItem';
 import { useTreeViewApiRef } from '@mui/x-tree-view/hooks';
@@ -79,6 +79,18 @@ export const MenuPage = () => {
   const menu = useMemo(() => {
     return menuData ? [menuData] : [];
   }, [menuData]);
+
+  useEffect(() => {
+    if (!selectedItemId) return;
+
+    const item = apiRef?.current?.getItem(
+      selectedItemId,
+    ) as AllMenuNodeOut | null;
+
+    if (item) return;
+
+    setSelectedItemId(null);
+  }, [apiRef, menuData, selectedItemId]);
 
   const handleSelectedItemsChange = (
     _: SyntheticEvent | null,
