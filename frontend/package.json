@@ -28,7 +28,8 @@
     "react-router-dom": "^7.9.2",
     "redux": "^5.0.1",
     "uuid": "^13.0.0",
-    "vite-tsconfig-paths": "^5.1.4"
+    "vite-tsconfig-paths": "^5.1.4",
+    "dayjs": "^1.11.18"
   },
   "devDependencies": {
     "@eslint/js": "^9.36.0",

@@ -10,11 +10,10 @@ export default function LoginPage() {
   const [emailError, setEmailError] = useState('');
   const [passwordError, setPasswordError] = useState('');
 
-  const ADMIN_EMAIL: string = import.meta.env
-    .VITE_ADMIN_SERVICE_LOGIN as string;
-  const ADMIN_PASSWORD: string = import.meta.env
-    .VITE_ADMIN_SERVICE_PASSWORD as number;
-
+  const FAKE_ADMIN_EMAIL: string = import.meta.env
+    .VITE_FAKE_ADMIN_EMAIL as string;
+  const FAKE_ADMIN_PASSWORD: string = import.meta.env
+    .VITE_ADMIN_SERVICE_PASSWORD as string;
   const navigate = useNavigate();
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -24,7 +23,7 @@ export default function LoginPage() {
     if (!email.includes('@')) {
       setEmailError('Введите корректный email');
       valid = false;
-    } else if (email !== ADMIN_EMAIL) {
+    } else if (email !== FAKE_ADMIN_EMAIL) {
       setEmailError('Неверный email');
       valid = false;
     } else {
@@ -34,7 +33,7 @@ export default function LoginPage() {
     if (password.length < 4) {
       setPasswordError('Пароль должен быть не менее 4 символов');
       valid = false;
-    } else if (password !== ADMIN_PASSWORD) {
+    } else if (password !== FAKE_ADMIN_PASSWORD) {
       setPasswordError('Неверный пароль');
       valid = false;
     } else {

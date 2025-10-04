@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { useState } from 'react';
 import { styled } from '@mui/material/styles';
 import Card from '@mui/material/Card';
 import CardHeader from '@mui/material/CardHeader';
@@ -42,7 +43,7 @@ const ExpandMore = styled((props: ExpandMoreProps) => {
 
 interface QuestionCardProps {
   content: string;
-  isAnswered?: string | null;
+  adminAnswer?: string | null;
   date: string;
   user_id: string;
   question_id: string;
@@ -51,14 +52,13 @@ interface QuestionCardProps {
 
 export default function QuestionCard({
   content,
-  isAnswered,
+  adminAnswer,
   date,
   user_id,
   question_id,
-  refetch,
 }: QuestionCardProps) {
-  const [expanded, setExpanded] = React.useState(false);
-  const [answerText, setAnswerText] = React.useState('');
+  const [expanded, setExpanded] = useState(!!adminAnswer);
+  const [answerText, setAnswerText] = useState('');
 
   const handleExpandClick = () => {
     setExpanded(!expanded);
@@ -68,8 +68,6 @@ export default function QuestionCard({
     useAnswerQuestionApiV1UsersQuestionsQuestionIdAnswerPutMutation();
 
   const handleSendAnswer = async () => {
-    console.log(question_id);
-    console.log(answerText);
     await answerQuestion({
       questionId: question_id,
       questionAnswer: { admin_answer: answerText },
@@ -82,9 +80,7 @@ export default function QuestionCard({
 
   const handleDeleteQuestion = async () => {
     try {
-      console.log(question_id);
       await deleteQuestion({ questionId: question_id }).unwrap();
-      await refetch();
     } catch (err) {
       console.error('Ошибка при удалении вопроса:', err);
     }
@@ -98,10 +94,10 @@ export default function QuestionCard({
   const formattedDate = dayjs(date.split('.')[0]).format('DD.MM.YYYY');
 
   React.useEffect(() => {
-    if (typeof isAnswered === 'string') {
+    if (typeof adminAnswer === 'string') {
       setExpanded(false);
     }
-  }, [isAnswered]);
+  }, [adminAnswer]);
 
   return (
     <Card sx={{ minWidth: 900 }}>
@@ -142,7 +138,7 @@ export default function QuestionCard({
           </Box>
           <CheckOutlinedIcon
             sx={{
-              color: isAnswered ? 'green' : 'red',
+              color: adminAnswer ? 'green' : 'red',
               cursor: 'default',
               pointerEvents: 'none',
               fontSize: 25,
@@ -164,9 +160,9 @@ export default function QuestionCard({
       </CardActions>
 
       <Collapse in={expanded} timeout="auto" unmountOnExit>
-        {typeof isAnswered === 'string' ? (
+        {typeof adminAnswer === 'string' ? (
           <CardContent sx={{ pt: 0 }}>
-            <Typography variant="subtitle2">Ответ: {isAnswered}</Typography>
+            <Typography variant="subtitle2">Ответ: {adminAnswer}</Typography>
           </CardContent>
         ) : (
           <CardContent sx={{ pt: 0 }}>
