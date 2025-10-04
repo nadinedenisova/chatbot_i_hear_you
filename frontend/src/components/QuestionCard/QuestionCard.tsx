@@ -11,6 +11,14 @@ import Typography from '@mui/material/Typography';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import DeleteTwoToneIcon from '@mui/icons-material/DeleteTwoTone';
 import { Box, Button, Divider, TextField } from '@mui/material';
+import dayjs from 'dayjs';
+import { skipToken } from '@reduxjs/toolkit/query/react';
+
+import {
+  useGetUsersApiV1UsersUsersGetQuery,
+  useAnswerQuestionApiV1UsersQuestionsQuestionIdAnswerPutMutation,
+  useDeleteQuestionApiV1UsersQuestionsQuestionIdDeleteMutation,
+} from '@store/api';
 
 import type { IconButtonProps } from '@mui/material/IconButton';
 
@@ -33,23 +41,67 @@ const ExpandMore = styled((props: ExpandMoreProps) => {
 }));
 
 interface QuestionCardProps {
-  phone: string;
-  date: string;
   content: string;
-  isAnswered?: string;
+  isAnswered?: string | null;
+  date: string;
+  user_id: string;
+  question_id: string;
+  refetch: () => Promise<unknown>;
 }
 
 export default function QuestionCard({
-  phone,
-  date,
   content,
   isAnswered,
+  date,
+  user_id,
+  question_id,
+  refetch,
 }: QuestionCardProps) {
-  const [expanded, setExpanded] = React.useState(!isAnswered);
+  const [expanded, setExpanded] = React.useState(false);
+  const [answerText, setAnswerText] = React.useState('');
 
   const handleExpandClick = () => {
     setExpanded(!expanded);
   };
+
+  const [answerQuestion] =
+    useAnswerQuestionApiV1UsersQuestionsQuestionIdAnswerPutMutation();
+
+  const handleSendAnswer = async () => {
+    console.log(question_id);
+    console.log(answerText);
+    await answerQuestion({
+      questionId: question_id,
+      questionAnswer: { admin_answer: answerText },
+    }).unwrap();
+    setAnswerText('');
+  };
+
+  const [deleteQuestion] =
+    useDeleteQuestionApiV1UsersQuestionsQuestionIdDeleteMutation();
+
+  const handleDeleteQuestion = async () => {
+    try {
+      console.log(question_id);
+      await deleteQuestion({ questionId: question_id }).unwrap();
+      await refetch();
+    } catch (err) {
+      console.error('Ошибка при удалении вопроса:', err);
+    }
+  };
+
+  const { data: usersData } = useGetUsersApiV1UsersUsersGetQuery(
+    user_id ? { id: user_id } : skipToken,
+  );
+  const user = usersData?.items?.find((u) => u.id === user_id);
+  const phoneNumber = user?.phone_number;
+  const formattedDate = dayjs(date.split('.')[0]).format('DD.MM.YYYY');
+
+  React.useEffect(() => {
+    if (typeof isAnswered === 'string') {
+      setExpanded(false);
+    }
+  }, [isAnswered]);
 
   return (
     <Card sx={{ minWidth: 900 }}>
@@ -62,14 +114,14 @@ export default function QuestionCard({
         }}
         title={
           <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
-            <Typography variant="subtitle2">{phone}</Typography>
+            <Typography variant="subtitle2">{phoneNumber}</Typography>
             <Divider orientation="vertical" flexItem />
-            <Typography variant="subtitle2">{date}</Typography>
+            <Typography variant="subtitle2">{formattedDate}</Typography>
           </Box>
         }
         action={
           <IconButton aria-label="Удалить вопрос">
-            <DeleteTwoToneIcon />
+            <DeleteTwoToneIcon onClick={() => void handleDeleteQuestion()} />
           </IconButton>
         }
       />
@@ -112,13 +164,29 @@ export default function QuestionCard({
       </CardActions>
 
       <Collapse in={expanded} timeout="auto" unmountOnExit>
-        <CardContent sx={{ pt: 0 }}>
-          <Typography variant="subtitle2">Ответ:</Typography>
-          <TextField fullWidth multiline />
-          <Button size="small" variant="contained" sx={{ mt: 2 }}>
-            Отправить
-          </Button>
-        </CardContent>
+        {typeof isAnswered === 'string' ? (
+          <CardContent sx={{ pt: 0 }}>
+            <Typography variant="subtitle2">Ответ: {isAnswered}</Typography>
+          </CardContent>
+        ) : (
+          <CardContent sx={{ pt: 0 }}>
+            <Typography variant="subtitle2">Ответ:</Typography>
+            <TextField
+              fullWidth
+              multiline
+              value={answerText}
+              onChange={(e) => setAnswerText(e.target.value)}
+            />
+            <Button
+              size="small"
+              variant="contained"
+              sx={{ mt: 2 }}
+              onClick={() => void handleSendAnswer()}
+            >
+              Отправить
+            </Button>
+          </CardContent>
+        )}
       </Collapse>
     </Card>
   );

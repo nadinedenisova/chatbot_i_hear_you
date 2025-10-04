@@ -1,11 +1,9 @@
-/* body {
+.container {
   display: flex;
   justify-content: center;
   align-items: center;
-  margin: 0;
-  padding: 0;
-  background-color: #e6f2fa;
-} */
+  height: 100vh;
+}
 
 .login {
   display: flex;
